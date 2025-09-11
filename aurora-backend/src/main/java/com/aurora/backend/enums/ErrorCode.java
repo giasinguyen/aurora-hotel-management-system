@@ -36,6 +36,14 @@ public enum ErrorCode {
     HOTEL_ID_REQUIRED(1203, "Hotel ID is required", HttpStatus.BAD_REQUEST),
     HOTEL_NOT_EXISTED(1204, "Hotel not found", HttpStatus.NOT_FOUND),
     
+    // Hotel errors
+    HOTEL_EXISTED(1500, "Hotel code already exists", HttpStatus.BAD_REQUEST),
+    HOTEL_NAME_REQUIRED(1501, "Hotel name is required", HttpStatus.BAD_REQUEST),
+    HOTEL_CODE_REQUIRED(1502, "Hotel code is required", HttpStatus.BAD_REQUEST),
+    HOTEL_ADDRESS_REQUIRED(1503, "Hotel address is required", HttpStatus.BAD_REQUEST),
+    PHONE_INVALID(1504, "Phone number format is invalid", HttpStatus.BAD_REQUEST),
+    TIME_FORMAT_INVALID(1505, "Time format must be HH:MM", HttpStatus.BAD_REQUEST),
+    
     // Booking errors
     BOOKING_NOT_EXISTED(1300, "Booking not found", HttpStatus.NOT_FOUND),
     BOOKING_DATE_INVALID(1301, "Check-in date must be before check-out date", HttpStatus.BAD_REQUEST),
@@ -56,6 +64,30 @@ public enum ErrorCode {
     NIGHTS_REQUIRED(1406, "Nights is required", HttpStatus.BAD_REQUEST),
     NIGHTS_POSITIVE(1407, "Nights must be positive", HttpStatus.BAD_REQUEST),
     BOOKING_ROOM_EXISTED(1408, "Room already booked for this booking", HttpStatus.BAD_REQUEST),
+    
+    // Payment errors
+    PAYMENT_NOT_EXISTED(1600, "Payment not found", HttpStatus.NOT_FOUND),
+    PAYMENT_METHOD_REQUIRED(1601, "Payment method is required", HttpStatus.BAD_REQUEST),
+    PAYMENT_STATUS_REQUIRED(1602, "Payment status is required", HttpStatus.BAD_REQUEST),
+    PAYMENT_AMOUNT_REQUIRED(1603, "Payment amount is required", HttpStatus.BAD_REQUEST),
+    PAYMENT_AMOUNT_POSITIVE(1604, "Payment amount must be positive", HttpStatus.BAD_REQUEST),
+    
+    // Role errors
+    ROLE_NOT_EXISTED(1700, "Role not found", HttpStatus.NOT_FOUND),
+    ROLE_EXISTED(1701, "Role already exists", HttpStatus.BAD_REQUEST),
+    ROLE_NAME_REQUIRED(1702, "Role name is required", HttpStatus.BAD_REQUEST),
+    
+    // Permission errors
+    PERMISSION_NOT_EXISTED(1800, "Permission not found", HttpStatus.NOT_FOUND),
+    PERMISSION_EXISTED(1801, "Permission already exists", HttpStatus.BAD_REQUEST),
+    PERMISSION_CODE_REQUIRED(1802, "Permission code is required", HttpStatus.BAD_REQUEST),
+    
+    // Promotion errors
+    PROMOTION_NOT_EXISTED(1900, "Promotion not found", HttpStatus.NOT_FOUND),
+    PROMOTION_EXISTED(1901, "Promotion code already exists", HttpStatus.BAD_REQUEST),
+    PROMOTION_CODE_REQUIRED(1902, "Promotion code is required", HttpStatus.BAD_REQUEST),
+    PROMOTION_NAME_REQUIRED(1903, "Promotion name is required", HttpStatus.BAD_REQUEST),
+    PROMOTION_DATE_INVALID(1904, "Start date must be before end date", HttpStatus.BAD_REQUEST),
     ;
 
     ErrorCode(int code, String message, HttpStatusCode statusCode) {
