@@ -22,6 +22,40 @@ public enum ErrorCode {
     FIRSTNAME_REQUIRED(1012, "First name is required", HttpStatus.BAD_REQUEST),
     LASTNAME_REQUIRED(1013, "Last name is required", HttpStatus.BAD_REQUEST),
     DOB_INVALID(1014, "Date of birth must be in the past", HttpStatus.BAD_REQUEST),
+    
+    // Amenity errors
+    AMENITY_EXISTED(1100, "Amenity already exists", HttpStatus.BAD_REQUEST),
+    AMENITY_NOT_EXISTED(1101, "Amenity not found", HttpStatus.NOT_FOUND),
+    AMENITY_NAME_REQUIRED(1102, "Amenity name is required", HttpStatus.BAD_REQUEST),
+    AMENITY_TYPE_REQUIRED(1103, "Amenity type is required", HttpStatus.BAD_REQUEST),
+    
+    // Facility errors
+    FACILITY_EXISTED(1200, "Facility already exists in this hotel", HttpStatus.BAD_REQUEST),
+    FACILITY_NOT_EXISTED(1201, "Facility not found", HttpStatus.NOT_FOUND),
+    FACILITY_NAME_REQUIRED(1202, "Facility name is required", HttpStatus.BAD_REQUEST),
+    HOTEL_ID_REQUIRED(1203, "Hotel ID is required", HttpStatus.BAD_REQUEST),
+    HOTEL_NOT_EXISTED(1204, "Hotel not found", HttpStatus.NOT_FOUND),
+    
+    // Booking errors
+    BOOKING_NOT_EXISTED(1300, "Booking not found", HttpStatus.NOT_FOUND),
+    BOOKING_DATE_INVALID(1301, "Check-in date must be before check-out date", HttpStatus.BAD_REQUEST),
+    BOOKING_DATE_REQUIRED(1302, "Check-in and check-out dates are required", HttpStatus.BAD_REQUEST),
+    BOOKING_CODE_REQUIRED(1303, "Booking code is required", HttpStatus.BAD_REQUEST),
+    CUSTOMER_ID_REQUIRED(1304, "Customer ID is required", HttpStatus.BAD_REQUEST),
+    CHECKIN_DATE_FUTURE(1305, "Check-in date must be in the future", HttpStatus.BAD_REQUEST),
+    CHECKOUT_DATE_FUTURE(1306, "Check-out date must be in the future", HttpStatus.BAD_REQUEST),
+    BOOKING_CODE_EXISTED(1307, "Booking code already exists", HttpStatus.BAD_REQUEST),
+    
+    // BookingRoom errors
+    BOOKING_ROOM_NOT_EXISTED(1400, "Booking room not found", HttpStatus.NOT_FOUND),
+    BOOKING_ID_REQUIRED(1401, "Booking ID is required", HttpStatus.BAD_REQUEST),
+    ROOM_ID_REQUIRED(1402, "Room ID is required", HttpStatus.BAD_REQUEST),
+    ROOM_NOT_EXISTED(1403, "Room not found", HttpStatus.NOT_FOUND),
+    PRICE_REQUIRED(1404, "Price is required", HttpStatus.BAD_REQUEST),
+    PRICE_POSITIVE(1405, "Price must be positive", HttpStatus.BAD_REQUEST),
+    NIGHTS_REQUIRED(1406, "Nights is required", HttpStatus.BAD_REQUEST),
+    NIGHTS_POSITIVE(1407, "Nights must be positive", HttpStatus.BAD_REQUEST),
+    BOOKING_ROOM_EXISTED(1408, "Room already booked for this booking", HttpStatus.BAD_REQUEST),
     ;
 
     ErrorCode(int code, String message, HttpStatusCode statusCode) {
