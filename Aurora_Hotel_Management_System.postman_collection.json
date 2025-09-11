@@ -1,0 +1,1063 @@
+{
+	"info": {
+		"_postman_id": "aurora-hotel-system-collection",
+		"name": "Aurora Hotel Management System",
+		"description": "Complete API testing collection for Aurora Hotel System",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "01. User Management",
+			"item": [
+				{
+					"name": "Create User",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"username\": \"admin\",\n  \"password\": \"admin123\",\n  \"email\": \"admin@aurora.com\",\n  \"firstName\": \"Admin\",\n  \"lastName\": \"User\",\n  \"phone\": \"+84901234567\",\n  \"address\": \"123 Admin Street, Ho Chi Minh City\",\n  \"dateOfBirth\": \"1990-01-01\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/users",
+							"host": ["{{baseUrl}}"],
+							"path": ["users"]
+						}
+					}
+				},
+				{
+					"name": "Get All Users",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/users?page=0&size=10&sortBy=username&sortDir=asc",
+							"host": ["{{baseUrl}}"],
+							"path": ["users"],
+							"query": [
+								{"key": "page", "value": "0"},
+								{"key": "size", "value": "10"},
+								{"key": "sortBy", "value": "username"},
+								{"key": "sortDir", "value": "asc"}
+							]
+						}
+					}
+				},
+				{
+					"name": "Get User by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/users/{{userId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["users", "{{userId}}"]
+						}
+					}
+				},
+				{
+					"name": "Update User",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"firstName\": \"Updated Admin\",\n  \"lastName\": \"Updated User\",\n  \"phone\": \"+84909876543\",\n  \"address\": \"456 Updated Street, Ho Chi Minh City\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/users/{{userId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["users", "{{userId}}"]
+						}
+					}
+				},
+				{
+					"name": "Search Users",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/users/search?username=admin&email=aurora&page=0&size=10",
+							"host": ["{{baseUrl}}"],
+							"path": ["users", "search"],
+							"query": [
+								{"key": "username", "value": "admin"},
+								{"key": "email", "value": "aurora"},
+								{"key": "page", "value": "0"},
+								{"key": "size", "value": "10"}
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "02. Hotel Management",
+			"item": [
+				{
+					"name": "Create Hotel",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"Aurora Grand Hotel\",\n  \"address\": \"123 Nguyen Hue Street, District 1, Ho Chi Minh City\",\n  \"phone\": \"+84283822228\",\n  \"email\": \"info@auroragrand.com\",\n  \"website\": \"https://auroragrand.com\",\n  \"description\": \"Luxury 5-star hotel in the heart of Ho Chi Minh City\",\n  \"starRating\": 5\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/hotels",
+							"host": ["{{baseUrl}}"],
+							"path": ["hotels"]
+						}
+					}
+				},
+				{
+					"name": "Get All Hotels",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/hotels?page=0&size=10",
+							"host": ["{{baseUrl}}"],
+							"path": ["hotels"],
+							"query": [
+								{"key": "page", "value": "0"},
+								{"key": "size", "value": "10"}
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Hotel by ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/hotels/{{hotelId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["hotels", "{{hotelId}}"]
+						}
+					}
+				},
+				{
+					"name": "Update Hotel",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"description\": \"Updated luxury 5-star hotel with world-class amenities\",\n  \"website\": \"https://auroragrandhotel.com\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/hotels/{{hotelId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["hotels", "{{hotelId}}"]
+						}
+					}
+				},
+				{
+					"name": "Search Hotels",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/hotels/search?name=Aurora&city=Ho Chi Minh&starRating=5",
+							"host": ["{{baseUrl}}"],
+							"path": ["hotels", "search"],
+							"query": [
+								{"key": "name", "value": "Aurora"},
+								{"key": "city", "value": "Ho Chi Minh"},
+								{"key": "starRating", "value": "5"}
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "03. Service Management",
+			"item": [
+				{
+					"name": "Create Service",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"hotelId\": \"{{hotelId}}\",\n  \"name\": \"Airport Transfer\",\n  \"description\": \"Luxury car transfer to/from airport\",\n  \"price\": 500000.0,\n  \"category\": \"TRANSPORT\",\n  \"available\": true\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/services",
+							"host": ["{{baseUrl}}"],
+							"path": ["services"]
+						}
+					}
+				},
+				{
+					"name": "Get All Services",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/services?page=0&size=10",
+							"host": ["{{baseUrl}}"],
+							"path": ["services"],
+							"query": [
+								{"key": "page", "value": "0"},
+								{"key": "size", "value": "10"}
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Services by Hotel",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/services/hotel/{{hotelId}}?page=0&size=10",
+							"host": ["{{baseUrl}}"],
+							"path": ["services", "hotel", "{{hotelId}}"],
+							"query": [
+								{"key": "page", "value": "0"},
+								{"key": "size", "value": "10"}
+							]
+						}
+					}
+				},
+				{
+					"name": "Search Services",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/services/search?name=Airport&category=TRANSPORT&available=true",
+							"host": ["{{baseUrl}}"],
+							"path": ["services", "search"],
+							"query": [
+								{"key": "name", "value": "Airport"},
+								{"key": "category", "value": "TRANSPORT"},
+								{"key": "available", "value": "true"}
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "04. Amenity Management",
+			"item": [
+				{
+					"name": "Create Amenity",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"hotelId\": \"{{hotelId}}\",\n  \"name\": \"Swimming Pool\",\n  \"description\": \"Outdoor infinity pool with city view\",\n  \"type\": \"RECREATION\",\n  \"available\": true\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/amenities",
+							"host": ["{{baseUrl}}"],
+							"path": ["amenities"]
+						}
+					}
+				},
+				{
+					"name": "Get All Amenities",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/amenities?page=0&size=10",
+							"host": ["{{baseUrl}}"],
+							"path": ["amenities"],
+							"query": [
+								{"key": "page", "value": "0"},
+								{"key": "size", "value": "10"}
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Amenities by Hotel",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/amenities/hotel/{{hotelId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["amenities", "hotel", "{{hotelId}}"]
+						}
+					}
+				},
+				{
+					"name": "Search Amenities",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/amenities/search?name=Pool&type=RECREATION",
+							"host": ["{{baseUrl}}"],
+							"path": ["amenities", "search"],
+							"query": [
+								{"key": "name", "value": "Pool"},
+								{"key": "type", "value": "RECREATION"}
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "05. Room Type Management",
+			"item": [
+				{
+					"name": "Create Room Type",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"hotelId\": \"{{hotelId}}\",\n  \"name\": \"Deluxe Room\",\n  \"description\": \"Spacious room with city view and modern amenities\",\n  \"capacityAdults\": 2,\n  \"capacityChildren\": 1,\n  \"size\": 35.5,\n  \"basePrice\": 2500000.0\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/room-types",
+							"host": ["{{baseUrl}}"],
+							"path": ["room-types"]
+						}
+					}
+				},
+				{
+					"name": "Get All Room Types",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/room-types?page=0&size=10",
+							"host": ["{{baseUrl}}"],
+							"path": ["room-types"],
+							"query": [
+								{"key": "page", "value": "0"},
+								{"key": "size", "value": "10"}
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Room Types by Hotel",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/room-types/hotel/{{hotelId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["room-types", "hotel", "{{hotelId}}"]
+						}
+					}
+				},
+				{
+					"name": "Search Room Types",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/room-types/search?name=Deluxe&capacityAdults=2&minPrice=2000000&maxPrice=3000000",
+							"host": ["{{baseUrl}}"],
+							"path": ["room-types", "search"],
+							"query": [
+								{"key": "name", "value": "Deluxe"},
+								{"key": "capacityAdults", "value": "2"},
+								{"key": "minPrice", "value": "2000000"},
+								{"key": "maxPrice", "value": "3000000"}
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "06. Room Management",
+			"item": [
+				{
+					"name": "Create Room",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"hotelId\": \"{{hotelId}}\",\n  \"roomTypeId\": \"{{roomTypeId}}\",\n  \"roomNumber\": \"101\",\n  \"floor\": 1,\n  \"status\": \"AVAILABLE\",\n  \"notes\": \"Room with balcony\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/rooms",
+							"host": ["{{baseUrl}}"],
+							"path": ["rooms"]
+						}
+					}
+				},
+				{
+					"name": "Get All Rooms",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/rooms?page=0&size=10",
+							"host": ["{{baseUrl}}"],
+							"path": ["rooms"],
+							"query": [
+								{"key": "page", "value": "0"},
+								{"key": "size", "value": "10"}
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Rooms by Hotel",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/rooms/hotel/{{hotelId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["rooms", "hotel", "{{hotelId}}"]
+						}
+					}
+				},
+				{
+					"name": "Search Rooms",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/rooms/search?roomNumber=101&status=AVAILABLE&floor=1",
+							"host": ["{{baseUrl}}"],
+							"path": ["rooms", "search"],
+							"query": [
+								{"key": "roomNumber", "value": "101"},
+								{"key": "status", "value": "AVAILABLE"},
+								{"key": "floor", "value": "1"}
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "07. Customer Management",
+			"item": [
+				{
+					"name": "Create Customer",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"firstName\": \"John\",\n  \"lastName\": \"Doe\",\n  \"email\": \"john.doe@gmail.com\",\n  \"phone\": \"+84909123456\",\n  \"address\": \"456 Customer Street, District 3, Ho Chi Minh City\",\n  \"dateOfBirth\": \"1985-06-15\",\n  \"nationality\": \"Vietnam\",\n  \"idNumber\": \"012345678901\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/customers",
+							"host": ["{{baseUrl}}"],
+							"path": ["customers"]
+						}
+					}
+				},
+				{
+					"name": "Get All Customers",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/customers?page=0&size=10",
+							"host": ["{{baseUrl}}"],
+							"path": ["customers"],
+							"query": [
+								{"key": "page", "value": "0"},
+								{"key": "size", "value": "10"}
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Customer by Email",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/customers/email/john.doe@gmail.com",
+							"host": ["{{baseUrl}}"],
+							"path": ["customers", "email", "john.doe@gmail.com"]
+						}
+					}
+				},
+				{
+					"name": "Search Customers",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/customers/search?firstName=John&email=gmail&phone=0909",
+							"host": ["{{baseUrl}}"],
+							"path": ["customers", "search"],
+							"query": [
+								{"key": "firstName", "value": "John"},
+								{"key": "email", "value": "gmail"},
+								{"key": "phone", "value": "0909"}
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "08. Booking Management",
+			"item": [
+				{
+					"name": "Create Booking",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"customerId\": \"{{customerId}}\",\n  \"hotelId\": \"{{hotelId}}\",\n  \"checkInDate\": \"2025-09-15\",\n  \"checkOutDate\": \"2025-09-17\",\n  \"totalAmount\": 5000000.0,\n  \"status\": \"CONFIRMED\",\n  \"notes\": \"Anniversary celebration\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/bookings",
+							"host": ["{{baseUrl}}"],
+							"path": ["bookings"]
+						}
+					}
+				},
+				{
+					"name": "Get All Bookings",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/bookings?page=0&size=10",
+							"host": ["{{baseUrl}}"],
+							"path": ["bookings"],
+							"query": [
+								{"key": "page", "value": "0"},
+								{"key": "size", "value": "10"}
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Bookings by Customer",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/bookings/customer/{{customerId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["bookings", "customer", "{{customerId}}"]
+						}
+					}
+				},
+				{
+					"name": "Get Bookings by Hotel",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/bookings/hotel/{{hotelId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["bookings", "hotel", "{{hotelId}}"]
+						}
+					}
+				},
+				{
+					"name": "Search Bookings",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/bookings/search?status=CONFIRMED&checkInDate=2025-09-15&checkOutDate=2025-09-17",
+							"host": ["{{baseUrl}}"],
+							"path": ["bookings", "search"],
+							"query": [
+								{"key": "status", "value": "CONFIRMED"},
+								{"key": "checkInDate", "value": "2025-09-15"},
+								{"key": "checkOutDate", "value": "2025-09-17"}
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "09. Payment Management",
+			"item": [
+				{
+					"name": "Create Payment",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"bookingId\": \"{{bookingId}}\",\n  \"amount\": 2500000.0,\n  \"paymentMethod\": \"CREDIT_CARD\",\n  \"paymentStatus\": \"COMPLETED\",\n  \"transactionId\": \"TXN123456789\",\n  \"notes\": \"Partial payment for booking\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/payments",
+							"host": ["{{baseUrl}}"],
+							"path": ["payments"]
+						}
+					}
+				},
+				{
+					"name": "Get All Payments",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/payments?page=0&size=10",
+							"host": ["{{baseUrl}}"],
+							"path": ["payments"],
+							"query": [
+								{"key": "page", "value": "0"},
+								{"key": "size", "value": "10"}
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Payments by Booking",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/payments/booking/{{bookingId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["payments", "booking", "{{bookingId}}"]
+						}
+					}
+				},
+				{
+					"name": "Search Payments",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/payments/search?paymentMethod=CREDIT_CARD&paymentStatus=COMPLETED",
+							"host": ["{{baseUrl}}"],
+							"path": ["payments", "search"],
+							"query": [
+								{"key": "paymentMethod", "value": "CREDIT_CARD"},
+								{"key": "paymentStatus", "value": "COMPLETED"}
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "10. Role Management",
+			"item": [
+				{
+					"name": "Create Role",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"name\": \"ADMIN\",\n  \"description\": \"System administrator with full access\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/roles",
+							"host": ["{{baseUrl}}"],
+							"path": ["roles"]
+						}
+					}
+				},
+				{
+					"name": "Get All Roles",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/roles?page=0&size=10",
+							"host": ["{{baseUrl}}"],
+							"path": ["roles"],
+							"query": [
+								{"key": "page", "value": "0"},
+								{"key": "size", "value": "10"}
+							]
+						}
+					}
+				},
+				{
+					"name": "Search Roles",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/roles/search?name=ADMIN&description=administrator",
+							"host": ["{{baseUrl}}"],
+							"path": ["roles", "search"],
+							"query": [
+								{"key": "name", "value": "ADMIN"},
+								{"key": "description", "value": "administrator"}
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "11. Permission Management",
+			"item": [
+				{
+					"name": "Create Permission",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"code\": \"USER_READ\",\n  \"description\": \"Permission to read user information\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/permissions",
+							"host": ["{{baseUrl}}"],
+							"path": ["permissions"]
+						}
+					}
+				},
+				{
+					"name": "Get All Permissions",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/permissions?page=0&size=10",
+							"host": ["{{baseUrl}}"],
+							"path": ["permissions"],
+							"query": [
+								{"key": "page", "value": "0"},
+								{"key": "size", "value": "10"}
+							]
+						}
+					}
+				},
+				{
+					"name": "Search Permissions",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/permissions/search?code=USER&description=read",
+							"host": ["{{baseUrl}}"],
+							"path": ["permissions", "search"],
+							"query": [
+								{"key": "code", "value": "USER"},
+								{"key": "description", "value": "read"}
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "12. Booking Room Management",
+			"item": [
+				{
+					"name": "Create Booking Room",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"bookingId\": \"{{bookingId}}\",\n  \"roomId\": \"{{roomId}}\",\n  \"pricePerNight\": 2500000.0,\n  \"nights\": 2\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/booking-rooms",
+							"host": ["{{baseUrl}}"],
+							"path": ["booking-rooms"]
+						}
+					}
+				},
+				{
+					"name": "Get All Booking Rooms",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/booking-rooms?page=0&size=10",
+							"host": ["{{baseUrl}}"],
+							"path": ["booking-rooms"],
+							"query": [
+								{"key": "page", "value": "0"},
+								{"key": "size", "value": "10"}
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Booking Rooms by Booking",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/booking-rooms/by-booking/{{bookingId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["booking-rooms", "by-booking", "{{bookingId}}"]
+						}
+					}
+				},
+				{
+					"name": "Get Booking Rooms by Room",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/booking-rooms/by-room/{{roomId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["booking-rooms", "by-room", "{{roomId}}"]
+						}
+					}
+				},
+				{
+					"name": "Search Booking Rooms",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/booking-rooms/search?bookingId={{bookingId}}&roomId={{roomId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["booking-rooms", "search"],
+							"query": [
+								{"key": "bookingId", "value": "{{bookingId}}"},
+								{"key": "roomId", "value": "{{roomId}}"}
+							]
+						}
+					}
+				}
+			]
+		},
+		{
+			"name": "13. Promotion Management",
+			"item": [
+				{
+					"name": "Create Promotion",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"code\": \"SUMMER2025\",\n  \"name\": \"Summer Holiday Special\",\n  \"description\": \"20% discount for summer bookings\",\n  \"discount\": 20.0,\n  \"startDate\": \"2025-06-01\",\n  \"endDate\": \"2025-08-31\",\n  \"active\": true\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/promotions",
+							"host": ["{{baseUrl}}"],
+							"path": ["promotions"]
+						}
+					}
+				},
+				{
+					"name": "Get All Promotions",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/promotions?page=0&size=10",
+							"host": ["{{baseUrl}}"],
+							"path": ["promotions"],
+							"query": [
+								{"key": "page", "value": "0"},
+								{"key": "size", "value": "10"}
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Active Promotions",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/promotions/active?page=0&size=10",
+							"host": ["{{baseUrl}}"],
+							"path": ["promotions", "active"],
+							"query": [
+								{"key": "page", "value": "0"},
+								{"key": "size", "value": "10"}
+							]
+						}
+					}
+				},
+				{
+					"name": "Get Promotion by Code",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/promotions/code/SUMMER2025",
+							"host": ["{{baseUrl}}"],
+							"path": ["promotions", "code", "SUMMER2025"]
+						}
+					}
+				},
+				{
+					"name": "Search Promotions",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/promotions/search?code=SUMMER&name=Holiday&active=true&startDate=2025-06-01&endDate=2025-08-31",
+							"host": ["{{baseUrl}}"],
+							"path": ["promotions", "search"],
+							"query": [
+								{"key": "code", "value": "SUMMER"},
+								{"key": "name", "value": "Holiday"},
+								{"key": "active", "value": "true"},
+								{"key": "startDate", "value": "2025-06-01"},
+								{"key": "endDate", "value": "2025-08-31"}
+							]
+						}
+					}
+				}
+			]
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:8080",
+			"type": "string"
+		},
+		{
+			"key": "userId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "hotelId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "serviceId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "amenityId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "roomTypeId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "roomId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "customerId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "bookingId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "paymentId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "roleId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "permissionId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "promotionId",
+			"value": "",
+			"type": "string"
+		}
+	]
+}

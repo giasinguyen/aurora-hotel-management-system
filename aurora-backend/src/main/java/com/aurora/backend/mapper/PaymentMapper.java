@@ -23,5 +23,5 @@ public interface PaymentMapper {
     @Mapping(target = "booking", ignore = true)
     @Mapping(target = "method", ignore = true)
     @Mapping(target = "paidAt", ignore = true)
-    void updatePaymentFromRequest(PaymentUpdateRequest request, @MappingTarget Payment payment);
+    void updatePayment(@MappingTarget Payment payment, PaymentUpdateRequest request);
 }

@@ -7,6 +7,8 @@ import lombok.Getter;
 
 @Getter
 public enum ErrorCode {
+
+    // User errors
     UNCATEGORIZED_EXCEPTION(9999, "Uncategorized error", HttpStatus.INTERNAL_SERVER_ERROR),
     INVALID_KEY(1001, "Uncategorized error", HttpStatus.BAD_REQUEST),
     USER_EXISTED(1002, "User existed", HttpStatus.BAD_REQUEST),
@@ -58,7 +60,6 @@ public enum ErrorCode {
     BOOKING_ROOM_NOT_EXISTED(1400, "Booking room not found", HttpStatus.NOT_FOUND),
     BOOKING_ID_REQUIRED(1401, "Booking ID is required", HttpStatus.BAD_REQUEST),
     ROOM_ID_REQUIRED(1402, "Room ID is required", HttpStatus.BAD_REQUEST),
-    ROOM_NOT_EXISTED(1403, "Room not found", HttpStatus.NOT_FOUND),
     PRICE_REQUIRED(1404, "Price is required", HttpStatus.BAD_REQUEST),
     PRICE_POSITIVE(1405, "Price must be positive", HttpStatus.BAD_REQUEST),
     NIGHTS_REQUIRED(1406, "Nights is required", HttpStatus.BAD_REQUEST),
@@ -88,6 +89,44 @@ public enum ErrorCode {
     PROMOTION_CODE_REQUIRED(1902, "Promotion code is required", HttpStatus.BAD_REQUEST),
     PROMOTION_NAME_REQUIRED(1903, "Promotion name is required", HttpStatus.BAD_REQUEST),
     PROMOTION_DATE_INVALID(1904, "Start date must be before end date", HttpStatus.BAD_REQUEST),
+    DISCOUNT_REQUIRED(1905, "Discount is required", HttpStatus.BAD_REQUEST),
+    DISCOUNT_POSITIVE(1906, "Discount must be positive or zero", HttpStatus.BAD_REQUEST),
+    START_DATE_REQUIRED(1907, "Start date is required", HttpStatus.BAD_REQUEST),
+    END_DATE_REQUIRED(1908, "End date is required", HttpStatus.BAD_REQUEST),
+    
+    // RoomType errors
+    ROOM_TYPE_NOT_EXISTED(2000, "Room type not found", HttpStatus.NOT_FOUND),
+    ROOM_TYPE_EXISTED(2001, "Room type already exists", HttpStatus.BAD_REQUEST),
+    ROOM_TYPE_NAME_REQUIRED(2002, "Room type name is required", HttpStatus.BAD_REQUEST),
+    CAPACITY_ADULTS_REQUIRED(2003, "Capacity adults is required", HttpStatus.BAD_REQUEST),
+    CAPACITY_ADULTS_POSITIVE(2004, "Capacity adults must be positive", HttpStatus.BAD_REQUEST),
+    CAPACITY_CHILDREN_POSITIVE(2005, "Capacity children must be positive", HttpStatus.BAD_REQUEST),
+    SIZE_POSITIVE(2006, "Room size must be positive", HttpStatus.BAD_REQUEST),
+    
+    // Room errors  
+    ROOM_NOT_FOUND(2100, "Room not found", HttpStatus.NOT_FOUND),
+    ROOM_NUMBER_ALREADY_EXISTS(2101, "Room number already exists in this hotel", HttpStatus.BAD_REQUEST),
+    ROOM_NUMBER_REQUIRED(2102, "Room number is required", HttpStatus.BAD_REQUEST),
+    ROOM_TYPE_ID_REQUIRED(2103, "Room type ID is required", HttpStatus.BAD_REQUEST),
+    FLOOR_POSITIVE(2104, "Floor number must be positive", HttpStatus.BAD_REQUEST),
+    ROOM_TYPE_HOTEL_MISMATCH(2105, "Room type does not belong to the specified hotel", HttpStatus.BAD_REQUEST),
+    HOTEL_NOT_FOUND(2106, "Hotel not found", HttpStatus.NOT_FOUND),
+    ROOM_TYPE_NOT_FOUND(2107, "Room type not found", HttpStatus.NOT_FOUND),
+    
+    // Service errors
+    SERVICE_NOT_FOUND(2200, "Service not found", HttpStatus.NOT_FOUND),
+    SERVICE_EXISTED(2201, "Service already exists in this hotel", HttpStatus.BAD_REQUEST),
+    SERVICE_NAME_REQUIRED(2202, "Service name is required", HttpStatus.BAD_REQUEST),
+    BASE_PRICE_POSITIVE(2203, "Base price must be positive", HttpStatus.BAD_REQUEST),
+    
+    // ServiceBooking errors
+    SERVICE_BOOKING_NOT_FOUND(2300, "Service booking not found", HttpStatus.NOT_FOUND),
+    SERVICE_BOOKING_EXISTED(2301, "Service already booked for this booking", HttpStatus.BAD_REQUEST),
+    SERVICE_ID_REQUIRED(2302, "Service ID is required", HttpStatus.BAD_REQUEST),
+    DATETIME_REQUIRED(2303, "Date time is required", HttpStatus.BAD_REQUEST),
+    QUANTITY_POSITIVE(2304, "Quantity must be positive", HttpStatus.BAD_REQUEST),
+    BOOKING_NOT_FOUND(2305, "Booking not found", HttpStatus.NOT_FOUND),
+    USER_NOT_FOUND(2306, "User not found", HttpStatus.NOT_FOUND),
     ;
 
     ErrorCode(int code, String message, HttpStatusCode statusCode) {

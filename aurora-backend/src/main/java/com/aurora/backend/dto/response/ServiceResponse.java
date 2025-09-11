@@ -1,0 +1,19 @@
+package com.aurora.backend.dto.response;
+
+import lombok.*;
+import lombok.experimental.FieldDefaults;
+
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+@FieldDefaults(level = AccessLevel.PRIVATE)
+public class ServiceResponse {
+    String id;
+    String hotelId;
+    String hotelName;
+    String name;
+    String type;
+    String description;
+    Double basePrice;
+}
