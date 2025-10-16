@@ -1,5 +1,7 @@
 package com.aurora.backend.controller;
 
+import com.aurora.backend.config.annotation.RequirePermission;
+import com.aurora.backend.constant.PermissionConstants;
 import com.aurora.backend.dto.request.RoomCreationRequest;
 import com.aurora.backend.dto.request.RoomUpdateRequest;
 import com.aurora.backend.dto.response.ApiResponse;
@@ -27,6 +29,7 @@ public class RoomController {
     RoomService roomService;
 
     @PostMapping
+    @RequirePermission(PermissionConstants.Manager.ROOM_CREATE)
     public ApiResponse<RoomResponse> createRoom(@Valid @RequestBody RoomCreationRequest request) {
         log.info("Creating new room with number: {} for hotel: {}", request.getRoomNumber(), request.getHotelId());
         
@@ -40,6 +43,7 @@ public class RoomController {
     }
 
     @PutMapping("/{id}")
+    @RequirePermission(PermissionConstants.Manager.ROOM_UPDATE)
     public ApiResponse<RoomResponse> updateRoom(
             @PathVariable String id,
             @Valid @RequestBody RoomUpdateRequest request) {
@@ -55,6 +59,7 @@ public class RoomController {
     }
 
     @DeleteMapping("/{id}")
+    @RequirePermission(PermissionConstants.Manager.ROOM_DELETE)
     public ApiResponse<Void> deleteRoom(@PathVariable String id) {
         log.info("Deleting room with ID: {}", id);
         
@@ -67,6 +72,7 @@ public class RoomController {
     }
 
     @GetMapping("/{id}")
+    // Public - no permission needed
     public ApiResponse<RoomResponse> getRoomById(@PathVariable String id) {
         log.debug("Fetching room with ID: {}", id);
         

@@ -1,5 +1,7 @@
 package com.aurora.backend.controller;
 
+import com.aurora.backend.config.annotation.RequirePermission;
+import com.aurora.backend.constant.PermissionConstants;
 import com.aurora.backend.dto.request.AmenityCreationRequest;
 import com.aurora.backend.dto.request.AmenityUpdateRequest;
 import com.aurora.backend.dto.response.AmenityResponse;
@@ -29,6 +31,7 @@ public class AmenityController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
+    @RequirePermission(PermissionConstants.Manager.ROOM_CREATE)
     ApiResponse<AmenityResponse> createAmenity(@RequestBody @Valid AmenityCreationRequest amenityCreationRequest) {
         log.info("Creating new amenity with name: {}", amenityCreationRequest.getName());
         return ApiResponse.<AmenityResponse>builder()
@@ -37,6 +40,7 @@ public class AmenityController {
     }
 
     @GetMapping
+    // Public - no permission needed
     ApiResponse<List<AmenityResponse>> getAllAmenities() {
         log.info("Fetching all amenities");
         return ApiResponse.<List<AmenityResponse>>builder()
@@ -82,6 +86,7 @@ public class AmenityController {
     }
 
     @PutMapping("/{amenityId}")
+    @RequirePermission(PermissionConstants.Manager.ROOM_UPDATE)
     ApiResponse<AmenityResponse> updateAmenity(
             @PathVariable("amenityId") String amenityId,
             @RequestBody @Valid AmenityUpdateRequest amenityUpdateRequest) {
@@ -93,6 +98,7 @@ public class AmenityController {
 
     @DeleteMapping("/{amenityId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @RequirePermission(PermissionConstants.Manager.ROOM_DELETE)
     ApiResponse<Void> deleteAmenity(@PathVariable("amenityId") String amenityId) {
         log.info("Deleting amenity with ID: {}", amenityId);
         amenityService.deleteAmenity(amenityId);

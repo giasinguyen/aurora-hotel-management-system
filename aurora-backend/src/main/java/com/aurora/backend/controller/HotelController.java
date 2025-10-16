@@ -1,5 +1,7 @@
 package com.aurora.backend.controller;
 
+import com.aurora.backend.config.annotation.RequirePermission;
+import com.aurora.backend.constant.PermissionConstants;
 import com.aurora.backend.dto.request.HotelCreationRequest;
 import com.aurora.backend.dto.request.HotelUpdateRequest;
 import com.aurora.backend.dto.response.HotelResponse;
@@ -29,6 +31,7 @@ public class HotelController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
+    @RequirePermission(PermissionConstants.Admin.HOTEL_CREATE)
     ApiResponse<HotelResponse> createHotel(@RequestBody @Valid HotelCreationRequest hotelCreationRequest) {
         log.info("Creating new hotel with code: {}", hotelCreationRequest.getCode());
         return ApiResponse.<HotelResponse>builder()
@@ -37,6 +40,7 @@ public class HotelController {
     }
 
     @GetMapping
+    // Public - no permission needed
     ApiResponse<List<HotelResponse>> getAllHotels() {
         log.info("Fetching all hotels");
         return ApiResponse.<List<HotelResponse>>builder()
@@ -82,6 +86,7 @@ public class HotelController {
     }
 
     @PutMapping("/{hotelId}")
+    @RequirePermission(PermissionConstants.Manager.HOTEL_UPDATE)
     ApiResponse<HotelResponse> updateHotel(
             @PathVariable("hotelId") String hotelId,
             @RequestBody @Valid HotelUpdateRequest hotelUpdateRequest) {
@@ -93,6 +98,7 @@ public class HotelController {
 
     @DeleteMapping("/{hotelId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @RequirePermission(PermissionConstants.Admin.HOTEL_DELETE)
     ApiResponse<Void> deleteHotel(@PathVariable("hotelId") String hotelId) {
         log.info("Deleting hotel with ID: {}", hotelId);
         hotelService.deleteHotel(hotelId);

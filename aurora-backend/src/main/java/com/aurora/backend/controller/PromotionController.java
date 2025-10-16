@@ -1,5 +1,7 @@
 package com.aurora.backend.controller;
 
+import com.aurora.backend.config.annotation.RequirePermission;
+import com.aurora.backend.constant.PermissionConstants;
 import com.aurora.backend.dto.request.PromotionCreationRequest;
 import com.aurora.backend.dto.request.PromotionUpdateRequest;
 import com.aurora.backend.dto.response.ApiResponse;
@@ -25,7 +27,9 @@ public class PromotionController {
     
     PromotionService promotionService;
 
+    // MANAGER - Tạo promotion
     @PostMapping
+    @RequirePermission(PermissionConstants.Manager.PROMOTION_CREATE)
     public ApiResponse<PromotionResponse> createPromotion(@Valid @RequestBody PromotionCreationRequest request) {
         PromotionResponse result = promotionService.createPromotion(request);
         return ApiResponse.<PromotionResponse>builder()
@@ -118,7 +122,9 @@ public class PromotionController {
             .build();
     }
 
+    // MANAGER - Update promotion
     @PutMapping("/{id}")
+    @RequirePermission(PermissionConstants.Manager.PROMOTION_UPDATE)
     public ApiResponse<PromotionResponse> updatePromotion(
             @PathVariable String id,
             @Valid @RequestBody PromotionUpdateRequest request) {
@@ -131,7 +137,9 @@ public class PromotionController {
             .build();
     }
 
+    // MANAGER - Delete promotion
     @DeleteMapping("/{id}")
+    @RequirePermission(PermissionConstants.Manager.PROMOTION_DELETE)
     public ApiResponse<Void> deletePromotion(@PathVariable String id) {
         promotionService.deletePromotion(id);
         return ApiResponse.<Void>builder()

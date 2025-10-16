@@ -1,5 +1,7 @@
 package com.aurora.backend.controller;
 
+import com.aurora.backend.config.annotation.RequirePermission;
+import com.aurora.backend.constant.PermissionConstants;
 import com.aurora.backend.dto.request.ServiceBookingCreationRequest;
 import com.aurora.backend.dto.request.ServiceBookingUpdateRequest;
 import com.aurora.backend.dto.response.ApiResponse;
@@ -27,6 +29,7 @@ public class ServiceBookingController {
     ServiceBookingService serviceBookingService;
 
     @PostMapping
+    @RequirePermission(PermissionConstants.Customer.SERVICE_REGISTER)
     public ApiResponse<ServiceBookingResponse> createServiceBooking(@Valid @RequestBody ServiceBookingCreationRequest request) {
         ServiceBookingResponse response = serviceBookingService.createServiceBooking(request);
         return ApiResponse.<ServiceBookingResponse>builder()
@@ -37,6 +40,7 @@ public class ServiceBookingController {
     }
 
     @PutMapping("/{id}")
+    @RequirePermission(PermissionConstants.Staff.SERVICE_MANAGE)
     public ApiResponse<ServiceBookingResponse> updateServiceBooking(@PathVariable String id, @Valid @RequestBody ServiceBookingUpdateRequest request) {
         ServiceBookingResponse response = serviceBookingService.updateServiceBooking(id, request);
         return ApiResponse.<ServiceBookingResponse>builder()
@@ -47,6 +51,7 @@ public class ServiceBookingController {
     }
 
     @DeleteMapping("/{id}")
+    @RequirePermission(PermissionConstants.Staff.SERVICE_MANAGE)
     public ApiResponse<Void> deleteServiceBooking(@PathVariable String id) {
         serviceBookingService.deleteServiceBooking(id);
         return ApiResponse.<Void>builder()
@@ -56,6 +61,7 @@ public class ServiceBookingController {
     }
 
     @GetMapping("/{id}")
+    @RequirePermission(PermissionConstants.Customer.SERVICE_REGISTER)
     public ApiResponse<ServiceBookingResponse> getServiceBookingById(@PathVariable String id) {
         ServiceBookingResponse response = serviceBookingService.getServiceBookingById(id);
         return ApiResponse.<ServiceBookingResponse>builder()
@@ -66,6 +72,7 @@ public class ServiceBookingController {
     }
 
     @GetMapping
+    @RequirePermission(PermissionConstants.Staff.SERVICE_MANAGE)
     public ApiResponse<Page<ServiceBookingResponse>> getAllServiceBookings(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
@@ -82,6 +89,7 @@ public class ServiceBookingController {
     }
 
     @GetMapping("/search")
+    @RequirePermission(PermissionConstants.Staff.SERVICE_MANAGE)
     public ApiResponse<Page<ServiceBookingResponse>> searchServiceBookings(
             @RequestParam(required = false) String bookingId,
             @RequestParam(required = false) String serviceId,

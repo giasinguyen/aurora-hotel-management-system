@@ -1,5 +1,7 @@
 package com.aurora.backend.controller;
 
+import com.aurora.backend.config.annotation.RequirePermission;
+import com.aurora.backend.constant.PermissionConstants;
 import com.aurora.backend.dto.request.PermissionCreationRequest;
 import com.aurora.backend.dto.request.PermissionUpdateRequest;
 import com.aurora.backend.dto.response.ApiResponse;
@@ -26,7 +28,9 @@ public class PermissionController {
     
     PermissionService permissionService;
 
+    // ADMIN ONLY - Tạo permission
     @PostMapping
+    @RequirePermission(PermissionConstants.Admin.PERMISSION_MANAGE)
     public ApiResponse<PermissionResponse> createPermission(@Valid @RequestBody PermissionCreationRequest request) {
         PermissionResponse response = permissionService.createPermission(request);
         return ApiResponse.<PermissionResponse>builder()
@@ -36,7 +40,9 @@ public class PermissionController {
                 .build();
     }
 
+    // ADMIN ONLY - Update permission
     @PutMapping("/{id}")
+    @RequirePermission(PermissionConstants.Admin.PERMISSION_MANAGE)
     public ApiResponse<PermissionResponse> updatePermission(@PathVariable String id, @Valid @RequestBody PermissionUpdateRequest request) {
         PermissionResponse response = permissionService.updatePermission(id, request);
         return ApiResponse.<PermissionResponse>builder()
@@ -46,7 +52,9 @@ public class PermissionController {
                 .build();
     }
 
+    // ADMIN ONLY - Delete permission
     @DeleteMapping("/{id}")
+    @RequirePermission(PermissionConstants.Admin.PERMISSION_MANAGE)
     public ApiResponse<Void> deletePermission(@PathVariable String id) {
         permissionService.deletePermission(id);
         return ApiResponse.<Void>builder()
@@ -55,7 +63,9 @@ public class PermissionController {
                 .build();
     }
 
+    // ADMIN ONLY - Xem permission
     @GetMapping("/{id}")
+    @RequirePermission(PermissionConstants.Admin.PERMISSION_MANAGE)
     public ApiResponse<PermissionResponse> getPermissionById(@PathVariable String id) {
         PermissionResponse response = permissionService.getPermissionById(id);
         return ApiResponse.<PermissionResponse>builder()
@@ -65,7 +75,9 @@ public class PermissionController {
                 .build();
     }
 
+    // ADMIN ONLY - Xem tất cả permissions
     @GetMapping
+    @RequirePermission(PermissionConstants.Admin.PERMISSION_MANAGE)
     public ApiResponse<Page<PermissionResponse>> getAllPermissions(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
@@ -81,7 +93,9 @@ public class PermissionController {
                 .build();
     }
 
+    // ADMIN ONLY - Search permissions
     @GetMapping("/search")
+    @RequirePermission(PermissionConstants.Admin.PERMISSION_MANAGE)
     public ApiResponse<Page<PermissionResponse>> searchPermissions(
             @RequestParam(required = false) String name,
             @RequestParam(required = false) String description,

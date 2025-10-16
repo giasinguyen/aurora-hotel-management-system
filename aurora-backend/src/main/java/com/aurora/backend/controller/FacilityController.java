@@ -1,5 +1,7 @@
 package com.aurora.backend.controller;
 
+import com.aurora.backend.config.annotation.RequirePermission;
+import com.aurora.backend.constant.PermissionConstants;
 import com.aurora.backend.dto.request.FacilityCreationRequest;
 import com.aurora.backend.dto.request.FacilityUpdateRequest;
 import com.aurora.backend.dto.response.FacilityResponse;
@@ -29,6 +31,7 @@ public class FacilityController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
+    @RequirePermission(PermissionConstants.Manager.ROOM_CREATE)
     ApiResponse<FacilityResponse> createFacility(@RequestBody @Valid FacilityCreationRequest facilityCreationRequest) {
         log.info("Creating new facility with name: {} for hotel: {}", 
                 facilityCreationRequest.getName(), facilityCreationRequest.getHotelId());
@@ -38,6 +41,7 @@ public class FacilityController {
     }
 
     @GetMapping
+    // Public - no permission needed
     ApiResponse<List<FacilityResponse>> getAllFacilities() {
         log.info("Fetching all facilities");
         return ApiResponse.<List<FacilityResponse>>builder()
@@ -104,6 +108,7 @@ public class FacilityController {
     }
 
     @PutMapping("/{facilityId}")
+    @RequirePermission(PermissionConstants.Manager.ROOM_UPDATE)
     ApiResponse<FacilityResponse> updateFacility(
             @PathVariable("facilityId") String facilityId,
             @RequestBody @Valid FacilityUpdateRequest facilityUpdateRequest) {
@@ -115,6 +120,7 @@ public class FacilityController {
 
     @DeleteMapping("/{facilityId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @RequirePermission(PermissionConstants.Manager.ROOM_DELETE)
     ApiResponse<Void> deleteFacility(@PathVariable("facilityId") String facilityId) {
         log.info("Deleting facility with ID: {}", facilityId);
         facilityService.deleteFacility(facilityId);

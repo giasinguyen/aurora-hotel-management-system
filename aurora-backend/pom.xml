@@ -78,6 +78,12 @@
             <version>9.40</version>
         </dependency>
 
+        <!-- AOP for custom permission handling -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-aop</artifactId>
+        </dependency>
+
         <!-- Lombok -->
         <dependency>
             <groupId>org.projectlombok</groupId>

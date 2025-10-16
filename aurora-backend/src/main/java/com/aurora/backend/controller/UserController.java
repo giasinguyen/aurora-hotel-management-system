@@ -3,6 +3,8 @@ package com.aurora.backend.controller;
 
 import java.util.List;
 
+import com.aurora.backend.config.annotation.RequirePermission;
+import com.aurora.backend.constant.PermissionConstants;
 import com.aurora.backend.dto.request.UserCreationRequest;
 import com.aurora.backend.dto.request.UserRegistrationRequest;
 import com.aurora.backend.dto.request.UserUpdateRequest;
@@ -16,6 +18,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
 import lombok.AccessLevel;
@@ -43,6 +47,7 @@ public class UserController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
+    @RequirePermission(PermissionConstants.Admin.USER_CREATE)
     ApiResponse<UserResponse> createUser(@RequestBody @Valid UserCreationRequest userCreationRequest) {
         log.info("Creating new user with username: {}", userCreationRequest.getUsername());
         return ApiResponse.<UserResponse>builder()
@@ -51,6 +56,7 @@ public class UserController {
     }
 
     @GetMapping
+    @RequirePermission({PermissionConstants.Admin.USER_CREATE, PermissionConstants.Manager.STAFF_VIEW})
     ApiResponse<List<UserResponse>> getAllUsers() {
         log.info("Fetching all users");
         return ApiResponse.<List<UserResponse>>builder()
@@ -59,6 +65,7 @@ public class UserController {
     }
 
     @GetMapping("/paginated")
+    @RequirePermission({PermissionConstants.Admin.USER_CREATE, PermissionConstants.Manager.STAFF_VIEW})
     ApiResponse<Page<UserResponse>> getUsersWithPagination(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
@@ -80,14 +87,25 @@ public class UserController {
     }
 
     @GetMapping("/{userId}")
+    @RequirePermission(PermissionConstants.Customer.PROFILE_VIEW)
     ApiResponse<UserResponse> getUser(@PathVariable("userId") String userId) {
         log.info("Fetching user with ID: {}", userId);
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String currentUsername = authentication.getName();
+        
+        UserResponse user = userService.getUser(userId);
+        if (!user.getUsername().equals(currentUsername)) {
+            throw new com.aurora.backend.exception.AppException(
+                com.aurora.backend.enums.ErrorCode.UNAUTHORIZED);
+        }
+        
         return ApiResponse.<UserResponse>builder()
-                .result(userService.getUser(userId))
+                .result(user)
                 .build();
     }
 
     @GetMapping("/username/{username}")
+    @RequirePermission({PermissionConstants.Admin.USER_CREATE, PermissionConstants.Staff.CUSTOMER_VIEW})
     ApiResponse<UserResponse> getUserByUsername(@PathVariable("username") String username) {
         log.info("Fetching user with username: {}", username);
         return ApiResponse.<UserResponse>builder()
@@ -96,10 +114,20 @@ public class UserController {
     }
 
     @PutMapping("/{userId}")
+    @RequirePermission(PermissionConstants.Customer.PROFILE_UPDATE)
     ApiResponse<UserResponse> updateUser(
             @PathVariable("userId") String userId,
             @RequestBody @Valid UserUpdateRequest userUpdateRequest) {
         log.info("Updating user with ID: {}", userId);
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String currentUsername = authentication.getName();
+        
+        UserResponse user = userService.getUser(userId);
+        if (!user.getUsername().equals(currentUsername)) {
+            throw new com.aurora.backend.exception.AppException(
+                com.aurora.backend.enums.ErrorCode.UNAUTHORIZED);
+        }
+        
         return ApiResponse.<UserResponse>builder()
                 .result(userService.updateUser(userId, userUpdateRequest))
                 .build();
@@ -107,6 +135,7 @@ public class UserController {
 
     @DeleteMapping("/{userId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @RequirePermission(PermissionConstants.Admin.USER_DELETE)
     ApiResponse<Void> deleteUser(@PathVariable("userId") String userId) {
         log.info("Deleting user with ID: {}", userId);
         userService.deleteUser(userId);
@@ -116,6 +145,7 @@ public class UserController {
     }
 
     @GetMapping("/search")
+    @RequirePermission({PermissionConstants.Admin.USER_CREATE, PermissionConstants.Staff.CUSTOMER_VIEW})
     ApiResponse<Page<UserResponse>> searchUsers(
             @RequestParam String username,
             @RequestParam(defaultValue = "0") int page,

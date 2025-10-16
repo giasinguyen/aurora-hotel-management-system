@@ -1,5 +1,7 @@
 package com.aurora.backend.controller;
 
+import com.aurora.backend.config.annotation.RequirePermission;
+import com.aurora.backend.constant.PermissionConstants;
 import com.aurora.backend.dto.request.PaymentCreationRequest;
 import com.aurora.backend.dto.request.PaymentUpdateRequest;
 import com.aurora.backend.dto.response.ApiResponse;
@@ -27,6 +29,7 @@ public class PaymentController {
     PaymentService paymentService;
 
     @PostMapping
+    @RequirePermission(PermissionConstants.Customer.PAYMENT_CREATE)
     public ApiResponse<PaymentResponse> createPayment(@Valid @RequestBody PaymentCreationRequest request) {
         PaymentResponse response = paymentService.createPayment(request);
         return ApiResponse.<PaymentResponse>builder()
@@ -37,6 +40,7 @@ public class PaymentController {
     }
 
     @PutMapping("/{id}")
+    @RequirePermission(PermissionConstants.Staff.PAYMENT_VIEW_ALL)
     public ApiResponse<PaymentResponse> updatePayment(@PathVariable String id, @Valid @RequestBody PaymentUpdateRequest request) {
         PaymentResponse response = paymentService.updatePayment(id, request);
         return ApiResponse.<PaymentResponse>builder()
@@ -47,6 +51,7 @@ public class PaymentController {
     }
 
     @DeleteMapping("/{id}")
+    @RequirePermission(PermissionConstants.Staff.PAYMENT_VIEW_ALL)
     public ApiResponse<Void> deletePayment(@PathVariable String id) {
         paymentService.deletePayment(id);
         return ApiResponse.<Void>builder()
@@ -56,6 +61,7 @@ public class PaymentController {
     }
 
     @GetMapping("/{id}")
+    @RequirePermission(PermissionConstants.Customer.PAYMENT_VIEW_OWN)
     public ApiResponse<PaymentResponse> getPaymentById(@PathVariable String id) {
         PaymentResponse response = paymentService.getPaymentById(id);
         return ApiResponse.<PaymentResponse>builder()
@@ -66,6 +72,7 @@ public class PaymentController {
     }
 
     @GetMapping
+    @RequirePermission(PermissionConstants.Staff.PAYMENT_VIEW_ALL)
     public ApiResponse<Page<PaymentResponse>> getAllPayments(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
@@ -82,6 +89,7 @@ public class PaymentController {
     }
 
     @GetMapping("/search")
+    @RequirePermission(PermissionConstants.Staff.PAYMENT_VIEW_ALL)
     public ApiResponse<Page<PaymentResponse>> searchPayments(
             @RequestParam(required = false) String bookingId,
             @RequestParam(required = false) String method,

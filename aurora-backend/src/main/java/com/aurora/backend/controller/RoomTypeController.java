@@ -1,5 +1,7 @@
 package com.aurora.backend.controller;
 
+import com.aurora.backend.config.annotation.RequirePermission;
+import com.aurora.backend.constant.PermissionConstants;
 import com.aurora.backend.dto.request.RoomTypeCreationRequest;
 import com.aurora.backend.dto.request.RoomTypeUpdateRequest;
 import com.aurora.backend.dto.response.RoomTypeResponse;
@@ -29,6 +31,7 @@ public class RoomTypeController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
+    @RequirePermission(PermissionConstants.Manager.ROOM_CREATE)
     ApiResponse<RoomTypeResponse> createRoomType(@RequestBody @Valid RoomTypeCreationRequest roomTypeCreationRequest) {
         log.info("Creating new room type with name: {} for hotel: {}", 
                 roomTypeCreationRequest.getName(), roomTypeCreationRequest.getHotelId());
@@ -38,6 +41,7 @@ public class RoomTypeController {
     }
 
     @GetMapping
+    // Public - no permission needed
     ApiResponse<List<RoomTypeResponse>> getAllRoomTypes() {
         log.info("Fetching all room types");
         return ApiResponse.<List<RoomTypeResponse>>builder()
@@ -104,6 +108,7 @@ public class RoomTypeController {
     }
 
     @PutMapping("/{roomTypeId}")
+    @RequirePermission(PermissionConstants.Manager.ROOM_UPDATE)
     ApiResponse<RoomTypeResponse> updateRoomType(
             @PathVariable("roomTypeId") String roomTypeId,
             @RequestBody @Valid RoomTypeUpdateRequest roomTypeUpdateRequest) {
@@ -115,6 +120,7 @@ public class RoomTypeController {
 
     @DeleteMapping("/{roomTypeId}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
+    @RequirePermission(PermissionConstants.Manager.ROOM_DELETE)
     ApiResponse<Void> deleteRoomType(@PathVariable("roomTypeId") String roomTypeId) {
         log.info("Deleting room type with ID: {}", roomTypeId);
         roomTypeService.deleteRoomType(roomTypeId);

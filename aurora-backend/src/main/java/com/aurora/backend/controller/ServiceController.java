@@ -1,5 +1,7 @@
 package com.aurora.backend.controller;
 
+import com.aurora.backend.config.annotation.RequirePermission;
+import com.aurora.backend.constant.PermissionConstants;
 import com.aurora.backend.dto.request.ServiceCreationRequest;
 import com.aurora.backend.dto.request.ServiceUpdateRequest;
 import com.aurora.backend.dto.response.ApiResponse;
@@ -27,6 +29,7 @@ public class ServiceController {
     ServiceService serviceService;
 
     @PostMapping
+    @RequirePermission(PermissionConstants.Staff.SERVICE_MANAGE)
     public ApiResponse<ServiceResponse> createService(@Valid @RequestBody ServiceCreationRequest request) {
         ServiceResponse response = serviceService.createService(request);
         return ApiResponse.<ServiceResponse>builder()
@@ -37,6 +40,7 @@ public class ServiceController {
     }
 
     @PutMapping("/{id}")
+    @RequirePermission(PermissionConstants.Staff.SERVICE_MANAGE)
     public ApiResponse<ServiceResponse> updateService(@PathVariable String id, @Valid @RequestBody ServiceUpdateRequest request) {
         ServiceResponse response = serviceService.updateService(id, request);
         return ApiResponse.<ServiceResponse>builder()
@@ -47,6 +51,7 @@ public class ServiceController {
     }
 
     @DeleteMapping("/{id}")
+    @RequirePermission(PermissionConstants.Staff.SERVICE_MANAGE)
     public ApiResponse<Void> deleteService(@PathVariable String id) {
         serviceService.deleteService(id);
         return ApiResponse.<Void>builder()

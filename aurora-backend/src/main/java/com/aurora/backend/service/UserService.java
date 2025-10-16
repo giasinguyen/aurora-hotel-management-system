@@ -53,21 +53,18 @@ public class UserService {
                 .address(request.getAddress())
                 .build();
 
-        Role userRole = roleRepository.findByName("USER")
-                .orElseGet(() -> {
-                    log.warn("USER role not found, creating default USER role");
-                    Role newRole = Role.builder()
-                            .name("USER")
-                            .description("Default user role")
-                            .build();
-                    return roleRepository.save(newRole);
+        // Gán role CUSTOMER cho user mới đăng ký (không phải USER)
+        Role customerRole = roleRepository.findByName("CUSTOMER")
+                .orElseThrow(() -> {
+                    log.error("CUSTOMER role not found in database! Please run init-roles-permissions.sql");
+                    return new AppException(ErrorCode.ROLE_NOT_EXISTED);
                 });
 
         user.setRoles(new HashSet<>());
-        user.getRoles().add(userRole);
+        user.getRoles().add(customerRole);
 
         User savedUser = userRepository.save(user);
-        log.info("User registered successfully with ID: {}", savedUser.getId());
+        log.info("User registered successfully with ID: {} and role: CUSTOMER", savedUser.getId());
         
         return userMapper.toUserResponse(savedUser);
     }

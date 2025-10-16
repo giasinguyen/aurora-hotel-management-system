@@ -32,7 +32,14 @@ public class SecurityConfig {
     
     private static final String[] PUBLIC_GET_ENDPOINTS = {
             "/api/v1/test/**",
-            "/actuator/**"
+            "/actuator/**",
+            "/api/v1/hotels/**",
+            "/api/v1/rooms/search",
+            "/api/v1/rooms/{id}",
+            "/api/v1/promotions",
+            "/api/v1/promotions/{id}",
+            "/api/v1/services",
+            "/api/v1/services/{id}"
     };
 
     @Bean

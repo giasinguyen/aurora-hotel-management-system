@@ -1,5 +1,7 @@
 package com.aurora.backend.controller;
 
+import com.aurora.backend.config.annotation.RequirePermission;
+import com.aurora.backend.constant.PermissionConstants;
 import com.aurora.backend.dto.request.BookingRoomCreationRequest;
 import com.aurora.backend.dto.request.BookingRoomUpdateRequest;
 import com.aurora.backend.dto.response.ApiResponse;
@@ -24,6 +26,7 @@ public class BookingRoomController {
     BookingRoomService bookingRoomService;
 
     @PostMapping
+    @RequirePermission(PermissionConstants.Customer.BOOKING_CREATE)
     public ApiResponse<BookingRoomResponse> createBookingRoom(@Valid @RequestBody BookingRoomCreationRequest request) {
         BookingRoomResponse result = bookingRoomService.createBookingRoom(request);
         return ApiResponse.<BookingRoomResponse>builder()
@@ -34,6 +37,7 @@ public class BookingRoomController {
     }
 
     @GetMapping
+    @RequirePermission(PermissionConstants.Staff.BOOKING_VIEW_ALL)
     public ApiResponse<Page<BookingRoomResponse>> getAllBookingRooms(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
@@ -53,6 +57,7 @@ public class BookingRoomController {
     }
 
     @GetMapping("/by-booking/{bookingId}")
+    @RequirePermission(PermissionConstants.Customer.BOOKING_VIEW_OWN)
     public ApiResponse<Page<BookingRoomResponse>> getBookingRoomsByBooking(
             @PathVariable String bookingId,
             @RequestParam(defaultValue = "0") int page,
@@ -73,6 +78,7 @@ public class BookingRoomController {
     }
 
     @GetMapping("/by-room/{roomId}")
+    @RequirePermission(PermissionConstants.Staff.BOOKING_VIEW_ALL)
     public ApiResponse<Page<BookingRoomResponse>> getBookingRoomsByRoom(
             @PathVariable String roomId,
             @RequestParam(defaultValue = "0") int page,
@@ -93,6 +99,7 @@ public class BookingRoomController {
     }
 
     @GetMapping("/search")
+    @RequirePermission(PermissionConstants.Staff.BOOKING_VIEW_ALL)
     public ApiResponse<Page<BookingRoomResponse>> searchBookingRooms(
             @RequestParam(required = false) String bookingId,
             @RequestParam(required = false) String roomId,
@@ -114,6 +121,7 @@ public class BookingRoomController {
     }
 
     @GetMapping("/{id}")
+    @RequirePermission(PermissionConstants.Customer.BOOKING_VIEW_OWN)
     public ApiResponse<BookingRoomResponse> getBookingRoomById(@PathVariable String id) {
         BookingRoomResponse result = bookingRoomService.getBookingRoomById(id);
         return ApiResponse.<BookingRoomResponse>builder()
@@ -124,6 +132,7 @@ public class BookingRoomController {
     }
 
     @PutMapping("/{id}")
+    @RequirePermission(PermissionConstants.Customer.BOOKING_UPDATE_OWN)
     public ApiResponse<BookingRoomResponse> updateBookingRoom(
             @PathVariable String id,
             @Valid @RequestBody BookingRoomUpdateRequest request) {
@@ -137,6 +146,7 @@ public class BookingRoomController {
     }
 
     @DeleteMapping("/{id}")
+    @RequirePermission(PermissionConstants.Customer.BOOKING_CANCEL_OWN)
     public ApiResponse<Void> deleteBookingRoom(@PathVariable String id) {
         bookingRoomService.deleteBookingRoom(id);
         return ApiResponse.<Void>builder()
