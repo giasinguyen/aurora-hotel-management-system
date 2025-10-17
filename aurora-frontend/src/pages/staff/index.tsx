@@ -1,15 +1,12 @@
-import { Outlet } from "react-router-dom";
-import StaffHeader from "./components/StaffHeader";
-import StaffFooter from "./components/StaffFooter";
-
 const StaffPage = () => {
   return (
-    <div className="flex flex-col min-h-screen">
-      <StaffHeader />
-      <main className="flex-1 bg-gray-100">
-        <Outlet />
-      </main>
-      <StaffFooter />
+    <div className="min-h-screen bg-gray-50 py-12 px-4">
+      <div className="max-w-7xl mx-auto">
+        <h1 className="text-3xl font-bold text-gray-900 mb-8">Dashboard - Nhân viên</h1>
+        <div className="bg-white rounded-lg shadow-md p-6">
+          <p className="text-gray-600">Content for Dashboard - Nhân viên page...</p>
+        </div>
+      </div>
     </div>
   );
 };

@@ -38,8 +38,6 @@ export default function ClientFooter() {
             <ul className="space-y-2">
               <li><Link to="/home" className="text-gray-400 hover:text-white transition-colors text-sm">Trang chủ</Link></li>
               <li><Link to="/about" className="text-gray-400 hover:text-white transition-colors text-sm">Giới thiệu</Link></li>
-              <li><Link to="/accommodation" className="text-gray-400 hover:text-white transition-colors text-sm">Phòng nghỉ</Link></li>
-              <li><Link to="/service" className="text-gray-400 hover:text-white transition-colors text-sm">Dịch vụ</Link></li>
               <li><Link to="/contact" className="text-gray-400 hover:text-white transition-colors text-sm">Liên hệ</Link></li>
             </ul>
           </div>

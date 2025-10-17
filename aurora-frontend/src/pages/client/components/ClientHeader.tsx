@@ -58,11 +58,11 @@ export default function ClientHeader() {
   }, []);
 
   const menuItems = [
-    { path: "/home", label: t("menu.home") },
+    { path: "/", label: t("menu.home") },
     { path: "/about", label: t("menu.about") },
     { path: "/accommodation", label: t("menu.accommodation") },
     { path: "/service", label: t("menu.service") },
-    { path: "/experience", label: t("menu.experience") },
+    { path: "/news", label: t("menu.news") },
     { path: "/gallery", label: t("menu.gallery") },
   ];
 
@@ -88,7 +88,7 @@ export default function ClientHeader() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center py-1">
           {/* Logo - Desktop */}
-          <Link to="/home" className="hidden lg:flex items-center space-x-3">
+          <Link to="/" className="hidden lg:flex items-center space-x-3">
             <div className="w-28 h-28 flex items-center justify-center">
               <img
                 src="src/assets/images/commons/aurora-logo.png"
@@ -258,7 +258,7 @@ export default function ClientHeader() {
 
             {/* Mobile Logo - Center */}
             <Link
-              to="/home"
+              to="/"
               className="absolute left-1/2 transform -translate-x-1/2"
             >
               <div className="w-28 h-28 flex items-center justify-center">
