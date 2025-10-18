@@ -13,7 +13,14 @@ spring:
       connection-timeout: 30000
       idle-timeout: 600000
       max-lifetime: 1800000
-  
+
+  # Spring Vector Store Init Configuration
+  sql:
+    init:
+      mode: always
+      encoding: UTF-8
+      schema-locations: classpath:db/init-vector-store.sql
+
   jpa:
     hibernate:
       ddl-auto: update
@@ -27,6 +34,38 @@ spring:
           batch_size: 20
         order_inserts: true
         order_updates: true
+
+  #  Multipart file config
+  spring:
+    servlet:
+      multipart:
+        max-file-size: 10MB
+        max-request-size: 10MB
+
+  # Spring AI OpenAI Configuration
+  ai:
+    openai:
+      api-key: ${OPEN_ROUTER_API}
+      embedding:
+        base-url: http://127.0.0.1:1234
+        options:
+          model: text-embedding-nomic-embed-text-v1.5-embedding
+          dimensions: 768
+      chat:
+        base-url: https://openrouter.ai/api
+        api-key: ${OPEN_ROUTER_API}
+        options:
+          model: mistralai/mistral-small-3.2-24b-instruct:free
+          internal-tool-execution-enabled: true
+    vectorstore:
+      pgvector:
+        index-type: HNSW
+        distance-type: COSINE_DISTANCE
+        dimensions: 768
+        max-document-batch-size: 10000
+        schema-validation: true
+        table-name: vector_store
+        initialize-schema: true
 
 # JWT Configuration
 jwt:
