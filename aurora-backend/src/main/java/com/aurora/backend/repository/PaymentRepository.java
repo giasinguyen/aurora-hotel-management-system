@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -31,4 +32,40 @@ public interface PaymentRepository extends JpaRepository<Payment, String> {
                                @Param("method") String method,
                                @Param("status") String status,
                                Pageable pageable);
+    
+    /**
+     * Calculate total paid amount for a booking (only successful payments)
+     */
+    @Query("SELECT COALESCE(SUM(p.amount), 0) FROM Payment p " +
+           "WHERE p.booking.id = :bookingId " +
+           "AND p.status = 'SUCCESS'")
+    BigDecimal getTotalPaidAmount(@Param("bookingId") String bookingId);
+    
+    /**
+     * Calculate total refunded amount for a booking
+     */
+    @Query("SELECT COALESCE(SUM(p.refundAmount), 0) FROM Payment p " +
+           "WHERE p.booking.id = :bookingId " +
+           "AND p.status IN ('REFUNDED', 'PARTIALLY_REFUNDED')")
+    BigDecimal getTotalRefundedAmount(@Param("bookingId") String bookingId);
+    
+    /**
+     * Get all successful payments for a booking
+     */
+    @Query("SELECT p FROM Payment p " +
+           "WHERE p.booking.id = :bookingId " +
+           "AND p.status = 'SUCCESS' " +
+           "ORDER BY p.paidAt DESC")
+    List<Payment> findSuccessfulPaymentsByBooking(@Param("bookingId") String bookingId);
+    
+    /**
+     * Check if booking is fully paid
+     */
+    @Query("SELECT CASE WHEN (SELECT COALESCE(SUM(p.amount), 0) FROM Payment p " +
+           "WHERE p.booking.id = :bookingId AND p.status = 'SUCCESS') >= :totalPrice " +
+           "THEN true ELSE false END")
+    boolean isBookingFullyPaid(
+        @Param("bookingId") String bookingId,
+        @Param("totalPrice") BigDecimal totalPrice
+    );
 }

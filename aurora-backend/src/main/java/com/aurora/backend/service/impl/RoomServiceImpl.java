@@ -38,11 +38,9 @@ public class RoomServiceImpl implements RoomService {
     public RoomResponse createRoom(RoomCreationRequest request) {
         log.info("Creating room with number: {} for branch: {}", request.getRoomNumber(), request.getBranchId());
         
-        // Validate branch exists
         Branch branch = branchRepository.findById(request.getBranchId())
                 .orElseThrow(() -> new AppException(ErrorCode.BRANCH_NOT_EXISTED));
         
-        // Validate room type exists and belongs to the same branch
         RoomType roomType = roomTypeRepository.findById(request.getRoomTypeId())
                 .orElseThrow(() -> new AppException(ErrorCode.ROOM_TYPE_NOT_FOUND));
         
@@ -50,7 +48,6 @@ public class RoomServiceImpl implements RoomService {
             throw new AppException(ErrorCode.ROOM_TYPE_HOTEL_MISMATCH);
         }
         
-        // Check if room number already exists in the branch
         if (roomRepository.existsByBranchAndRoomNumber(branch, request.getRoomNumber())) {
             throw new AppException(ErrorCode.ROOM_NUMBER_ALREADY_EXISTS);
         }
@@ -59,9 +56,8 @@ public class RoomServiceImpl implements RoomService {
         room.setBranch(branch);
         room.setRoomType(roomType);
         
-        // Set default status if not provided
         if (request.getStatus() == null || request.getStatus().trim().isEmpty()) {
-            room.setStatus("AVAILABLE");
+            room.setStatus(Room.RoomStatus.AVAILABLE);
         }
         
         Room savedRoom = roomRepository.save(room);
@@ -78,7 +74,6 @@ public class RoomServiceImpl implements RoomService {
         Room room = roomRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.ROOM_NOT_FOUND));
         
-        // If room type is being updated, validate it exists and belongs to same branch
         if (request.getRoomTypeId() != null && !request.getRoomTypeId().equals(room.getRoomType().getId())) {
             RoomType newRoomType = roomTypeRepository.findById(request.getRoomTypeId())
                     .orElseThrow(() -> new AppException(ErrorCode.ROOM_TYPE_NOT_FOUND));
@@ -90,7 +85,6 @@ public class RoomServiceImpl implements RoomService {
             room.setRoomType(newRoomType);
         }
         
-        // If room number is being updated, check uniqueness within branch
         if (request.getRoomNumber() != null && !request.getRoomNumber().equals(room.getRoomNumber())) {
             if (roomRepository.existsByBranchAndRoomNumber(room.getBranch(), request.getRoomNumber())) {
                 throw new AppException(ErrorCode.ROOM_NUMBER_ALREADY_EXISTS);
@@ -113,9 +107,6 @@ public class RoomServiceImpl implements RoomService {
         
         Room room = roomRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.ROOM_NOT_FOUND));
-        
-        // Check if room can be deleted (no active bookings)
-        // This would require BookingRoom entity check if implemented
         
         roomRepository.delete(room);
         log.info("Room deleted successfully with ID: {}", id);

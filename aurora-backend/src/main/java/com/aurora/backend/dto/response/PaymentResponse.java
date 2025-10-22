@@ -3,7 +3,7 @@ package com.aurora.backend.dto.response;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
-import java.time.Instant;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -19,5 +19,5 @@ public class PaymentResponse {
     String status;
     Double amount;
     String providerTxnId;
-    Instant paidAt;
+    LocalDateTime paidAt;
 }

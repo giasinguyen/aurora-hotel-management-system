@@ -40,11 +40,9 @@ public class BookingServiceImpl implements BookingService {
     public BookingResponse createBooking(BookingCreationRequest request) {
         log.info("Creating booking for branch: {} and customer: {}", request.getBranchId(), request.getCustomerId());
         
-        // Validate branch exists
         Branch branch = branchRepository.findById(request.getBranchId())
                 .orElseThrow(() -> new AppException(ErrorCode.BRANCH_NOT_EXISTED));
         
-        // Validate customer exists
         User customer = userRepository.findById(request.getCustomerId())
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
         
@@ -52,16 +50,14 @@ public class BookingServiceImpl implements BookingService {
         booking.setBranch(branch);
         booking.setCustomer(customer);
         
-        // Generate unique booking code
         String bookingCode = generateBookingCode();
         while (bookingRepository.existsByBookingCode(bookingCode)) {
             bookingCode = generateBookingCode();
         }
         booking.setBookingCode(bookingCode);
         
-        // Set default status if not provided
         if (request.getStatus() == null || request.getStatus().trim().isEmpty()) {
-            booking.setStatus("PENDING");
+            booking.setStatus(Booking.BookingStatus.PENDING);
         }
         
         Booking savedBooking = bookingRepository.save(booking);
@@ -93,8 +89,6 @@ public class BookingServiceImpl implements BookingService {
         
         Booking booking = bookingRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.BOOKING_NOT_FOUND));
-        
-        // Check if booking can be deleted (no active rooms/services)
         
         bookingRepository.delete(booking);
         log.info("Booking deleted successfully with ID: {}", id);

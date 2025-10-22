@@ -4,6 +4,7 @@ import com.aurora.backend.dto.request.BranchCreationRequest;
 import com.aurora.backend.dto.request.BranchUpdateRequest;
 import com.aurora.backend.dto.response.BranchResponse;
 import com.aurora.backend.entity.Branch;
+import com.aurora.backend.entity.Room;
 import org.mapstruct.*;
 
 @Mapper(componentModel = "spring")
@@ -59,7 +60,7 @@ public interface BranchMapper {
     default Integer getAvailableRooms(Branch branch) {
         if (branch.getRooms() == null) return 0;
         return (int) branch.getRooms().stream()
-            .filter(room -> "AVAILABLE".equals(room.getStatus()))
+            .filter(room -> Room.RoomStatus.AVAILABLE.equals(room.getStatus()))
             .count();
     }
 }

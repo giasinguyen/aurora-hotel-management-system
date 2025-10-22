@@ -16,13 +16,11 @@ public interface PromotionMapper {
     @Mapping(source = "startDate", target = "startAt")
     @Mapping(source = "endDate", target = "endAt")
     @Mapping(source = "discount", target = "percentOff")
-    @Mapping(source = "description", target = "conditions")
     Promotion toPromotion(PromotionCreationRequest request);
     
     @Mapping(source = "startAt", target = "startDate")
     @Mapping(source = "endAt", target = "endDate")
     @Mapping(source = "percentOff", target = "discount")
-    @Mapping(source = "conditions", target = "description")
     PromotionResponse toPromotionResponse(Promotion promotion);
     
     @Mapping(target = "id", ignore = true)
@@ -31,7 +29,6 @@ public interface PromotionMapper {
     @Mapping(source = "startDate", target = "startAt")
     @Mapping(source = "endDate", target = "endAt")
     @Mapping(source = "discount", target = "percentOff")
-    @Mapping(source = "description", target = "conditions")
     void updatePromotion(@MappingTarget Promotion promotion, 
                         PromotionUpdateRequest request);
 }
