@@ -1,0 +1,37 @@
+{
+  "hero": {
+    "banner": "Banner"
+  },
+  "about": {
+    "title": "AURORA HOTEL",
+    "subtitle": "Taps into clients's emotions",
+    "description1": "Located in the heart of the dynamic city, right on the romantic beach, Aurora Hotel expresses a desire to bring excellent full-service to all customers. In addition, visitors will get a chance to enjoy delicious food as well as high quality specialities selected from the essence of Ho Chi Minh City's unique culinary culture right at Annata's restaurant.",
+    "description2": "With modern amenities and professional service, we ensure every moment of your stay will be memorable and comfortable.",
+    "learnMore": "LEARN MORE"
+  },
+  "services": {
+    "title": "Our Services",
+    "subtitle": "Experience luxury and comfort with our premium services",
+    "luxuryRooms": {
+      "title": "Luxury Rooms",
+      "description": "Spacious and elegantly designed rooms with ocean views"
+    },
+    "fineDining": {
+      "title": "Fine Dining",
+      "description": "Exquisite cuisine prepared by world-class chefs"
+    },
+    "wellness": {
+      "title": "Wellness & Spa",
+      "description": "Relax and rejuvenate with our premium spa services"
+    }
+  },
+  "luxuryExperience": {
+    "title1": "Experience Luxury Like",
+    "title2": "President Room Signature"
+  },
+  "cta": {
+    "title": "Ready for an Unforgettable Experience?",
+    "subtitle": "Book your stay now and enjoy exclusive offers",
+    "button": "BOOK YOUR STAY"
+  }
+}

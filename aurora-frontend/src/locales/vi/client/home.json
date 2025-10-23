@@ -1,0 +1,37 @@
+{
+  "hero": {
+    "banner": "Biểu ngữ"
+  },
+  "about": {
+    "title": "KHÁCH SẠN AURORA",
+    "subtitle": "Chạm đến cảm xúc khách hàng",
+    "description1": "Tọa lạc tại trung tâm thành phố sôi động, ngay bên bờ biển lãng mạn, Khách sạn Aurora thể hiện mong muốn mang đến dịch vụ trọn gói xuất sắc cho tất cả khách hàng. Ngoài ra, du khách sẽ có cơ hội thưởng thức những món ăn ngon cũng như các món đặc sản chất lượng cao được chọn lọc từ tinh hoa ẩm thực độc đáo của Thành phố Hồ Chí Minh ngay tại nhà hàng Annata.",
+    "description2": "Với tiện nghi hiện đại và dịch vụ chuyên nghiệp, chúng tôi đảm bảo mỗi khoảnh khắc lưu trú của bạn sẽ đáng nhớ và thoải mái.",
+    "learnMore": "TÌM HIỂU THÊM"
+  },
+  "services": {
+    "title": "Dịch Vụ Của Chúng Tôi",
+    "subtitle": "Trải nghiệm sang trọng và thoải mái với các dịch vụ cao cấp của chúng tôi",
+    "luxuryRooms": {
+      "title": "Phòng Sang Trọng",
+      "description": "Phòng rộng rãi và được thiết kế tinh tế với tầm nhìn ra biển"
+    },
+    "fineDining": {
+      "title": "Ẩm Thực Cao Cấp",
+      "description": "Món ăn tinh tế được chế biến bởi các đầu bếp đẳng cấp thế giới"
+    },
+    "wellness": {
+      "title": "Chăm Sóc Sức Khỏe & Spa",
+      "description": "Thư giãn và làm mới bản thân với các dịch vụ spa cao cấp"
+    }
+  },
+  "luxuryExperience": {
+    "title1": "Trải Nghiệm Sang Trọng Như",
+    "title2": "Phòng Tổng Thống Đặc Biệt"
+  },
+  "cta": {
+    "title": "Sẵn Sàng Cho Trải Nghiệm Khó Quên?",
+    "subtitle": "Đặt phòng ngay và tận hưởng những ưu đãi độc quyền",
+    "button": "ĐẶT PHÒNG NGAY"
+  }
+}

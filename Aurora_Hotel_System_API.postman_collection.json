@@ -1,0 +1,1718 @@
+{
+	"info": {
+		"_postman_id": "aurora-hotel-system-2024",
+		"name": "Aurora Hotel Management System - API Tests",
+		"description": "Comprehensive API Testing Collection for Aurora Hotel System\n\n## Test Flow\n1. **Authentication** - Login and get tokens\n2. **User Management** - Register and manage users\n3. **Branch Management** - Create and manage hotel branches\n4. **Amenity Management** - Manage hotel amenities (WiFi, TV, etc.)\n5. **Facility Management** - Manage branch facilities (Pool, Gym, Spa)\n6. **Room Type Management** - Configure room types\n7. **Room Management** - Manage individual rooms\n8. **Service Management** - Hotel services (Laundry, Room service, etc.)\n9. **Promotion Management** - Discounts and promotions\n10. **Booking Management** - Room bookings\n11. **Booking Room** - Booking-Room relationship\n12. **Service Booking** - Service bookings for guests\n13. **Payment Management** - Process payments\n14. **Role & Permission** - Manage access control\n\n## Authentication\nAll endpoints (except register and login) require Bearer token authentication.\n\n## Default Users\n- **Admin**: username=`admin`, password=`Admin@123`\n- **Manager**: username=`manager`, password=`Manager@123`\n- **Staff**: username=`staff`, password=`Staff@123`\n- **Customer**: username=`customer`, password=`Customer@123`",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{accessToken}}",
+				"type": "string"
+			}
+		]
+	},
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:8080",
+			"type": "string"
+		},
+		{
+			"key": "accessToken",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "refreshToken",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "userId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "branchId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "amenityId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "facilityId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "roomTypeId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "roomId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "serviceId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "promotionId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "bookingId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "bookingRoomId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "serviceBookingId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "paymentId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "roleId",
+			"value": "",
+			"type": "string"
+		},
+		{
+			"key": "permissionId",
+			"value": "",
+			"type": "string"
+		}
+	],
+	"item": [
+		{
+			"name": "01. Authentication",
+			"item": [
+				{
+					"name": "Login as Admin",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.collectionVariables.set('accessToken', jsonData.result.token);",
+									"    pm.collectionVariables.set('refreshToken', jsonData.result.refreshToken);",
+									"    pm.test('✅ Admin login successful', function() {",
+									"        pm.expect(jsonData.code).to.eql(200);",
+									"        pm.expect(jsonData.result.token).to.not.be.empty;",
+									"    });",
+									"    console.log('Admin Access Token:', jsonData.result.token);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"admin\",\n    \"password\": \"Admin@123\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/token",
+							"host": ["{{baseUrl}}"],
+							"path": ["auth", "token"]
+						},
+						"description": "Login with admin credentials to get access token"
+					},
+					"response": []
+				},
+				{
+					"name": "Introspect Token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.test('✅ Token is valid', function() {",
+									"        pm.expect(jsonData.result.valid).to.be.true;",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"token\": \"{{accessToken}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/introspect",
+							"host": ["{{baseUrl}}"],
+							"path": ["auth", "introspect"]
+						},
+						"description": "Check if the current token is valid"
+					},
+					"response": []
+				},
+				{
+					"name": "Refresh Token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.collectionVariables.set('accessToken', jsonData.result.token);",
+									"    pm.test('✅ Token refreshed successfully', function() {",
+									"        pm.expect(jsonData.result.token).to.not.be.empty;",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"token\": \"{{refreshToken}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/refresh",
+							"host": ["{{baseUrl}}"],
+							"path": ["auth", "refresh"]
+						},
+						"description": "Get a new access token using refresh token"
+					},
+					"response": []
+				},
+				{
+					"name": "Logout",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    pm.test('✅ Logout successful', function() {",
+									"        pm.response.to.have.status(200);",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"token\": \"{{accessToken}}\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/auth/logout",
+							"host": ["{{baseUrl}}"],
+							"path": ["auth", "logout"]
+						},
+						"description": "Invalidate the current access token"
+					},
+					"response": []
+				}
+			],
+			"description": "Authentication endpoints for login, token management, and logout"
+		},
+		{
+			"name": "02. User Management",
+			"item": [
+				{
+					"name": "Register New Customer",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.collectionVariables.set('userId', jsonData.result.id);",
+									"    pm.test('✅ User registered successfully', function() {",
+									"        pm.expect(jsonData.result.username).to.not.be.empty;",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"testuser_{{$timestamp}}\",\n    \"password\": \"TestUser@123\",\n    \"email\": \"testuser{{$timestamp}}@example.com\",\n    \"fullName\": \"Test User\",\n    \"phone\": \"0901234567\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/users/register",
+							"host": ["{{baseUrl}}"],
+							"path": ["users", "register"]
+						},
+						"description": "Register a new customer account (no authentication required)"
+					},
+					"response": []
+				},
+				{
+					"name": "Create User (Admin)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.test('✅ User created by admin', function() {",
+									"        pm.expect(jsonData.result.id).to.not.be.empty;",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"username\": \"staff_{{$timestamp}}\",\n    \"password\": \"Staff@123\",\n    \"email\": \"staff{{$timestamp}}@aurora.com\",\n    \"fullName\": \"Staff Member\",\n    \"phone\": \"0907654321\",\n    \"roleIds\": [\"STAFF_ROLE_ID\"]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/users",
+							"host": ["{{baseUrl}}"],
+							"path": ["users"]
+						},
+						"description": "Admin creates a new user with specific roles"
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Users",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.test('✅ Retrieved user list', function() {",
+									"        pm.expect(jsonData.result).to.be.an('array');",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/users",
+							"host": ["{{baseUrl}}"],
+							"path": ["users"]
+						},
+						"description": "Get list of all users"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Users Paginated",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.test('✅ Retrieved paginated users', function() {",
+									"        pm.expect(jsonData.result.content).to.be.an('array');",
+									"        pm.expect(jsonData.result.totalElements).to.be.a('number');",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/users/paginated?page=0&size=10&sortBy=createdDate&sortDirection=DESC",
+							"host": ["{{baseUrl}}"],
+							"path": ["users", "paginated"],
+							"query": [
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "10"
+								},
+								{
+									"key": "sortBy",
+									"value": "createdDate"
+								},
+								{
+									"key": "sortDirection",
+									"value": "DESC"
+								}
+							]
+						},
+						"description": "Get paginated list of users"
+					},
+					"response": []
+				},
+				{
+					"name": "Get User by ID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.test('✅ Retrieved user details', function() {",
+									"        pm.expect(jsonData.result.id).to.not.be.empty;",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/users/{{userId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["users", "{{userId}}"]
+						},
+						"description": "Get specific user by ID"
+					},
+					"response": []
+				},
+				{
+					"name": "Get User by Username",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.test('✅ Retrieved user by username', function() {",
+									"        pm.expect(jsonData.result.username).to.eql('admin');",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/users/username/admin",
+							"host": ["{{baseUrl}}"],
+							"path": ["users", "username", "admin"]
+						},
+						"description": "Get user by username"
+					},
+					"response": []
+				},
+				{
+					"name": "Update User",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    pm.test('✅ User updated successfully', function() {",
+									"        pm.response.to.have.status(200);",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"fullName\": \"Updated User Name\",\n    \"email\": \"updated.email@example.com\",\n    \"phone\": \"0908888888\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/users/{{userId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["users", "{{userId}}"]
+						},
+						"description": "Update user information"
+					},
+					"response": []
+				},
+				{
+					"name": "Search Users",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.test('✅ User search completed', function() {",
+									"        pm.expect(jsonData.result.content).to.be.an('array');",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/users/search?username=admin&page=0&size=10",
+							"host": ["{{baseUrl}}"],
+							"path": ["users", "search"],
+							"query": [
+								{
+									"key": "username",
+									"value": "admin"
+								},
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "10"
+								}
+							]
+						},
+						"description": "Search users by username"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete User",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    pm.test('✅ User deleted successfully', function() {",
+									"        pm.response.to.have.status(200);",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/users/{{userId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["users", "{{userId}}"]
+						},
+						"description": "Delete a user (soft delete)"
+					},
+					"response": []
+				}
+			],
+			"description": "User management endpoints for registration, CRUD operations, and search"
+		},
+		{
+			"name": "03. Branch Management",
+			"item": [
+				{
+					"name": "Create Branch",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.collectionVariables.set('branchId', jsonData.result.id);",
+									"    pm.test('✅ Branch created successfully', function() {",
+									"        pm.expect(jsonData.result.code).to.not.be.empty;",
+									"    });",
+									"    console.log('Branch ID:', jsonData.result.id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"code\": \"AURORA_HCM_{{$timestamp}}\",\n    \"name\": \"Aurora Hotel Ho Chi Minh\",\n    \"address\": \"123 Nguyen Hue, District 1\",\n    \"city\": \"Ho Chi Minh\",\n    \"country\": \"Vietnam\",\n    \"phone\": \"02812345678\",\n    \"email\": \"hcm@aurorahotel.com\",\n    \"description\": \"Luxury 5-star hotel in the heart of Saigon\",\n    \"rating\": 5,\n    \"totalRooms\": 200,\n    \"status\": \"ACTIVE\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/branches",
+							"host": ["{{baseUrl}}"],
+							"path": ["branches"]
+						},
+						"description": "Create a new hotel branch"
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Branches",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.test('✅ Retrieved branches', function() {",
+									"        pm.expect(jsonData.result.content).to.be.an('array');",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/branches?page=0&size=10&sortBy=name",
+							"host": ["{{baseUrl}}"],
+							"path": ["branches"],
+							"query": [
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "10"
+								},
+								{
+									"key": "sortBy",
+									"value": "name"
+								}
+							]
+						},
+						"description": "Get paginated list of branches"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Branch by ID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.test('✅ Retrieved branch details', function() {",
+									"        pm.expect(jsonData.result.id).to.not.be.empty;",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/branches/{{branchId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["branches", "{{branchId}}"]
+						},
+						"description": "Get specific branch by ID"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Branch by Code",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    pm.test('✅ Retrieved branch by code', function() {",
+									"        pm.response.to.have.status(200);",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/branches/code/AURORA_HCM",
+							"host": ["{{baseUrl}}"],
+							"path": ["branches", "code", "AURORA_HCM"]
+						},
+						"description": "Get branch by unique code"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Branch",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    pm.test('✅ Branch updated successfully', function() {",
+									"        pm.response.to.have.status(200);",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Aurora Grand Hotel Ho Chi Minh\",\n    \"description\": \"Updated: Luxury 5-star hotel with ocean view\",\n    \"rating\": 5\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/branches/{{branchId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["branches", "{{branchId}}"]
+						},
+						"description": "Update branch information"
+					},
+					"response": []
+				},
+				{
+					"name": "Search Branches",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.test('✅ Branch search completed', function() {",
+									"        pm.expect(jsonData.result.content).to.be.an('array');",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/branches/search?keyword=Aurora&page=0&size=10",
+							"host": ["{{baseUrl}}"],
+							"path": ["branches", "search"],
+							"query": [
+								{
+									"key": "keyword",
+									"value": "Aurora"
+								},
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "10"
+								}
+							]
+						},
+						"description": "Search branches by keyword"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Branches by City",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    pm.test('✅ Retrieved branches by city', function() {",
+									"        pm.response.to.have.status(200);",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/branches/city/Ho Chi Minh?page=0&size=10",
+							"host": ["{{baseUrl}}"],
+							"path": ["branches", "city", "Ho Chi Minh"],
+							"query": [
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "10"
+								}
+							]
+						},
+						"description": "Get branches in a specific city"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Branches by Status",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    pm.test('✅ Retrieved branches by status', function() {",
+									"        pm.response.to.have.status(200);",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/branches/status/ACTIVE?page=0&size=10",
+							"host": ["{{baseUrl}}"],
+							"path": ["branches", "status", "ACTIVE"],
+							"query": [
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "10"
+								}
+							]
+						},
+						"description": "Get branches by status (ACTIVE, INACTIVE, UNDER_MAINTENANCE)"
+					},
+					"response": []
+				},
+				{
+					"name": "Assign Manager to Branch",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    pm.test('✅ Manager assigned to branch', function() {",
+									"        pm.response.to.have.status(200);",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/branches/{{branchId}}/manager?managerId={{userId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["branches", "{{branchId}}", "manager"],
+							"query": [
+								{
+									"key": "managerId",
+									"value": "{{userId}}"
+								}
+							]
+						},
+						"description": "Assign a manager to a branch"
+					},
+					"response": []
+				},
+				{
+					"name": "Remove Manager from Branch",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    pm.test('✅ Manager removed from branch', function() {",
+									"        pm.response.to.have.status(200);",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/branches/{{branchId}}/manager",
+							"host": ["{{baseUrl}}"],
+							"path": ["branches", "{{branchId}}", "manager"]
+						},
+						"description": "Remove manager from a branch"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Branch Statistics",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.test('✅ Retrieved branch statistics', function() {",
+									"        pm.expect(jsonData.result).to.be.an('object');",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/branches/{{branchId}}/statistics",
+							"host": ["{{baseUrl}}"],
+							"path": ["branches", "{{branchId}}", "statistics"]
+						},
+						"description": "Get statistics for a specific branch"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Branch",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    pm.test('✅ Branch deleted successfully', function() {",
+									"        pm.response.to.have.status(200);",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/branches/{{branchId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["branches", "{{branchId}}"]
+						},
+						"description": "Delete a branch (soft delete)"
+					},
+					"response": []
+				}
+			],
+			"description": "Branch management endpoints for hotel locations"
+		},
+		{
+			"name": "04. Amenity Management",
+			"item": [
+				{
+					"name": "Create Amenity",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.collectionVariables.set('amenityId', jsonData.result.id);",
+									"    pm.test('✅ Amenity created successfully', function() {",
+									"        pm.expect(jsonData.result.name).to.not.be.empty;",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"High-Speed WiFi\",\n    \"description\": \"Free high-speed wireless internet\",\n    \"type\": \"TECHNOLOGY\",\n    \"isPaid\": false\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/amenities",
+							"host": ["{{baseUrl}}"],
+							"path": ["amenities"]
+						},
+						"description": "Create a new amenity"
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Amenities",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.test('✅ Retrieved amenities', function() {",
+									"        pm.expect(jsonData.result).to.be.an('array');",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/amenities",
+							"host": ["{{baseUrl}}"],
+							"path": ["amenities"]
+						},
+						"description": "Get all amenities"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Amenities Paginated",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.test('✅ Retrieved paginated amenities', function() {",
+									"        pm.expect(jsonData.result.content).to.be.an('array');",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/amenities/paginated?page=0&size=10&sortBy=name&sortDirection=ASC",
+							"host": ["{{baseUrl}}"],
+							"path": ["amenities", "paginated"],
+							"query": [
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "10"
+								},
+								{
+									"key": "sortBy",
+									"value": "name"
+								},
+								{
+									"key": "sortDirection",
+									"value": "ASC"
+								}
+							]
+						},
+						"description": "Get paginated list of amenities"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Amenity by ID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    pm.test('✅ Retrieved amenity details', function() {",
+									"        pm.response.to.have.status(200);",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/amenities/{{amenityId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["amenities", "{{amenityId}}"]
+						},
+						"description": "Get specific amenity by ID"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Amenity by Name",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    pm.test('✅ Retrieved amenity by name', function() {",
+									"        pm.response.to.have.status(200);",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/amenities/name/WiFi",
+							"host": ["{{baseUrl}}"],
+							"path": ["amenities", "name", "WiFi"]
+						},
+						"description": "Get amenity by name"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Amenity",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    pm.test('✅ Amenity updated successfully', function() {",
+									"        pm.response.to.have.status(200);",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Ultra High-Speed WiFi\",\n    \"description\": \"Fiber optic high-speed wireless internet - 1Gbps\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/amenities/{{amenityId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["amenities", "{{amenityId}}"]
+						},
+						"description": "Update amenity information"
+					},
+					"response": []
+				},
+				{
+					"name": "Search Amenities",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.test('✅ Amenity search completed', function() {",
+									"        pm.expect(jsonData.result.content).to.be.an('array');",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/amenities/search?name=WiFi&page=0&size=10",
+							"host": ["{{baseUrl}}"],
+							"path": ["amenities", "search"],
+							"query": [
+								{
+									"key": "name",
+									"value": "WiFi"
+								},
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "10"
+								}
+							]
+						},
+						"description": "Search amenities by name"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Amenities by Type",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    pm.test('✅ Retrieved amenities by type', function() {",
+									"        pm.response.to.have.status(200);",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/amenities/type/TECHNOLOGY?page=0&size=10",
+							"host": ["{{baseUrl}}"],
+							"path": ["amenities", "type", "TECHNOLOGY"],
+							"query": [
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "10"
+								}
+							]
+						},
+						"description": "Get amenities by type (TECHNOLOGY, BATHROOM, BEDROOM, ENTERTAINMENT, KITCHEN, OTHER)"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Amenity",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    pm.test('✅ Amenity deleted successfully', function() {",
+									"        pm.response.to.have.status(200);",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/amenities/{{amenityId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["amenities", "{{amenityId}}"]
+						},
+						"description": "Delete an amenity"
+					},
+					"response": []
+				}
+			],
+			"description": "Amenity management for room features (WiFi, TV, Air conditioning, etc.)"
+		},
+		{
+			"name": "05. Facility Management",
+			"item": [
+				{
+					"name": "Create Facility",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.collectionVariables.set('facilityId', jsonData.result.id);",
+									"    pm.test('✅ Facility created successfully', function() {",
+									"        pm.expect(jsonData.result.name).to.not.be.empty;",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Infinity Pool\",\n    \"description\": \"Rooftop infinity pool with panoramic city view\",\n    \"branchId\": \"{{branchId}}\",\n    \"operatingHours\": \"06:00 - 22:00\",\n    \"isPaid\": false\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/facilities",
+							"host": ["{{baseUrl}}"],
+							"path": ["facilities"]
+						},
+						"description": "Create a new facility for a branch"
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Facilities",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.test('✅ Retrieved facilities', function() {",
+									"        pm.expect(jsonData.result).to.be.an('array');",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/facilities",
+							"host": ["{{baseUrl}}"],
+							"path": ["facilities"]
+						},
+						"description": "Get all facilities"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Facilities Paginated",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.test('✅ Retrieved paginated facilities', function() {",
+									"        pm.expect(jsonData.result.content).to.be.an('array');",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/facilities/paginated?page=0&size=10&sortBy=name&sortDirection=ASC",
+							"host": ["{{baseUrl}}"],
+							"path": ["facilities", "paginated"],
+							"query": [
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "10"
+								},
+								{
+									"key": "sortBy",
+									"value": "name"
+								},
+								{
+									"key": "sortDirection",
+									"value": "ASC"
+								}
+							]
+						},
+						"description": "Get paginated list of facilities"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Facility by ID",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    pm.test('✅ Retrieved facility details', function() {",
+									"        pm.response.to.have.status(200);",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/facilities/{{facilityId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["facilities", "{{facilityId}}"]
+						},
+						"description": "Get specific facility by ID"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Facilities by Branch",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.test('✅ Retrieved facilities by branch', function() {",
+									"        pm.expect(jsonData.result).to.be.an('array');",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/facilities/hotel/{{branchId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["facilities", "hotel", "{{branchId}}"]
+						},
+						"description": "Get all facilities for a specific branch"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Facilities by Branch (Paginated)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.test('✅ Retrieved paginated facilities by branch', function() {",
+									"        pm.expect(jsonData.result.content).to.be.an('array');",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/facilities/hotel/{{branchId}}/paginated?page=0&size=10&sortBy=name&sortDirection=ASC",
+							"host": ["{{baseUrl}}"],
+							"path": ["facilities", "hotel", "{{branchId}}", "paginated"],
+							"query": [
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "10"
+								},
+								{
+									"key": "sortBy",
+									"value": "name"
+								},
+								{
+									"key": "sortDirection",
+									"value": "ASC"
+								}
+							]
+						},
+						"description": "Get paginated facilities for a branch"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Facility",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    pm.test('✅ Facility updated successfully', function() {",
+									"        pm.response.to.have.status(200);",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Infinity Pool & Jacuzzi\",\n    \"description\": \"Rooftop infinity pool with panoramic city view and hot tub\",\n    \"operatingHours\": \"06:00 - 23:00\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/facilities/{{facilityId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["facilities", "{{facilityId}}"]
+						},
+						"description": "Update facility information"
+					},
+					"response": []
+				},
+				{
+					"name": "Search Facilities",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.test('✅ Facility search completed', function() {",
+									"        pm.expect(jsonData.result.content).to.be.an('array');",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/facilities/search?name=Pool&page=0&size=10",
+							"host": ["{{baseUrl}}"],
+							"path": ["facilities", "search"],
+							"query": [
+								{
+									"key": "name",
+									"value": "Pool"
+								},
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "10"
+								}
+							]
+						},
+						"description": "Search facilities by name"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Facility",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    pm.test('✅ Facility deleted successfully', function() {",
+									"        pm.response.to.have.status(200);",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/facilities/{{facilityId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["facilities", "{{facilityId}}"]
+						},
+						"description": "Delete a facility"
+					},
+					"response": []
+				}
+			],
+			"description": "Facility management for branch amenities (Pool, Gym, Spa, Restaurant, etc.)"
+		}
+	]
+}

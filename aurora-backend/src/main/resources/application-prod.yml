@@ -1,0 +1,27 @@
+spring:
+  datasource:
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    hikari:
+      maximum-pool-size: 20
+      minimum-idle: 10
+      
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: false
+    open-in-view: false
+    properties:
+      hibernate:
+        format_sql: false
+
+logging:
+  level:
+    com.aurora.backend: INFO
+    org.hibernate.SQL: WARN
+    org.springframework.security: WARN
+  file:
+    name: logs/aurora-backend.log
+    max-size: 10MB
+    max-history: 30

@@ -1,0 +1,17 @@
+{
+  "menu": {
+    "home": "HOME",
+    "about": "ABOUT US",
+    "accommodation": "ACCOMMODATION",
+    "service": "SERVICE",
+    "news": "NEWS",
+    "gallery": "GALLERY"
+  },
+  "buttons": {
+    "bookNow": "BOOK NOW",
+    "search": "Search"
+  },
+  "navigation": {
+    "menu": "Menu"
+  }
+}
