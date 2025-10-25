@@ -15,8 +15,8 @@ import java.util.Set;
 public class BookingResponse {
     String id;
     String bookingCode;
-    String hotelId;
-    String hotelName;
+    String branchId;
+    String branchName;
     String customerId;
     String customerName;
     LocalDate checkin;

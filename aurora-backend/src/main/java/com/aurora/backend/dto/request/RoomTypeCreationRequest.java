@@ -14,8 +14,8 @@ import java.util.Set;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class RoomTypeCreationRequest {
-    @NotBlank(message = "HOTEL_ID_REQUIRED")
-    String hotelId;
+    @NotBlank(message = "BRANCH_ID_REQUIRED")
+    String branchId;
     
     @NotBlank(message = "ROOM_TYPE_NAME_REQUIRED")
     String name;

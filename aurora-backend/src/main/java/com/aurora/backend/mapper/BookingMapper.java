@@ -10,21 +10,21 @@ import org.mapstruct.MappingTarget;
 
 @Mapper(componentModel = "spring")
 public interface BookingMapper {
-    @Mapping(target = "hotel.id", source = "hotelId")
+    @Mapping(target = "branch.id", source = "branchId")
     @Mapping(target = "customer.id", source = "customerId")
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "bookingCode", ignore = true)
     Booking toBooking(BookingCreationRequest request);
     
-    @Mapping(target = "hotelId", source = "hotel.id")
-    @Mapping(target = "hotelName", source = "hotel.name")
+    @Mapping(target = "branchId", source = "branch.id")
+    @Mapping(target = "branchName", source = "branch.name")
     @Mapping(target = "customerId", source = "customer.id")
     @Mapping(target = "customerName", expression = "java(booking.getCustomer().getFirstName() + \" \" + booking.getCustomer().getLastName())")
     BookingResponse toBookingResponse(Booking booking);
     
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "bookingCode", ignore = true)
-    @Mapping(target = "hotel", ignore = true)
+    @Mapping(target = "branch", ignore = true)
     @Mapping(target = "customer", ignore = true)
     void updateBooking(@MappingTarget Booking booking, BookingUpdateRequest request);
 }

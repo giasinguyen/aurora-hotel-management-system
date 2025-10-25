@@ -17,8 +17,8 @@ public class BookingCreationRequest {
     @NotBlank(message = "BOOKING_CODE_REQUIRED")
     String bookingCode;
     
-    @NotBlank(message = "HOTEL_ID_REQUIRED")
-    String hotelId;
+    @NotBlank(message = "BRANCH_ID_REQUIRED")
+    String branchId;
     
     @NotBlank(message = "CUSTOMER_ID_REQUIRED")
     String customerId;

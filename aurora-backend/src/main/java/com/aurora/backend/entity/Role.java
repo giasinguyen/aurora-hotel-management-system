@@ -3,16 +3,18 @@ package com.aurora.backend.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
+import lombok.experimental.SuperBuilder;
 import java.util.Set;
 
-@Getter @Setter @Builder
-@NoArgsConstructor @AllArgsConstructor
+@Getter
+@Setter
+@SuperBuilder
+@NoArgsConstructor
+@AllArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
-@Entity @Table(name = "roles")
-public class Role {
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    String id;
+@Entity
+@Table(name = "roles")
+public class Role extends BaseEntity {
 
     @Column(nullable = false, unique = true)
     String name;          // ADMIN, STAFF, CUSTOMER
@@ -29,7 +31,6 @@ public class Role {
     Set<Permission> permissions;
 
     public Role orElseGet(Object object) {
-        // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'orElseGet'");
     }
 }

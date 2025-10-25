@@ -33,15 +33,14 @@ public class RoomTypeController {
     @ResponseStatus(HttpStatus.CREATED)
     @RequirePermission(PermissionConstants.Manager.ROOM_CREATE)
     ApiResponse<RoomTypeResponse> createRoomType(@RequestBody @Valid RoomTypeCreationRequest roomTypeCreationRequest) {
-        log.info("Creating new room type with name: {} for hotel: {}", 
-                roomTypeCreationRequest.getName(), roomTypeCreationRequest.getHotelId());
+        log.info("Creating new room type with name: {} for branch: {}", 
+                roomTypeCreationRequest.getName(), roomTypeCreationRequest.getBranchId());
         return ApiResponse.<RoomTypeResponse>builder()
                 .result(roomTypeService.createRoomType(roomTypeCreationRequest))
                 .build();
     }
 
     @GetMapping
-    // Public - no permission needed
     ApiResponse<List<RoomTypeResponse>> getAllRoomTypes() {
         log.info("Fetching all room types");
         return ApiResponse.<List<RoomTypeResponse>>builder()
@@ -80,7 +79,7 @@ public class RoomTypeController {
 
     @GetMapping("/hotel/{hotelId}")
     ApiResponse<List<RoomTypeResponse>> getRoomTypesByHotel(@PathVariable("hotelId") String hotelId) {
-        log.info("Fetching room types for hotel: {}", hotelId);
+        log.info("Fetching room types for branch: {}", hotelId);
         return ApiResponse.<List<RoomTypeResponse>>builder()
                 .result(roomTypeService.getRoomTypesByHotel(hotelId))
                 .build();
@@ -94,7 +93,7 @@ public class RoomTypeController {
             @RequestParam(defaultValue = "name") String sortBy,
             @RequestParam(defaultValue = "asc") String sortDirection) {
         
-        log.info("Fetching room types for hotel: {} with pagination", hotelId);
+        log.info("Fetching room types for branch: {} with pagination", hotelId);
         
         Sort sort = sortDirection.equalsIgnoreCase("desc") 
                 ? Sort.by(sortBy).descending() 

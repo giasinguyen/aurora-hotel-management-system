@@ -13,8 +13,8 @@ import java.util.Set;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class RoomTypeResponse {
     String id;
-    String hotelId;
-    String hotelName;
+    String branchId;
+    String branchName;
     String name;
     String code;
     Integer capacityAdults;

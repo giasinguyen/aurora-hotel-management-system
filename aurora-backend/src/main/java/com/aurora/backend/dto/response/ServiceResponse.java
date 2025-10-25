@@ -10,8 +10,8 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class ServiceResponse {
     String id;
-    String hotelId;
-    String hotelName;
+    String branchId;
+    String branchName;
     String name;
     String type;
     String description;

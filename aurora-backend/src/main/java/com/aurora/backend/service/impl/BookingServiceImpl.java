@@ -4,13 +4,13 @@ import com.aurora.backend.dto.request.BookingCreationRequest;
 import com.aurora.backend.dto.request.BookingUpdateRequest;
 import com.aurora.backend.dto.response.BookingResponse;
 import com.aurora.backend.entity.Booking;
-import com.aurora.backend.entity.Hotel;
+import com.aurora.backend.entity.Branch;
 import com.aurora.backend.entity.User;
 import com.aurora.backend.exception.AppException;
 import com.aurora.backend.enums.ErrorCode;
 import com.aurora.backend.mapper.BookingMapper;
 import com.aurora.backend.repository.BookingRepository;
-import com.aurora.backend.repository.HotelRepository;
+import com.aurora.backend.repository.BranchRepository;
 import com.aurora.backend.repository.UserRepository;
 import com.aurora.backend.service.BookingService;
 import lombok.AccessLevel;
@@ -28,40 +28,37 @@ import java.util.UUID;
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Slf4j
+@Transactional(readOnly = true)
 public class BookingServiceImpl implements BookingService {
     
     BookingRepository bookingRepository;
-    HotelRepository hotelRepository;
+    BranchRepository branchRepository;
     UserRepository userRepository;
     BookingMapper bookingMapper;
 
     @Override
     @Transactional
     public BookingResponse createBooking(BookingCreationRequest request) {
-        log.info("Creating booking for hotel: {} and customer: {}", request.getHotelId(), request.getCustomerId());
+        log.info("Creating booking for branch: {} and customer: {}", request.getBranchId(), request.getCustomerId());
         
-        // Validate hotel exists
-        Hotel hotel = hotelRepository.findById(request.getHotelId())
-                .orElseThrow(() -> new AppException(ErrorCode.HOTEL_NOT_FOUND));
+        Branch branch = branchRepository.findById(request.getBranchId())
+                .orElseThrow(() -> new AppException(ErrorCode.BRANCH_NOT_EXISTED));
         
-        // Validate customer exists
         User customer = userRepository.findById(request.getCustomerId())
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
         
         Booking booking = bookingMapper.toBooking(request);
-        booking.setHotel(hotel);
+        booking.setBranch(branch);
         booking.setCustomer(customer);
         
-        // Generate unique booking code
         String bookingCode = generateBookingCode();
         while (bookingRepository.existsByBookingCode(bookingCode)) {
             bookingCode = generateBookingCode();
         }
         booking.setBookingCode(bookingCode);
         
-        // Set default status if not provided
         if (request.getStatus() == null || request.getStatus().trim().isEmpty()) {
-            booking.setStatus("PENDING");
+            booking.setStatus(Booking.BookingStatus.PENDING);
         }
         
         Booking savedBooking = bookingRepository.save(booking);
@@ -94,8 +91,6 @@ public class BookingServiceImpl implements BookingService {
         Booking booking = bookingRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.BOOKING_NOT_FOUND));
         
-        // Check if booking can be deleted (no active rooms/services)
-        
         bookingRepository.delete(booking);
         log.info("Booking deleted successfully with ID: {}", id);
     }
@@ -122,13 +117,13 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<BookingResponse> getBookingsByHotel(String hotelId, Pageable pageable) {
-        log.debug("Fetching bookings for hotel ID: {} with pagination: {}", hotelId, pageable);
+    public Page<BookingResponse> getBookingsByBranch(String branchId, Pageable pageable) {
+        log.debug("Fetching bookings for branch ID: {} with pagination: {}", branchId, pageable);
         
-        Hotel hotel = hotelRepository.findById(hotelId)
-                .orElseThrow(() -> new AppException(ErrorCode.HOTEL_NOT_FOUND));
+        Branch branch = branchRepository.findById(branchId)
+                .orElseThrow(() -> new AppException(ErrorCode.BRANCH_NOT_EXISTED));
         
-        Page<Booking> bookings = bookingRepository.findByHotel(hotel, pageable);
+        Page<Booking> bookings = bookingRepository.findByBranch(branch, pageable);
         return bookings.map(bookingMapper::toBookingResponse);
     }
 
@@ -146,15 +141,15 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<BookingResponse> searchBookings(String hotelId, String customerId, String status, Pageable pageable) {
-        log.debug("Searching bookings with filters - Hotel: {}, Customer: {}, Status: {}", hotelId, customerId, status);
+    public Page<BookingResponse> searchBookings(String branchId, String customerId, String status, Pageable pageable) {
+        log.debug("Searching bookings with filters - branch: {}, Customer: {}, Status: {}", branchId, customerId, status);
         
-        Hotel hotel = null;
+        Branch branch = null;
         User customer = null;
         
-        if (hotelId != null && !hotelId.trim().isEmpty()) {
-            hotel = hotelRepository.findById(hotelId)
-                    .orElseThrow(() -> new AppException(ErrorCode.HOTEL_NOT_FOUND));
+        if (branchId != null && !branchId.trim().isEmpty()) {
+            branch = branchRepository.findById(branchId)
+                    .orElseThrow(() -> new AppException(ErrorCode.BRANCH_NOT_EXISTED));
         }
         
         if (customerId != null && !customerId.trim().isEmpty()) {
@@ -162,7 +157,7 @@ public class BookingServiceImpl implements BookingService {
                     .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
         }
         
-        Page<Booking> bookings = bookingRepository.findByFilters(hotel, customer, status, pageable);
+        Page<Booking> bookings = bookingRepository.findByFilters(branch, customer, status, pageable);
         return bookings.map(bookingMapper::toBookingResponse);
     }
     

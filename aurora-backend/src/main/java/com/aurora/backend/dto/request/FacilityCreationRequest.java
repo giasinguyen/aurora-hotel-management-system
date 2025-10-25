@@ -10,8 +10,8 @@ import lombok.experimental.FieldDefaults;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class FacilityCreationRequest {
-    @NotBlank(message = "HOTEL_ID_REQUIRED")
-    String hotelId;
+    @NotBlank(message = "BRANCH_ID_REQUIRED")
+    String branchId;
     
     @NotBlank(message = "FACILITY_NAME_REQUIRED")
     String name;

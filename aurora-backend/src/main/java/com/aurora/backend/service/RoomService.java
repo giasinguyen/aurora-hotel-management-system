@@ -12,8 +12,8 @@ public interface RoomService {
     void deleteRoom(String id);
     RoomResponse getRoomById(String id);
     Page<RoomResponse> getAllRooms(Pageable pageable);
-    Page<RoomResponse> getRoomsByHotel(String hotelId, Pageable pageable);
+    Page<RoomResponse> getRoomsByBranch(String branchId, Pageable pageable);
     Page<RoomResponse> getRoomsByRoomType(String roomTypeId, Pageable pageable);
     Page<RoomResponse> getRoomsByStatus(String status, Pageable pageable);
-    Page<RoomResponse> searchRooms(String hotelId, String roomTypeId, String status, Pageable pageable);
+    Page<RoomResponse> searchRooms(String branchId, String roomTypeId, String status, Pageable pageable);
 }

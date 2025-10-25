@@ -11,8 +11,8 @@ import lombok.experimental.FieldDefaults;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class RoomCreationRequest {
-    @NotBlank(message = "HOTEL_ID_REQUIRED")
-    String hotelId;
+    @NotBlank(message = "BRANCH_ID_REQUIRED")
+    String branchId;
     
     @NotBlank(message = "ROOM_TYPE_ID_REQUIRED")
     String roomTypeId;

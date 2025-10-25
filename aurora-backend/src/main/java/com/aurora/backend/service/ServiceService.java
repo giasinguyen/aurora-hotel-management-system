@@ -12,7 +12,7 @@ public interface ServiceService {
     void deleteService(String id);
     ServiceResponse getServiceById(String id);
     Page<ServiceResponse> getAllServices(Pageable pageable);
-    Page<ServiceResponse> getServicesByHotel(String hotelId, Pageable pageable);
+    Page<ServiceResponse> getServicesByBranch(String branchId, Pageable pageable);
     Page<ServiceResponse> getServicesByType(String type, Pageable pageable);
-    Page<ServiceResponse> searchServices(String hotelId, String type, String name, Pageable pageable);
+    Page<ServiceResponse> searchServices(String branchId, String type, String name, Pageable pageable);
 }

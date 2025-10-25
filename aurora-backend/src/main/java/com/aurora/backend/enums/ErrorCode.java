@@ -24,6 +24,8 @@ public enum ErrorCode {
     FIRSTNAME_REQUIRED(1012, "First name is required", HttpStatus.BAD_REQUEST),
     LASTNAME_REQUIRED(1013, "Last name is required", HttpStatus.BAD_REQUEST),
     DOB_INVALID(1014, "Date of birth must be in the past", HttpStatus.BAD_REQUEST),
+    ACCOUNT_LOCKED(1015, "Account is locked due to too many failed login attempts", HttpStatus.UNAUTHORIZED),
+    WEAK_PASSWORD(1016, "Password must be at least 8 characters with uppercase, lowercase, digit and special character", HttpStatus.BAD_REQUEST),
     
     // Amenity errors
     AMENITY_EXISTED(1100, "Amenity already exists", HttpStatus.BAD_REQUEST),
@@ -55,6 +57,10 @@ public enum ErrorCode {
     CHECKIN_DATE_FUTURE(1305, "Check-in date must be in the future", HttpStatus.BAD_REQUEST),
     CHECKOUT_DATE_FUTURE(1306, "Check-out date must be in the future", HttpStatus.BAD_REQUEST),
     BOOKING_CODE_EXISTED(1307, "Booking code already exists", HttpStatus.BAD_REQUEST),
+    INVALID_BOOKING_TOTAL(1308, "Invalid booking total price", HttpStatus.BAD_REQUEST),
+    PRICE_MISMATCH(1309, "Price mismatch between client and server calculation", HttpStatus.BAD_REQUEST),
+    NO_ROOMS_AVAILABLE(1310, "No rooms available for the selected dates", HttpStatus.BAD_REQUEST),
+    EXCEEDS_ROOM_CAPACITY(1311, "Number of guests exceeds room capacity", HttpStatus.BAD_REQUEST),
     
     // BookingRoom errors
     BOOKING_ROOM_NOT_EXISTED(1400, "Booking room not found", HttpStatus.NOT_FOUND),
@@ -72,6 +78,8 @@ public enum ErrorCode {
     PAYMENT_STATUS_REQUIRED(1602, "Payment status is required", HttpStatus.BAD_REQUEST),
     PAYMENT_AMOUNT_REQUIRED(1603, "Payment amount is required", HttpStatus.BAD_REQUEST),
     PAYMENT_AMOUNT_POSITIVE(1604, "Payment amount must be positive", HttpStatus.BAD_REQUEST),
+    INVALID_PAYMENT_AMOUNT(1605, "Invalid payment amount", HttpStatus.BAD_REQUEST),
+    PAYMENT_EXCEEDS_TOTAL(1606, "Payment amount exceeds booking total price", HttpStatus.BAD_REQUEST),
     
     // Role errors
     ROLE_NOT_EXISTED(1700, "Role not found", HttpStatus.NOT_FOUND),
@@ -127,6 +135,18 @@ public enum ErrorCode {
     QUANTITY_POSITIVE(2304, "Quantity must be positive", HttpStatus.BAD_REQUEST),
     BOOKING_NOT_FOUND(2305, "Booking not found", HttpStatus.NOT_FOUND),
     USER_NOT_FOUND(2306, "User not found", HttpStatus.NOT_FOUND),
+    
+    // Branch errors (replacing Hotel errors)
+    BRANCH_NOT_EXISTED(2400, "Branch not found", HttpStatus.NOT_FOUND),
+    BRANCH_CODE_EXISTED(2401, "Branch code already exists", HttpStatus.BAD_REQUEST),
+    BRANCH_NAME_REQUIRED(2402, "Branch name is required", HttpStatus.BAD_REQUEST),
+    BRANCH_CODE_REQUIRED(2403, "Branch code is required", HttpStatus.BAD_REQUEST),
+    BRANCH_ADDRESS_REQUIRED(2404, "Branch address is required", HttpStatus.BAD_REQUEST),
+    BRANCH_HAS_ROOMS(2405, "Cannot delete branch with existing rooms", HttpStatus.BAD_REQUEST),
+    USER_NOT_MANAGER(2406, "User does not have MANAGER role", HttpStatus.BAD_REQUEST),
+    BRANCH_CITY_REQUIRED(2407, "City is required", HttpStatus.BAD_REQUEST),
+    BRANCH_DISTRICT_REQUIRED(2408, "District is required", HttpStatus.BAD_REQUEST),
+    BRANCH_WARD_REQUIRED(2409, "Ward is required", HttpStatus.BAD_REQUEST),
     ;
 
     ErrorCode(int code, String message, HttpStatusCode statusCode) {

@@ -28,6 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Slf4j
+@Transactional(readOnly = true)
 public class ServiceBookingServiceImpl implements ServiceBookingService {
     
     ServiceBookingRepository serviceBookingRepository;
@@ -41,19 +42,15 @@ public class ServiceBookingServiceImpl implements ServiceBookingService {
     public ServiceBookingResponse createServiceBooking(ServiceBookingCreationRequest request) {
         log.info("Creating service booking for booking: {} and service: {}", request.getBookingId(), request.getServiceId());
         
-        // Validate booking exists
         Booking booking = bookingRepository.findById(request.getBookingId())
                 .orElseThrow(() -> new AppException(ErrorCode.BOOKING_NOT_FOUND));
         
-        // Validate service exists
         Service service = serviceRepository.findById(request.getServiceId())
                 .orElseThrow(() -> new AppException(ErrorCode.SERVICE_NOT_FOUND));
         
-        // Validate customer exists
         User customer = userRepository.findById(request.getCustomerId())
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
         
-        // Check if service is already booked for this booking
         if (serviceBookingRepository.existsByBookingAndService(booking, service)) {
             throw new AppException(ErrorCode.SERVICE_BOOKING_EXISTED);
         }
@@ -63,9 +60,8 @@ public class ServiceBookingServiceImpl implements ServiceBookingService {
         serviceBooking.setService(service);
         serviceBooking.setCustomer(customer);
         
-        // Set default status if not provided
         if (request.getStatus() == null || request.getStatus().trim().isEmpty()) {
-            serviceBooking.setStatus("PENDING");
+            serviceBooking.setStatus(ServiceBooking.ServiceBookingStatus.PENDING);
         }
         
         ServiceBooking savedServiceBooking = serviceBookingRepository.save(serviceBooking);

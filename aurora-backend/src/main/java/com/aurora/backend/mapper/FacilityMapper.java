@@ -10,15 +10,15 @@ import org.mapstruct.MappingTarget;
 
 @Mapper(componentModel = "spring")
 public interface FacilityMapper {
-    @Mapping(target = "hotel.id", source = "hotelId")
+    @Mapping(target = "branch.id", source = "branchId")
     @Mapping(target = "id", ignore = true)
     Facility toFacility(FacilityCreationRequest request);
     
-    @Mapping(target = "hotelId", source = "hotel.id")
-    @Mapping(target = "hotelName", source = "hotel.name")
+    @Mapping(target = "branchId", source = "branch.id")
+    @Mapping(target = "branchName", source = "branch.name")
     FacilityResponse toFacilityResponse(Facility facility);
     
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "hotel", ignore = true)
+    @Mapping(target = "branch", ignore = true)
     void updateFacilityFromRequest(FacilityUpdateRequest request, @MappingTarget Facility facility);
 }

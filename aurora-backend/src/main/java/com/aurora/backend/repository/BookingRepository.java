@@ -1,7 +1,7 @@
 package com.aurora.backend.repository;
 
 import com.aurora.backend.entity.Booking;
-import com.aurora.backend.entity.Hotel;
+import com.aurora.backend.entity.Branch;
 import com.aurora.backend.entity.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -18,19 +18,18 @@ public interface BookingRepository extends JpaRepository<Booking, String> {
     boolean existsByBookingCode(String bookingCode);
     Optional<Booking> findByBookingCode(String bookingCode);
     Page<Booking> findByCustomerId(String customerId, Pageable pageable);
-    Page<Booking> findByHotelId(String hotelId, Pageable pageable);
+    Page<Booking> findByBranchId(String BranchId, Pageable pageable);
     Page<Booking> findByStatus(String status, Pageable pageable);
     Page<Booking> findByCheckinBetween(LocalDate startDate, LocalDate endDate, Pageable pageable);
     
-    // Additional methods with entities for service layer
-    Page<Booking> findByHotel(Hotel hotel, Pageable pageable);
+    Page<Booking> findByBranch(Branch Branch, Pageable pageable);
     Page<Booking> findByCustomer(User customer, Pageable pageable);
     
     @Query("SELECT b FROM Booking b WHERE " +
-           "(:hotel IS NULL OR b.hotel = :hotel) AND " +
+           "(:Branch IS NULL OR b.branch = :Branch) AND " +
            "(:customer IS NULL OR b.customer = :customer) AND " +
            "(:status IS NULL OR :status = '' OR b.status = :status)")
-    Page<Booking> findByFilters(@Param("hotel") Hotel hotel,
+    Page<Booking> findByFilters(@Param("Branch") Branch Branch,
                                @Param("customer") User customer,
                                @Param("status") String status,
                                Pageable pageable);

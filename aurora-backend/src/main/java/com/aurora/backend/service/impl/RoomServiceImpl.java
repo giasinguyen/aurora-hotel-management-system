@@ -3,13 +3,13 @@ package com.aurora.backend.service.impl;
 import com.aurora.backend.dto.request.RoomCreationRequest;
 import com.aurora.backend.dto.request.RoomUpdateRequest;
 import com.aurora.backend.dto.response.RoomResponse;
-import com.aurora.backend.entity.Hotel;
+import com.aurora.backend.entity.Branch;
 import com.aurora.backend.entity.Room;
 import com.aurora.backend.entity.RoomType;
 import com.aurora.backend.exception.AppException;
 import com.aurora.backend.enums.ErrorCode;
 import com.aurora.backend.mapper.RoomMapper;
-import com.aurora.backend.repository.HotelRepository;
+import com.aurora.backend.repository.BranchRepository;
 import com.aurora.backend.repository.RoomRepository;
 import com.aurora.backend.repository.RoomTypeRepository;
 import com.aurora.backend.service.RoomService;
@@ -26,42 +26,39 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Slf4j
+@Transactional(readOnly = true)
 public class RoomServiceImpl implements RoomService {
     
     RoomRepository roomRepository;
-    HotelRepository hotelRepository;
+    BranchRepository branchRepository;
     RoomTypeRepository roomTypeRepository;
     RoomMapper roomMapper;
 
     @Override
     @Transactional
     public RoomResponse createRoom(RoomCreationRequest request) {
-        log.info("Creating room with number: {} for hotel: {}", request.getRoomNumber(), request.getHotelId());
+        log.info("Creating room with number: {} for branch: {}", request.getRoomNumber(), request.getBranchId());
         
-        // Validate hotel exists
-        Hotel hotel = hotelRepository.findById(request.getHotelId())
-                .orElseThrow(() -> new AppException(ErrorCode.HOTEL_NOT_FOUND));
+        Branch branch = branchRepository.findById(request.getBranchId())
+                .orElseThrow(() -> new AppException(ErrorCode.BRANCH_NOT_EXISTED));
         
-        // Validate room type exists and belongs to the same hotel
         RoomType roomType = roomTypeRepository.findById(request.getRoomTypeId())
                 .orElseThrow(() -> new AppException(ErrorCode.ROOM_TYPE_NOT_FOUND));
         
-        if (!roomType.getHotel().getId().equals(request.getHotelId())) {
+        if (!roomType.getBranch().getId().equals(request.getBranchId())) {
             throw new AppException(ErrorCode.ROOM_TYPE_HOTEL_MISMATCH);
         }
         
-        // Check if room number already exists in the hotel
-        if (roomRepository.existsByHotelAndRoomNumber(hotel, request.getRoomNumber())) {
+        if (roomRepository.existsByBranchAndRoomNumber(branch, request.getRoomNumber())) {
             throw new AppException(ErrorCode.ROOM_NUMBER_ALREADY_EXISTS);
         }
         
         Room room = roomMapper.toRoom(request);
-        room.setHotel(hotel);
+        room.setBranch(branch);
         room.setRoomType(roomType);
         
-        // Set default status if not provided
         if (request.getStatus() == null || request.getStatus().trim().isEmpty()) {
-            room.setStatus("AVAILABLE");
+            room.setStatus(Room.RoomStatus.AVAILABLE);
         }
         
         Room savedRoom = roomRepository.save(room);
@@ -78,21 +75,19 @@ public class RoomServiceImpl implements RoomService {
         Room room = roomRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.ROOM_NOT_FOUND));
         
-        // If room type is being updated, validate it exists and belongs to same hotel
         if (request.getRoomTypeId() != null && !request.getRoomTypeId().equals(room.getRoomType().getId())) {
             RoomType newRoomType = roomTypeRepository.findById(request.getRoomTypeId())
                     .orElseThrow(() -> new AppException(ErrorCode.ROOM_TYPE_NOT_FOUND));
             
-            if (!newRoomType.getHotel().getId().equals(room.getHotel().getId())) {
+            if (!newRoomType.getBranch().getId().equals(room.getBranch().getId())) {
                 throw new AppException(ErrorCode.ROOM_TYPE_HOTEL_MISMATCH);
             }
             
             room.setRoomType(newRoomType);
         }
         
-        // If room number is being updated, check uniqueness within hotel
         if (request.getRoomNumber() != null && !request.getRoomNumber().equals(room.getRoomNumber())) {
-            if (roomRepository.existsByHotelAndRoomNumber(room.getHotel(), request.getRoomNumber())) {
+            if (roomRepository.existsByBranchAndRoomNumber(room.getBranch(), request.getRoomNumber())) {
                 throw new AppException(ErrorCode.ROOM_NUMBER_ALREADY_EXISTS);
             }
             room.setRoomNumber(request.getRoomNumber());
@@ -113,9 +108,6 @@ public class RoomServiceImpl implements RoomService {
         
         Room room = roomRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.ROOM_NOT_FOUND));
-        
-        // Check if room can be deleted (no active bookings)
-        // This would require BookingRoom entity check if implemented
         
         roomRepository.delete(room);
         log.info("Room deleted successfully with ID: {}", id);
@@ -143,13 +135,13 @@ public class RoomServiceImpl implements RoomService {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<RoomResponse> getRoomsByHotel(String hotelId, Pageable pageable) {
-        log.debug("Fetching rooms for hotel ID: {} with pagination: {}", hotelId, pageable);
+    public Page<RoomResponse> getRoomsByBranch(String branchId, Pageable pageable) {
+        log.debug("Fetching rooms for branch ID: {} with pagination: {}", branchId, pageable);
         
-        Hotel hotel = hotelRepository.findById(hotelId)
-                .orElseThrow(() -> new AppException(ErrorCode.HOTEL_NOT_FOUND));
+        Branch branch = branchRepository.findById(branchId)
+                .orElseThrow(() -> new AppException(ErrorCode.BRANCH_NOT_EXISTED));
         
-        Page<Room> rooms = roomRepository.findByHotel(hotel, pageable);
+        Page<Room> rooms = roomRepository.findByBranch(branch, pageable);
         return rooms.map(roomMapper::toRoomResponse);
     }
 
@@ -176,15 +168,15 @@ public class RoomServiceImpl implements RoomService {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<RoomResponse> searchRooms(String hotelId, String roomTypeId, String status, Pageable pageable) {
-        log.debug("Searching rooms with filters - Hotel: {}, RoomType: {}, Status: {}", hotelId, roomTypeId, status);
+    public Page<RoomResponse> searchRooms(String branchId, String roomTypeId, String status, Pageable pageable) {
+        log.debug("Searching rooms with filters - Branch: {}, RoomType: {}, Status: {}", branchId, roomTypeId, status);
         
-        Hotel hotel = null;
+        Branch branch = null;
         RoomType roomType = null;
         
-        if (hotelId != null && !hotelId.trim().isEmpty()) {
-            hotel = hotelRepository.findById(hotelId)
-                    .orElseThrow(() -> new AppException(ErrorCode.HOTEL_NOT_FOUND));
+        if (branchId != null && !branchId.trim().isEmpty()) {
+            branch = branchRepository.findById(branchId)
+                    .orElseThrow(() -> new AppException(ErrorCode.BRANCH_NOT_EXISTED));
         }
         
         if (roomTypeId != null && !roomTypeId.trim().isEmpty()) {
@@ -192,7 +184,7 @@ public class RoomServiceImpl implements RoomService {
                     .orElseThrow(() -> new AppException(ErrorCode.ROOM_TYPE_NOT_FOUND));
         }
         
-        Page<Room> rooms = roomRepository.findByFilters(hotel, roomType, status, pageable);
+        Page<Room> rooms = roomRepository.findByFilters(branch, roomType, status, pageable);
         return rooms.map(roomMapper::toRoomResponse);
     }
 }

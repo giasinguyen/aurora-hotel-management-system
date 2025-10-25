@@ -12,7 +12,7 @@ public interface BookingService {
     void deleteBooking(String id);
     BookingResponse getBookingById(String id);
     Page<BookingResponse> getAllBookings(Pageable pageable);
-    Page<BookingResponse> getBookingsByHotel(String hotelId, Pageable pageable);
+    Page<BookingResponse> getBookingsByBranch(String branchId, Pageable pageable);
     Page<BookingResponse> getBookingsByCustomer(String customerId, Pageable pageable);
-    Page<BookingResponse> searchBookings(String hotelId, String customerId, String status, Pageable pageable);
+    Page<BookingResponse> searchBookings(String branchId, String customerId, String status, Pageable pageable);
 }

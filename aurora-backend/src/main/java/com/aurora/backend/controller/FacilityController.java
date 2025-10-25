@@ -33,8 +33,8 @@ public class FacilityController {
     @ResponseStatus(HttpStatus.CREATED)
     @RequirePermission(PermissionConstants.Manager.ROOM_CREATE)
     ApiResponse<FacilityResponse> createFacility(@RequestBody @Valid FacilityCreationRequest facilityCreationRequest) {
-        log.info("Creating new facility with name: {} for hotel: {}", 
-                facilityCreationRequest.getName(), facilityCreationRequest.getHotelId());
+        log.info("Creating new facility with name: {} for branch: {}", 
+                facilityCreationRequest.getName(), facilityCreationRequest.getBranchId());
         return ApiResponse.<FacilityResponse>builder()
                 .result(facilityService.createFacility(facilityCreationRequest))
                 .build();
@@ -79,22 +79,22 @@ public class FacilityController {
     }
 
     @GetMapping("/hotel/{hotelId}")
-    ApiResponse<List<FacilityResponse>> getFacilitiesByHotel(@PathVariable("hotelId") String hotelId) {
-        log.info("Fetching facilities for hotel: {}", hotelId);
+    ApiResponse<List<FacilityResponse>> getFacilitiesByBranch(@PathVariable("hotelId") String hotelId) {
+        log.info("Fetching facilities for branch: {}", hotelId);
         return ApiResponse.<List<FacilityResponse>>builder()
-                .result(facilityService.getFacilitiesByHotel(hotelId))
+                .result(facilityService.getFacilitiesByBranch(hotelId))
                 .build();
     }
 
     @GetMapping("/hotel/{hotelId}/paginated")
-    ApiResponse<Page<FacilityResponse>> getFacilitiesByHotelWithPagination(
+    ApiResponse<Page<FacilityResponse>> getFacilitiesByBranchWithPagination(
             @PathVariable("hotelId") String hotelId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "name") String sortBy,
             @RequestParam(defaultValue = "asc") String sortDirection) {
         
-        log.info("Fetching facilities for hotel: {} with pagination", hotelId);
+        log.info("Fetching facilities for branch: {} with pagination", hotelId);
         
         Sort sort = sortDirection.equalsIgnoreCase("desc") 
                 ? Sort.by(sortBy).descending() 
@@ -103,7 +103,7 @@ public class FacilityController {
         Pageable pageable = PageRequest.of(page, size, sort);
         
         return ApiResponse.<Page<FacilityResponse>>builder()
-                .result(facilityService.getFacilitiesByHotelWithPagination(hotelId, pageable))
+                .result(facilityService.getFacilitiesByBranchWithPagination(hotelId, pageable))
                 .build();
     }
 

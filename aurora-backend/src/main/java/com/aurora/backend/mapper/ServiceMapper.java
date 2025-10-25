@@ -10,15 +10,15 @@ import org.mapstruct.MappingTarget;
 
 @Mapper(componentModel = "spring")
 public interface ServiceMapper {
-    @Mapping(target = "hotel.id", source = "hotelId")
+    @Mapping(target = "branch.id", source = "branchId")
     @Mapping(target = "id", ignore = true)
     Service toService(ServiceCreationRequest request);
     
-    @Mapping(target = "hotelId", source = "hotel.id")
-    @Mapping(target = "hotelName", source = "hotel.name")
+    @Mapping(target = "branchId", source = "branch.id")
+    @Mapping(target = "branchName", source = "branch.name")
     ServiceResponse toServiceResponse(Service service);
     
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "hotel", ignore = true)
+    @Mapping(target = "branch", ignore = true)
     void updateService(@MappingTarget Service service, ServiceUpdateRequest request);
 }

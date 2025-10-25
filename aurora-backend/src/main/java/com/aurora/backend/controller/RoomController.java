@@ -31,7 +31,7 @@ public class RoomController {
     @PostMapping
     @RequirePermission(PermissionConstants.Manager.ROOM_CREATE)
     public ApiResponse<RoomResponse> createRoom(@Valid @RequestBody RoomCreationRequest request) {
-        log.info("Creating new room with number: {} for hotel: {}", request.getRoomNumber(), request.getHotelId());
+        log.info("Creating new room with number: {} for branch: {}", request.getRoomNumber(), request.getBranchId());
         
         RoomResponse response = roomService.createRoom(request);
         
@@ -72,7 +72,6 @@ public class RoomController {
     }
 
     @GetMapping("/{id}")
-    // Public - no permission needed
     public ApiResponse<RoomResponse> getRoomById(@PathVariable String id) {
         log.debug("Fetching room with ID: {}", id);
         
@@ -108,19 +107,19 @@ public class RoomController {
     }
 
     @GetMapping("/hotel/{hotelId}")
-    public ApiResponse<Page<RoomResponse>> getRoomsByHotel(
+    public ApiResponse<Page<RoomResponse>> getRoomsByBranch(
             @PathVariable String hotelId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "roomNumber") String sortBy,
             @RequestParam(defaultValue = "asc") String sortDir) {
-        log.debug("Fetching rooms for hotel: {} - page: {}, size: {}", hotelId, page, size);
+        log.debug("Fetching rooms for branch: {} - page: {}, size: {}", hotelId, page, size);
         
         Sort.Direction direction = sortDir.equalsIgnoreCase("desc") ? 
                 Sort.Direction.DESC : Sort.Direction.ASC;
         Pageable pageable = PageRequest.of(page, size, Sort.by(direction, sortBy));
         
-        Page<RoomResponse> response = roomService.getRoomsByHotel(hotelId, pageable);
+        Page<RoomResponse> response = roomService.getRoomsByBranch(hotelId, pageable);
         
         return ApiResponse.<Page<RoomResponse>>builder()
                 .code(HttpStatus.OK.value())
@@ -182,7 +181,7 @@ public class RoomController {
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "roomNumber") String sortBy,
             @RequestParam(defaultValue = "asc") String sortDir) {
-        log.debug("Searching rooms with filters - Hotel: {}, RoomType: {}, Status: {}", 
+        log.debug("Searching rooms with filters - branch: {}, RoomType: {}, Status: {}", 
                 hotelId, roomTypeId, status);
         
         Sort.Direction direction = sortDir.equalsIgnoreCase("desc") ? 

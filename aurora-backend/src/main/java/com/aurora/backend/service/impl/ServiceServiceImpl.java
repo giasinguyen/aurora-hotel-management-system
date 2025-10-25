@@ -3,12 +3,12 @@ package com.aurora.backend.service.impl;
 import com.aurora.backend.dto.request.ServiceCreationRequest;
 import com.aurora.backend.dto.request.ServiceUpdateRequest;
 import com.aurora.backend.dto.response.ServiceResponse;
-import com.aurora.backend.entity.Hotel;
+import com.aurora.backend.entity.Branch;
 import com.aurora.backend.entity.Service;
 import com.aurora.backend.exception.AppException;
 import com.aurora.backend.enums.ErrorCode;
 import com.aurora.backend.mapper.ServiceMapper;
-import com.aurora.backend.repository.HotelRepository;
+import com.aurora.backend.repository.BranchRepository;
 import com.aurora.backend.repository.ServiceRepository;
 import com.aurora.backend.service.ServiceService;
 import lombok.AccessLevel;
@@ -24,28 +24,27 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Slf4j
+@Transactional(readOnly = true)
 public class ServiceServiceImpl implements ServiceService {
     
     ServiceRepository serviceRepository;
-    HotelRepository hotelRepository;
+    BranchRepository branchRepository;
     ServiceMapper serviceMapper;
 
     @Override
     @Transactional
     public ServiceResponse createService(ServiceCreationRequest request) {
-        log.info("Creating service: {} for hotel: {}", request.getName(), request.getHotelId());
+        log.info("Creating service: {} for branch: {}", request.getName(), request.getBranchId());
         
-        // Validate hotel exists
-        Hotel hotel = hotelRepository.findById(request.getHotelId())
-                .orElseThrow(() -> new AppException(ErrorCode.HOTEL_NOT_FOUND));
+        Branch branch = branchRepository.findById(request.getBranchId())
+                .orElseThrow(() -> new AppException(ErrorCode.BRANCH_NOT_EXISTED));
         
-        // Check if service name already exists in this hotel
-        if (serviceRepository.existsByHotelAndName(hotel, request.getName())) {
+        if (serviceRepository.existsByBranchAndName(branch, request.getName())) {
             throw new AppException(ErrorCode.SERVICE_EXISTED);
         }
         
         Service service = serviceMapper.toService(request);
-        service.setHotel(hotel);
+        service.setBranch(branch);
         
         Service savedService = serviceRepository.save(service);
         log.info("Service created successfully with ID: {}", savedService.getId());
@@ -61,9 +60,9 @@ public class ServiceServiceImpl implements ServiceService {
         Service service = serviceRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.SERVICE_NOT_FOUND));
         
-        // If name is being updated, check uniqueness within hotel
+        // If name is being updated, check uniqueness within branch
         if (request.getName() != null && !request.getName().equals(service.getName())) {
-            if (serviceRepository.existsByHotelAndName(service.getHotel(), request.getName())) {
+            if (serviceRepository.existsByBranchAndName(service.getBranch(), request.getName())) {
                 throw new AppException(ErrorCode.SERVICE_EXISTED);
             }
         }
@@ -113,13 +112,13 @@ public class ServiceServiceImpl implements ServiceService {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<ServiceResponse> getServicesByHotel(String hotelId, Pageable pageable) {
-        log.debug("Fetching services for hotel ID: {} with pagination: {}", hotelId, pageable);
+    public Page<ServiceResponse> getServicesByBranch(String branchId, Pageable pageable) {
+        log.debug("Fetching services for branch ID: {} with pagination: {}", branchId, pageable);
         
-        Hotel hotel = hotelRepository.findById(hotelId)
-                .orElseThrow(() -> new AppException(ErrorCode.HOTEL_NOT_FOUND));
+        Branch branch = branchRepository.findById(branchId)
+                .orElseThrow(() -> new AppException(ErrorCode.BRANCH_NOT_EXISTED));
         
-        Page<Service> services = serviceRepository.findByHotel(hotel, pageable);
+        Page<Service> services = serviceRepository.findByBranch(branch, pageable);
         return services.map(serviceMapper::toServiceResponse);
     }
 
@@ -134,16 +133,16 @@ public class ServiceServiceImpl implements ServiceService {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<ServiceResponse> searchServices(String hotelId, String type, String name, Pageable pageable) {
-        log.debug("Searching services with filters - Hotel: {}, Type: {}, Name: {}", hotelId, type, name);
+    public Page<ServiceResponse> searchServices(String branchId, String type, String name, Pageable pageable) {
+        log.debug("Searching services with filters - branch: {}, Type: {}, Name: {}", branchId, type, name);
         
-        Hotel hotel = null;
-        if (hotelId != null && !hotelId.trim().isEmpty()) {
-            hotel = hotelRepository.findById(hotelId)
-                    .orElseThrow(() -> new AppException(ErrorCode.HOTEL_NOT_FOUND));
+        Branch branch = null;
+        if (branchId != null && !branchId.trim().isEmpty()) {
+            branch = branchRepository.findById(branchId)
+                    .orElseThrow(() -> new AppException(ErrorCode.BRANCH_NOT_EXISTED));
         }
         
-        Page<Service> services = serviceRepository.findByFilters(hotel, type, name, pageable);
+        Page<Service> services = serviceRepository.findByFilters(branch, type, name, pageable);
         return services.map(serviceMapper::toServiceResponse);
     }
 }

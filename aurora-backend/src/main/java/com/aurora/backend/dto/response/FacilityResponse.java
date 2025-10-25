@@ -11,8 +11,8 @@ import lombok.experimental.FieldDefaults;
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class FacilityResponse {
     String id;
-    String hotelId;
-    String hotelName;
+    String branchId;
+    String branchName;
     String name;
     String openingHours;
     String policies;

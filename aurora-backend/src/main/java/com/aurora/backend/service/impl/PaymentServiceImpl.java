@@ -11,6 +11,8 @@ import com.aurora.backend.mapper.PaymentMapper;
 import com.aurora.backend.repository.BookingRepository;
 import com.aurora.backend.repository.PaymentRepository;
 import com.aurora.backend.service.PaymentService;
+import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -20,10 +22,13 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
+
 @Component
 @RequiredArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE, makeFinal = true)
 @Slf4j
+@Transactional(readOnly = true)
 public class PaymentServiceImpl implements PaymentService {
     
     PaymentRepository paymentRepository;
@@ -35,22 +40,75 @@ public class PaymentServiceImpl implements PaymentService {
     public PaymentResponse createPayment(PaymentCreationRequest request) {
         log.info("Creating payment for booking: {}", request.getBookingId());
         
-        // Validate booking exists
         Booking booking = bookingRepository.findById(request.getBookingId())
                 .orElseThrow(() -> new AppException(ErrorCode.BOOKING_NOT_FOUND));
+        
+        validatePaymentAmount(booking, BigDecimal.valueOf(request.getAmount()));
         
         Payment payment = paymentMapper.toPayment(request);
         payment.setBooking(booking);
         
-        // Set default status if not provided
         if (request.getStatus() == null || request.getStatus().trim().isEmpty()) {
-            payment.setStatus("PENDING");
+            payment.setStatus(Payment.PaymentStatus.PENDING);
         }
         
         Payment savedPayment = paymentRepository.save(payment);
+        
+        if (savedPayment.getStatus() == Payment.PaymentStatus.SUCCESS) {
+            updateBookingPaymentStatus(booking);
+        }
+        
         log.info("Payment created successfully with ID: {}", savedPayment.getId());
         
         return paymentMapper.toPaymentResponse(savedPayment);
+    }
+
+    private void validatePaymentAmount(Booking booking, BigDecimal paymentAmount) {
+        if (paymentAmount == null || paymentAmount.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new AppException(ErrorCode.INVALID_PAYMENT_AMOUNT);
+        }
+        
+        BigDecimal totalPaid = paymentRepository.getTotalPaidAmount(booking.getId());
+        
+        BigDecimal totalPrice = booking.getTotalPrice();
+        if (totalPrice == null || totalPrice.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new AppException(ErrorCode.INVALID_BOOKING_TOTAL);
+        }
+        
+        BigDecimal remaining = totalPrice.subtract(totalPaid);
+        
+        if (paymentAmount.compareTo(remaining) > 0) {
+            log.warn("Payment amount {} exceeds remaining {} for booking {}", 
+                paymentAmount, remaining, booking.getId());
+            throw new AppException(ErrorCode.PAYMENT_EXCEEDS_TOTAL);
+        }
+        
+        log.debug("Payment validation passed: amount={}, totalPaid={}, remaining={}", 
+            paymentAmount, totalPaid, remaining);
+    }
+
+    private void updateBookingPaymentStatus(Booking booking) {
+        BigDecimal totalPaid = paymentRepository.getTotalPaidAmount(booking.getId());
+        BigDecimal totalPrice = booking.getTotalPrice();
+        BigDecimal depositAmount = booking.getDepositAmount();
+        
+        Booking.PaymentStatus newStatus;
+        
+        if (totalPaid.compareTo(totalPrice) >= 0) {
+            newStatus = Booking.PaymentStatus.PAID;
+        } else if (depositAmount != null && totalPaid.compareTo(depositAmount) >= 0) {
+            newStatus = Booking.PaymentStatus.DEPOSIT_PAID;
+        } else if (totalPaid.compareTo(BigDecimal.ZERO) > 0) {
+            newStatus = Booking.PaymentStatus.PARTIALLY_PAID;
+        } else {
+            newStatus = Booking.PaymentStatus.PENDING;
+        }
+        
+        if (booking.getPaymentStatus() != newStatus) {
+            booking.setPaymentStatus(newStatus);
+            bookingRepository.save(booking);
+            log.info("Updated booking {} payment status to {}", booking.getId(), newStatus);
+        }
     }
 
     @Override

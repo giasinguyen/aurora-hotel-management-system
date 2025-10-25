@@ -10,8 +10,8 @@ import java.util.List;
 
 @Repository
 public interface FacilityRepository extends JpaRepository<Facility, String> {
-    List<Facility> findByHotelId(String hotelId);
-    Page<Facility> findByHotelId(String hotelId, Pageable pageable);
+    List<Facility> findByBranchId(String BranchId);
+    Page<Facility> findByBranchId(String BranchId, Pageable pageable);
     Page<Facility> findByNameContainingIgnoreCase(String name, Pageable pageable);
-    boolean existsByHotelIdAndName(String hotelId, String name);
+    boolean existsByBranchIdAndName(String BranchId, String name);
 }

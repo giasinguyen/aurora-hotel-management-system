@@ -10,9 +10,9 @@ import java.util.List;
 
 @Repository
 public interface RoomTypeRepository extends JpaRepository<RoomType, String> {
-    List<RoomType> findByHotelId(String hotelId);
-    Page<RoomType> findByHotelId(String hotelId, Pageable pageable);
+    List<RoomType> findByBranchId(String BranchId);
+    Page<RoomType> findByBranchId(String BranchId, Pageable pageable);
     Page<RoomType> findByNameContainingIgnoreCase(String name, Pageable pageable);
-    boolean existsByHotelIdAndName(String hotelId, String name);
-    boolean existsByHotelIdAndCode(String hotelId, String code);
+    boolean existsByBranchIdAndName(String BranchId, String name);
+    boolean existsByBranchIdAndCode(String BranchId, String code);
 }
