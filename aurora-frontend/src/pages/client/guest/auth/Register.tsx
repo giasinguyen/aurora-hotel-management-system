@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import PageWithCarousel from "@/components/custom/PageWithCarousel";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
-import { registerUserApi } from "@/services/userApi";
 import { registerSchema } from "@/utils/validateSchema";
 import type { ValidationError } from "yup";
 
@@ -53,10 +53,9 @@ const RegisterPage = () => {
       // Validate using Yup schema
       await registerSchema.validate(formData, { abortEarly: false });
       
-      // If validation passes, proceed with registration
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { confirmPassword, ...registerData } = formData;
-      await registerUserApi(registerData);
+      // TODO: Call register API
+      // const { confirmPassword, ...registerData } = formData;
+      // await authService.register(registerData);
       
       setSuccess(true);
       setTimeout(() => {
@@ -94,8 +93,8 @@ const RegisterPage = () => {
 
   if (success) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-amber-50 via-white to-amber-50 py-12 px-4 flex items-center justify-center">
-        <Card className="w-full max-w-md shadow-xl">
+      <PageWithCarousel>
+        <Card className="w-full max-w-md shadow-2xl backdrop-blur-sm bg-white/95">
           <CardContent className="pt-6">
             <div className="text-center space-y-4">
               <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100">
@@ -103,20 +102,20 @@ const RegisterPage = () => {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
               </div>
-              <h3 className="text-lg font-medium text-gray-900">Đăng ký thành công!</h3>
+              <h3 className="text-lg font-medium text-gray-900">Đăng ký thành công! (FAKE)</h3>
               <p className="text-sm text-gray-600">
                 Tài khoản của bạn đã được tạo. Đang chuyển đến trang đăng nhập...
               </p>
             </div>
           </CardContent>
         </Card>
-      </div>
+      </PageWithCarousel>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-amber-50 via-white to-amber-50 py-12 px-4 flex items-center justify-center">
-      <Card className="w-full max-w-md shadow-xl">
+    <PageWithCarousel>
+      <Card className="w-full max-w-md shadow-2xl backdrop-blur-sm bg-white/95">
         <CardHeader className="space-y-1">
           <CardTitle className="text-3xl font-bold text-center text-gray-900">
             Đăng ký
@@ -354,7 +353,7 @@ const RegisterPage = () => {
           </p>
         </CardFooter>
       </Card>
-    </div>
+    </PageWithCarousel>
   );
 };
 

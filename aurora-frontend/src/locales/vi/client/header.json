@@ -8,10 +8,17 @@
     "gallery": "THƯ VIỆN ẢNH"
   },
   "buttons": {
-    "bookNow": "ĐẶT PHÒNG",
+    "login": "ĐĂNG NHẬP",
+    "register": "ĐĂNG KÝ",
     "search": "Tìm kiếm"
   },
   "navigation": {
     "menu": "Danh mục"
+  },
+  "user": {
+    "myAccount": "Tài khoản của tôi",
+    "profile": "Hồ sơ",
+    "settings": "Cài đặt",
+    "logout": "Đăng xuất"
   }
 }

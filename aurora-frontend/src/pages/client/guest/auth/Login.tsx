@@ -1,94 +1,154 @@
 import { useState, useEffect } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAppDispatch, useAppSelector } from "@/hooks/useRedux";
-import { loginUser } from "@/features/slices/auth/authThunk";
-import { clearError } from "@/features/slices/auth/authSlice";
+import { loginAsync, fetchCurrentUserAsync, clearError, clearAuth, selectAuth } from "@/features/slices/auth/authSlice";
+import PageWithCarousel from "@/components/custom/PageWithCarousel";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { loginSchema } from "@/utils/validateSchema";
+import { getRedirectPathByRole } from "@/utils/roleHelper";
+import { toast } from "sonner";
 import type { ValidationError } from "yup";
+
+interface FormData {
+  username: string;
+  password: string;
+}
+
+interface ValidationErrors {
+  username?: string;
+  password?: string;
+}
 
 const LoginPage = () => {
   const navigate = useNavigate();
   const dispatch = useAppDispatch();
-  const { isLoading, error, isAuthenticated } = useAppSelector((state) => state.auth);
+  const { isLoading, error, isAuthenticated, currentUser } = useAppSelector(selectAuth);
 
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<FormData>({
     username: "",
     password: "",
   });
+
+  const [validationErrors, setValidationErrors] = useState<ValidationErrors>({});
   const [showPassword, setShowPassword] = useState(false);
-  const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
+  const [isCheckingAuth, setIsCheckingAuth] = useState(false);
 
+  // Check if token is actually valid when component mounts
   useEffect(() => {
-    if (isAuthenticated) {
-      navigate("/");
-    }
-  }, [isAuthenticated, navigate]);
+    const checkAuthValidity = async () => {
+      if (isAuthenticated && !currentUser && !isCheckingAuth) {
+        setIsCheckingAuth(true);
+        
+        try {
+          const user = await dispatch(fetchCurrentUserAsync()).unwrap();
+          const redirectPath = getRedirectPathByRole(user);
+          toast.success("Đã đăng nhập!");
+          navigate(redirectPath);
+        } catch {
+          dispatch(clearAuth());
+        } finally {
+          setIsCheckingAuth(false);
+        }
+      } else if (isAuthenticated && currentUser) {
+        // Đã có user, redirect theo role
+        const redirectPath = getRedirectPathByRole(currentUser);
+        navigate(redirectPath);
+      }
+    };
 
+    checkAuthValidity();
+  }, [isAuthenticated, currentUser, dispatch, navigate, isCheckingAuth]);
+
+  // Clear error when component unmounts
   useEffect(() => {
-    dispatch(clearError());
+    return () => {
+      dispatch(clearError());
+    };
   }, [dispatch]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    setFormData({
-      ...formData,
+    setFormData((prev) => ({
+      ...prev,
       [name]: value,
-    });
-    // Clear validation error when user types
-    if (validationErrors[name]) {
-      setValidationErrors({
-        ...validationErrors,
-        [name]: "",
-      });
+    }));
+
+    // Clear validation error for this field
+    if (validationErrors[name as keyof ValidationErrors]) {
+      setValidationErrors((prev) => ({
+        ...prev,
+        [name]: undefined,
+      }));
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    dispatch(clearError());
+
+    // Clear previous errors
     setValidationErrors({});
+    dispatch(clearError());
 
     try {
-      // Validate using Yup schema
+      // Validate form data
       await loginSchema.validate(formData, { abortEarly: false });
       
-      // If validation passes, proceed with login
-      await dispatch(loginUser(formData)).unwrap();
-      navigate("/");
-    } catch (err) {
-      if (err instanceof Error && err.name === 'ValidationError') {
-        // Handle Yup validation errors
-        const yupError = err as ValidationError;
-        const errors: Record<string, string> = {};
-        yupError.inner.forEach((error) => {
+      // Dispatch login action
+      const result = await dispatch(loginAsync(formData)).unwrap();
+
+      if (result.authenticated) {
+        // Fetch current user info after successful login
+        const user = await dispatch(fetchCurrentUserAsync()).unwrap();
+        
+        // Redirect based on user role
+        const redirectPath = getRedirectPathByRole(user);
+        
+        toast.success("Đăng nhập thành công!", {
+          description: "Chào mừng bạn quay trở lại!",
+          duration: 3000,
+        });
+        
+        navigate(redirectPath);
+      }
+    } catch (err: unknown) {
+      if (err && typeof err === "object" && "inner" in err) {
+        // Yup validation errors
+        const errors: ValidationErrors = {};
+        (err as ValidationError).inner.forEach((error) => {
           if (error.path) {
-            errors[error.path] = error.message;
+            errors[error.path as keyof ValidationErrors] = error.message;
           }
         });
         setValidationErrors(errors);
       } else {
-        console.error("Login failed:", err);
+        // API error
+        const errorMessage = typeof err === "string" ? err : "Đăng nhập thất bại. Vui lòng thử lại!";
+        toast.error("Đăng nhập thất bại", {
+          description: errorMessage,
+          duration: 4000,
+        });
       }
     }
   };
 
   const handleFacebookLogin = () => {
-    // TODO: Implement Facebook login
-    console.log("Facebook login clicked");
+    toast.info("Chức năng đang phát triển", {
+      description: "Đăng nhập bằng Facebook sẽ sớm có mặt!",
+    });
   };
 
   const handleGoogleLogin = () => {
-    // TODO: Implement Google login
-    console.log("Google login clicked");
+    toast.info("Chức năng đang phát triển", {
+      description: "Đăng nhập bằng Google sẽ sớm có mặt!",
+    });
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-amber-50 via-white to-amber-50 py-12 px-4 flex items-center justify-center">
-      <Card className="w-full max-w-md shadow-xl">
+    <PageWithCarousel>
+      <Card className="w-full max-w-md shadow-2xl backdrop-blur-sm bg-white/95">
         <CardHeader className="space-y-1">
           <CardTitle className="text-3xl font-bold text-center text-gray-900">
             Đăng nhập
@@ -148,6 +208,7 @@ const LoginPage = () => {
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+                  disabled={isLoading}
                 >
                   {showPassword ? (
                     <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -169,15 +230,15 @@ const LoginPage = () => {
             <Button
               type="submit"
               className="w-full bg-amber-600 hover:bg-amber-700 text-white py-2.5 text-base font-medium"
-              disabled={isLoading}
+              disabled={isLoading || isCheckingAuth}
             >
-              {isLoading ? (
+              {isLoading || isCheckingAuth ? (
                 <span className="flex items-center justify-center gap-2">
                   <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
                     <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
                     <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
                   </svg>
-                  Đang đăng nhập...
+                  {isCheckingAuth ? "Đang kiểm tra..." : "Đang đăng nhập..."}
                 </span>
               ) : (
                 "Đăng nhập"
@@ -238,7 +299,7 @@ const LoginPage = () => {
           </p>
         </CardFooter>
       </Card>
-    </div>
+    </PageWithCarousel>
   );
 };
 
