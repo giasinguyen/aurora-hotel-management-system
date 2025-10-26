@@ -14,11 +14,11 @@ import { useTranslation } from "react-i18next";
 import { motion, useInView, type Variants } from "framer-motion";
 
 const bannerImages = [
-  "src/assets/images/banners/aurora-banner-01.jpg",
-  "src/assets/images/banners/aurora-banner-02.jpg",
-  "src/assets/images/banners/aurora-banner-03.jpg",
-  "src/assets/images/banners/aurora-banner-04.jpg",
-  "src/assets/images/banners/aurora-banner-05.jpg",
+  "/src/assets/images/banners/aurora-banner-01.jpg",
+  "/src/assets/images/banners/aurora-banner-02.jpg",
+  "/src/assets/images/banners/aurora-banner-03.jpg",
+  "/src/assets/images/banners/aurora-banner-04.jpg",
+  "/src/assets/images/banners/aurora-banner-05.jpg",
 ];
 
 export default function HomePage() {
@@ -180,7 +180,7 @@ export default function HomePage() {
                 transition={{ duration: 0.3 }}
               >
                 <LazyImage
-                  src="src/assets/images/banners/aurora-banner-02.jpg"
+                  src="/src/assets/images/banners/aurora-banner-02.jpg"
                   alt="Hotel Room"
                   className="w-full h-64 object-cover"
                   containerClassName="rounded-lg shadow-lg"
@@ -193,7 +193,7 @@ export default function HomePage() {
                 className="mt-8"
               >
                 <LazyImage
-                  src="src/assets/images/banners/aurora-banner-03.jpg"
+                  src="/src/assets/images/banners/aurora-banner-03.jpg"
                   alt="Hotel View"
                   className="w-full h-64 object-cover"
                   containerClassName="rounded-lg shadow-lg"
@@ -206,7 +206,7 @@ export default function HomePage() {
                 className="-mt-8"
               >
                 <LazyImage
-                  src="src/assets/images/banners/aurora-banner-04.jpg"
+                  src="/src/assets/images/banners/aurora-banner-04.jpg"
                   alt="Hotel Amenity"
                   className="w-full h-64 object-cover"
                   containerClassName="rounded-lg shadow-lg"
@@ -218,7 +218,7 @@ export default function HomePage() {
                 transition={{ duration: 0.3 }}
               >
                 <LazyImage
-                  src="src/assets/images/banners/aurora-banner-05.jpg"
+                  src="/src/assets/images/banners/aurora-banner-05.jpg"
                   alt="Hotel Service"
                   className="w-full h-64 object-cover"
                   containerClassName="rounded-lg shadow-lg"
@@ -269,7 +269,7 @@ export default function HomePage() {
                 transition={{ duration: 0.3 }}
               >
                 <LazyImage
-                  src="src/assets/images/rooms/aurora-persident-room.jpg"
+                  src="/src/assets/images/rooms/aurora-persident-room.jpg"
                   alt="Luxury Rooms"
                   className="w-full h-full object-cover"
                 />
@@ -293,7 +293,7 @@ export default function HomePage() {
                 transition={{ duration: 0.3 }}
               >
                 <LazyImage
-                  src="src/assets/images/food/aurora-food-01.jpg"
+                  src="/src/assets/images/food/aurora-food-01.jpg"
                   alt="Fine Dining"
                   className="w-full h-full object-cover"
                 />
@@ -317,7 +317,7 @@ export default function HomePage() {
                 transition={{ duration: 0.3 }}
               >
                 <LazyImage
-                  src="src/assets/images/spa/aurora-spa.jpg"
+                  src="/src/assets/images/spa/aurora-spa.jpg"
                   alt="Wellness & Spa"
                   className="w-full h-full object-cover"
                 />
@@ -348,7 +348,7 @@ export default function HomePage() {
           }
         >
           <img
-            src="src/assets/images/rooms/aurora-persident-room.jpg"
+            src="/src/assets/images/rooms/aurora-persident-room.jpg"
             alt="Aurora Beach Hotel Luxury Experience"
             height={720}
             width={1400}

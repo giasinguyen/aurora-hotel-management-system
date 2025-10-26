@@ -40,13 +40,6 @@ import CustomerBookingDetailPage from "@/pages/client/customer/bookings/BookingD
 // Customer favorites
 import FavoriteListPage from "@/pages/client/customer/favorites/FavoriteList";
 
-// Customer requests
-import LateCheckoutRequestListPage from "@/pages/client/customer/requests/LateCheckoutRequestList";
-import LateCheckoutRequestUpsertPage from "@/pages/client/customer/requests/LateCheckoutRequestUpsert";
-import EarlyCheckinRequestListPage from "@/pages/client/customer/requests/EarlyCheckinRequestList";
-import EarlyCheckinRequestUpsertPage from "@/pages/client/customer/requests/EarlyCheckinRequestUpsert";
-import IssueReportListPage from "@/pages/client/customer/requests/IssueReportList";
-import IssueReportUpsertPage from "@/pages/client/customer/requests/IssueReportUpsert";
 
 // Customer reviews
 import ReviewListPage from "@/pages/client/customer/reviews/ReviewList";
@@ -62,10 +55,6 @@ import StaffBookingListPage from "@/pages/staff/bookings/BookingList";
 import StaffBookingUpsertPage from "@/pages/staff/bookings/BookingUpsert";
 import StaffBookingDetailPage from "@/pages/staff/bookings/BookingDetail";
 import StaffCustomerUpsertPage from "@/pages/staff/customers/CustomerUpsert";
-import StaffCustomerRequestListPage from "@/pages/staff/requests/CustomerRequestList";
-import StaffLateCheckoutRequestListPage from "@/pages/staff/requests/LateCheckoutRequestList";
-import StaffEarlyCheckinRequestListPage from "@/pages/staff/requests/EarlyCheckinRequestList";
-import StaffIssueReportListPage from "@/pages/staff/requests/IssueReportList";
 import ShiftReportPage from "@/pages/staff/reports/ShiftReport";
 
 // ==================== MANAGER PAGES ====================
@@ -106,7 +95,6 @@ import AdminOccupancyReportPage from "@/pages/admin/reports/OccupancyReport";
 import AdminBranchComparisonReportPage from "@/pages/admin/reports/BranchComparisonReport";
 
 // ==================== COMMON PAGES ====================
-import CheckInOutPage from "@/pages/commons/CheckInOut";
 import UserProfilePage from "@/pages/commons/UserProfile";
 
 const router = createBrowserRouter([
@@ -144,27 +132,6 @@ const router = createBrowserRouter([
       { path: "customer/booking", element: <CustomerBookingListPage /> },
       { path: "customer/booking/:id", element: <CustomerBookingDetailPage /> },
       { path: "customer/favorites", element: <FavoriteListPage /> },
-      {
-        path: "customer/late-checkout-requests",
-        element: <LateCheckoutRequestListPage />,
-      },
-      {
-        path: "customer/late-checkout-requests/upsert",
-        element: <LateCheckoutRequestUpsertPage />,
-      },
-      {
-        path: "customer/early-checkin-requests",
-        element: <EarlyCheckinRequestListPage />,
-      },
-      {
-        path: "customer/early-checkin-requests/upsert",
-        element: <EarlyCheckinRequestUpsertPage />,
-      },
-      { path: "customer/issue-reports", element: <IssueReportListPage /> },
-      {
-        path: "customer/issue-reports/upsert",
-        element: <IssueReportUpsertPage />,
-      },
       { path: "customer/reviews", element: <ReviewListPage /> },
       { path: "customer/reviews/upsert", element: <ReviewUpsertPage /> },
       { path: "customer/payment", element: <CustomerPaymentPage /> },
@@ -178,73 +145,131 @@ const router = createBrowserRouter([
     errorElement: <ErrorPage />,
     children: [
       { index: true, element: <StaffDashboardPage /> },
+      
+      // Quản lý đơn đặt phòng
       { path: "booking", element: <StaffBookingListPage /> },
       { path: "booking/upsert", element: <StaffBookingUpsertPage /> },
       { path: "booking/:id", element: <StaffBookingDetailPage /> },
-      { path: "checkinout", element: <CheckInOutPage /> },
-      { path: "profile", element: <UserProfilePage /> },
+      
+      // Quản lý khách hàng (chỉ tạo/upsert)
       { path: "customers/upsert", element: <StaffCustomerUpsertPage /> },
-      { path: "customer-requests", element: <StaffCustomerRequestListPage /> },
-      {
-        path: "customer-requests/late-checkout",
-        element: <StaffLateCheckoutRequestListPage />,
-      },
-      {
-        path: "customer-requests/early-checkin",
-        element: <StaffEarlyCheckinRequestListPage />,
-      },
-      {
-        path: "customer-requests/issue-reports",
-        element: <StaffIssueReportListPage />,
-      },
+      
+      // Báo cáo ca làm việc
       { path: "reports/shift", element: <ShiftReportPage /> },
+      
+      // Profile
+      { path: "profile", element: <UserProfilePage /> },
     ],
   },
 
   // ==================== MANAGER ROUTES ====================
+  // Manager kế thừa tất cả chức năng của Staff + thêm chức năng riêng
   {
     path: "/manager",
     element: <ManagerPage />,
     errorElement: <ErrorPage />,
     children: [
       { index: true, element: <ManagerDashboardPage /> },
+      
+      // ===== Kế thừa từ Staff =====
+      // Quản lý đơn đặt phòng (từ Staff)
+      { path: "booking", element: <StaffBookingListPage /> },
+      { path: "booking/upsert", element: <StaffBookingUpsertPage /> },
+      { path: "booking/:id", element: <StaffBookingDetailPage /> },
+      
+      // Báo cáo ca làm việc (từ Staff)
+      { path: "reports/shift", element: <ShiftReportPage /> },
+      
+      // ===== Chức năng riêng của Manager =====
+      // Quản lý phòng
       { path: "rooms", element: <ManagerRoomListPage /> },
       { path: "rooms/upsert", element: <ManagerRoomUpsertPage /> },
       { path: "room-types", element: <RoomTypeListPage /> },
       { path: "room-types/upsert", element: <RoomTypeUpsertPage /> },
+      
+      // Quản lý dịch vụ
       { path: "services", element: <ManagerServiceListPage /> },
       { path: "services/upsert", element: <ManagerServiceUpsertPage /> },
+      
+      // Quản lý khách hàng (đầy đủ: xem, tạo, sửa)
       { path: "customers", element: <ManagerCustomerListPage /> },
       { path: "customers/upsert", element: <ManagerCustomerUpsertPage /> },
       { path: "customers/:id", element: <ManagerCustomerDetailPage /> },
+      
+      // Quản lý nhân viên
       { path: "staff", element: <ManagerStaffListPage /> },
       { path: "staff/upsert", element: <ManagerStaffUpsertPage /> },
       { path: "staff/:id/assign-branch", element: <AssignBranchPage /> },
+      
+      // Quản lý khuyến mãi
       { path: "promotions", element: <ManagerPromotionListPage /> },
       { path: "promotions/upsert", element: <ManagerPromotionUpsertPage /> },
+      
+      // Quản lý tin tức
       { path: "news", element: <ManagerNewsListPage /> },
       { path: "news/upsert", element: <ManagerNewsUpsertPage /> },
+      
+      // Báo cáo doanh thu và công suất
       { path: "reports/revenue", element: <ManagerRevenueReportPage /> },
       { path: "reports/occupancy", element: <ManagerOccupancyReportPage /> },
-      { path: "checkinout", element: <CheckInOutPage /> },
+      
+      // Profile
       { path: "profile", element: <UserProfilePage /> },
     ],
   },
 
   // ==================== ADMIN ROUTES ====================
+  // Admin kế thừa tất cả chức năng của Manager (và Staff) + thêm chức năng riêng
   {
     path: "/admin",
     element: <AdminPage />,
     errorElement: <ErrorPage />,
     children: [
       { index: true, element: <AdminDashboardPage /> },
+      
+      // ===== Kế thừa từ Staff =====
+      // Quản lý đơn đặt phòng (từ Staff)
+      { path: "booking", element: <StaffBookingListPage /> },
+      { path: "booking/upsert", element: <StaffBookingUpsertPage /> },
+      { path: "booking/:id", element: <StaffBookingDetailPage /> },
+      
+      // Báo cáo ca làm việc (từ Staff)
+      { path: "reports/shift", element: <ShiftReportPage /> },
+      
+      // ===== Kế thừa từ Manager =====
+      // Quản lý phòng (từ Manager)
+      { path: "rooms", element: <ManagerRoomListPage /> },
+      { path: "rooms/upsert", element: <ManagerRoomUpsertPage /> },
+      { path: "room-types", element: <RoomTypeListPage /> },
+      { path: "room-types/upsert", element: <RoomTypeUpsertPage /> },
+      
+      // Quản lý dịch vụ (từ Manager)
+      { path: "services", element: <ManagerServiceListPage /> },
+      { path: "services/upsert", element: <ManagerServiceUpsertPage /> },
+      
+      // Quản lý khuyến mãi (từ Manager)
+      { path: "promotions", element: <ManagerPromotionListPage /> },
+      { path: "promotions/upsert", element: <ManagerPromotionUpsertPage /> },
+      
+      // Quản lý tin tức (từ Manager)
+      { path: "news", element: <ManagerNewsListPage /> },
+      { path: "news/upsert", element: <ManagerNewsUpsertPage /> },
+      
+      // ===== Chức năng riêng của Admin =====
+      // Quản lý chi nhánh
       { path: "branches", element: <AdminBranchListPage /> },
       { path: "branches/upsert", element: <AdminBranchUpsertPage /> },
+      
+      // Quản lý User System (bao gồm tất cả: Staff, Manager, Customer)
       { path: "users", element: <AdminUserListPage /> },
       { path: "users/upsert", element: <AdminUserUpsertPage /> },
       { path: "roles", element: <AdminRoleManagementPage /> },
+      
+      // Quản lý tài liệu
       { path: "documents", element: <AdminDocumentListPage /> },
       { path: "documents/upsert", element: <AdminDocumentUpsertPage /> },
+      
+      // Báo cáo tổng quát (gồm tất cả các role)
       { path: "reports/overview", element: <AdminOverviewReportPage /> },
       { path: "reports/revenue", element: <AdminRevenueReportPage /> },
       { path: "reports/occupancy", element: <AdminOccupancyReportPage /> },
@@ -252,7 +277,8 @@ const router = createBrowserRouter([
         path: "reports/branch-comparison",
         element: <AdminBranchComparisonReportPage />,
       },
-      { path: "checkinout", element: <CheckInOutPage /> },
+      
+      // Profile
       { path: "profile", element: <UserProfilePage /> },
     ],
   },

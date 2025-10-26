@@ -1,7 +1,7 @@
 export interface IApiResponse<T> {
-  message: string;
-  errorCode: string;
-  data: T;
+  code?: number;
+  message?: string;
+  result?: T;
 }
 
 export interface IPageResponse<T> {

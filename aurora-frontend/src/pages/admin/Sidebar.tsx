@@ -1,6 +1,11 @@
 import { Link, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard,
+  CalendarCheck,
+  BedDouble,
+  Utensils,
+  Gift,
+  Newspaper,
   Building2,
   Users,
   FileText,
@@ -8,7 +13,6 @@ import {
   ChevronLeft,
   ChevronRight,
   Hotel,
-  LogIn,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -27,6 +31,42 @@ const menuItems = [
     icon: LayoutDashboard,
     href: '/admin',
   },
+  // ===== Kế thừa từ Staff =====
+  {
+    title: 'Bookings',
+    icon: CalendarCheck,
+    href: '/admin/booking',
+    children: [
+      { title: 'Booking List', href: '/admin/booking' },
+      { title: 'Create Booking', href: '/admin/booking/upsert' },
+    ],
+  },
+  // ===== Kế thừa từ Manager =====
+  {
+    title: 'Rooms',
+    icon: BedDouble,
+    href: '/admin/rooms',
+    children: [
+      { title: 'Room List', href: '/admin/rooms' },
+      { title: 'Room Types', href: '/admin/room-types' },
+    ],
+  },
+  {
+    title: 'Services',
+    icon: Utensils,
+    href: '/admin/services',
+  },
+  {
+    title: 'Promotions',
+    icon: Gift,
+    href: '/admin/promotions',
+  },
+  {
+    title: 'News',
+    icon: Newspaper,
+    href: '/admin/news',
+  },
+  // ===== Chức năng riêng của Admin =====
   {
     title: 'Branches',
     icon: Building2,
@@ -52,8 +92,9 @@ const menuItems = [
     href: '/admin/reports',
     children: [
       { title: 'Overview', href: '/admin/reports/overview' },
-      { title: 'Revenue', href: '/admin/reports/revenue' },
-      { title: 'Occupancy', href: '/admin/reports/occupancy' },
+      { title: 'Shift Report', href: '/admin/reports/shift' },
+      { title: 'Revenue Report', href: '/admin/reports/revenue' },
+      { title: 'Occupancy Report', href: '/admin/reports/occupancy' },
       { title: 'Branch Comparison', href: '/admin/reports/branch-comparison' },
     ],
   },
@@ -202,30 +243,6 @@ export default function Sidebar({ className }: SidebarProps) {
             );
           })}
         </div>
-
-        <Separator className="my-4" />
-
-        {/* Quick Actions */}
-        {!collapsed && (
-          <div className="space-y-2">
-            <p className="px-3 text-xs font-semibold text-gray-500">QUICK ACTIONS</p>
-            <Link
-              to="/admin/checkinout"
-              className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-gray-700 transition-all"
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = `${APP_COLOR.ADMIN}20`;
-                e.currentTarget.style.color = APP_COLOR.ADMIN;
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = 'transparent';
-                e.currentTarget.style.color = '#374151';
-              }}
-            >
-              <LogIn className="h-5 w-5" />
-              <span>Check-in / Check-out</span>
-            </Link>
-          </div>
-        )}
 
         <Separator className="my-4" />
 
