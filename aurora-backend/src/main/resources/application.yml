@@ -42,33 +42,25 @@ spring:
         max-file-size: 10MB
         max-request-size: 10MB
 
-  # Spring AI OpenAI Configuration
-  ai:
-    openai:
-      api-key: ${OPEN_ROUTER_API}
-      embedding:
-        base-url: http://127.0.0.1:1234
-        options:
-          model: text-embedding-nomic-embed-text-v1.5-embedding
-          dimensions: 768
-      chat:
-        base-url: https://openrouter.ai/api
-        api-key: ${OPEN_ROUTER_API}
-        options:
-          model: mistralai/mistral-small-3.2-24b-instruct:free
-          internal-tool-execution-enabled: true
-    vectorstore:
-      pgvector:
-        index-type: HNSW
-        distance-type: COSINE_DISTANCE
-        dimensions: 768
-        max-document-batch-size: 10000
-        schema-validation: true
-        table-name: vector_store
-        initialize-schema: true
-
 # JWT Configuration
 jwt:
   signerKey: ${JWT_SIGNER_KEY}
   valid-duration: ${JWT_VALID_DURATION:3600}
   refreshable-duration: ${JWT_REFRESHABLE_DURATION:86400}
+
+# Langchain4j
+langchain4j:
+  google-ai-gemini:
+    chat-model:
+      api-key: ${GEMINI_AI_KEY}
+      model-name: gemini-2.5-flash
+      log-requests-and-responses: true
+    streaming-chat-model:
+      api-key: ${GEMINI_AI_KEY}
+      model-name: gemini-2.5-flash
+      log-requests-and-responses: true
+    embedding-model:
+      api-key: ${GEMINI_AI_KEY}
+      model-name: text-embedding-004
+      output-dimensionality: 768
+      log-requests-and-responses: false
