@@ -35,19 +35,21 @@ export default function LazyImage({
         <div className="absolute inset-0 bg-gray-200 animate-pulse" />
       )}
       
-      {/* Actual image */}
-      <motion.img
-        src={imageSrc}
-        alt={alt}
-        className={className}
-        initial={{ opacity: 0, scale: 1.1 }}
-        animate={{ 
-          opacity: isLoaded ? 1 : 0,
-          scale: isLoaded ? 1 : 1.1,
-        }}
-        transition={{ duration: 0.6, ease: "easeOut" }}
-        loading="lazy"
-      />
+      {/* Actual image - only render when imageSrc is loaded */}
+      {imageSrc && (
+        <motion.img
+          src={imageSrc}
+          alt={alt}
+          className={className}
+          initial={{ opacity: 0, scale: 1.1 }}
+          animate={{ 
+            opacity: isLoaded ? 1 : 0,
+            scale: isLoaded ? 1 : 1.1,
+          }}
+          transition={{ duration: 0.6, ease: "easeOut" }}
+          loading="lazy"
+        />
+      )}
     </div>
   );
 }

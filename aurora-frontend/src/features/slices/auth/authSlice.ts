@@ -4,9 +4,9 @@ import type { User, AuthState } from '../../../types/auth';
 
 const initialState: AuthState = {
   user: null,
-  token: localStorage.getItem('token'),
+  token: localStorage.getItem('access_token'),
   isLoading: false,
-  isAuthenticated: !!localStorage.getItem('token'),
+  isAuthenticated: !!localStorage.getItem('access_token'),
   error: null,
 };
 
@@ -22,14 +22,19 @@ const authSlice = createSlice({
       state.token = action.payload.token;
       state.isAuthenticated = true;
       state.error = null;
-      localStorage.setItem('token', action.payload.token);
+      localStorage.setItem('access_token', action.payload.token);
     },
     clearCredentials: (state) => {
       state.user = null;
       state.token = null;
       state.isAuthenticated = false;
       state.error = null;
-      localStorage.removeItem('token');
+      localStorage.removeItem('access_token');
+    },
+    updateTokenManually: (state, action: PayloadAction<{ accessToken: string }>) => {
+      state.token = action.payload.accessToken;
+      state.isAuthenticated = true;
+      localStorage.setItem('access_token', action.payload.accessToken);
     },
   },
   extraReducers: (builder) => {
@@ -45,7 +50,7 @@ const authSlice = createSlice({
         state.token = action.payload.token;
         state.isAuthenticated = true;
         state.error = null;
-        localStorage.setItem('token', action.payload.token);
+        // Token already stored in thunk
       })
       .addCase(loginUser.rejected, (state, action) => {
         state.isLoading = false;
@@ -66,7 +71,7 @@ const authSlice = createSlice({
         state.isAuthenticated = false;
         state.user = null;
         state.token = null;
-        localStorage.removeItem('token');
+        localStorage.removeItem('access_token');
       })
       // Logout cases
       .addCase(logoutUser.fulfilled, (state) => {
@@ -74,10 +79,10 @@ const authSlice = createSlice({
         state.token = null;
         state.isAuthenticated = false;
         state.error = null;
-        localStorage.removeItem('token');
+        localStorage.removeItem('access_token');
       });
   },
 });
 
-export const { clearError, setCredentials, clearCredentials } = authSlice.actions;
+export const { clearError, setCredentials, clearCredentials, updateTokenManually } = authSlice.actions;
 export default authSlice.reducer;
