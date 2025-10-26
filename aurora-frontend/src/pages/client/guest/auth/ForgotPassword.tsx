@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import PageWithCarousel from "@/components/custom/PageWithCarousel";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -48,8 +49,8 @@ const ForgotPasswordPage = () => {
 
   if (success) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-amber-50 via-white to-amber-50 py-12 px-4 flex items-center justify-center">
-        <Card className="w-full max-w-md shadow-xl">
+      <PageWithCarousel>
+        <Card className="w-full max-w-md shadow-2xl backdrop-blur-sm bg-white/95">
           <CardContent className="pt-6">
             <div className="text-center space-y-4">
               <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100">
@@ -72,13 +73,13 @@ const ForgotPasswordPage = () => {
             </div>
           </CardContent>
         </Card>
-      </div>
+      </PageWithCarousel>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-amber-50 via-white to-amber-50 py-12 px-4 flex items-center justify-center">
-      <Card className="w-full max-w-md shadow-xl">
+    <PageWithCarousel>
+      <Card className="w-full max-w-md shadow-2xl backdrop-blur-sm bg-white/95">
         <CardHeader className="space-y-1">
           <div className="flex justify-center mb-4">
             <div className="h-12 w-12 rounded-full bg-amber-100 flex items-center justify-center">
@@ -163,7 +164,7 @@ const ForgotPasswordPage = () => {
           </div>
         </CardFooter>
       </Card>
-    </div>
+    </PageWithCarousel>
   );
 };
 
