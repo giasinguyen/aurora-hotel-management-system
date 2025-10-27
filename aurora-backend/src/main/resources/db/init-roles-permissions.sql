@@ -33,7 +33,10 @@ INSERT INTO permissions (id, name, description, created_at, updated_at, version,
 (gen_random_uuid(), 'PAYMENT_VIEW_OWN', 'Xem lịch sử thanh toán của mình', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, false),
 (gen_random_uuid(), 'PROFILE_VIEW', 'Xem thông tin cá nhân', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, false),
 (gen_random_uuid(), 'PROFILE_UPDATE', 'Cập nhật thông tin cá nhân', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, false),
-(gen_random_uuid(), 'SERVICE_REGISTER', 'Đăng ký dịch vụ bổ sung', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, false);
+(gen_random_uuid(), 'SERVICE_REGISTER', 'Đăng ký dịch vụ bổ sung', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, false),
+(gen_random_uuid(), 'REVIEW_CREATE', 'Tạo đánh giá cho booking đã hoàn thành', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, false),
+(gen_random_uuid(), 'REVIEW_UPDATE_OWN', 'Cập nhật đánh giá của mình (trong 24h)', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, false),
+(gen_random_uuid(), 'REVIEW_DELETE_OWN', 'Xóa đánh giá của mình', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, false);
 
 -- Staff Permissions (Nhân viên lễ tân)
 INSERT INTO permissions (id, name, description, created_at, updated_at, version, deleted) VALUES 
@@ -46,7 +49,8 @@ INSERT INTO permissions (id, name, description, created_at, updated_at, version,
 (gen_random_uuid(), 'CHECKOUT_PROCESS', 'Xử lý check-out', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, false),
 (gen_random_uuid(), 'CUSTOMER_VIEW', 'Xem thông tin khách hàng', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, false),
 (gen_random_uuid(), 'PAYMENT_VIEW_ALL', 'Xem tất cả thanh toán', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, false),
-(gen_random_uuid(), 'SERVICE_MANAGE', 'Quản lý dịch vụ bổ sung', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, false);
+(gen_random_uuid(), 'SERVICE_MANAGE', 'Quản lý dịch vụ bổ sung', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, false),
+(gen_random_uuid(), 'REVIEW_VIEW_ALL', 'Xem tất cả đánh giá', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, false);
 
 -- Manager Permissions (Quản lý)
 INSERT INTO permissions (id, name, description, created_at, updated_at, version, deleted) VALUES 
@@ -58,10 +62,11 @@ INSERT INTO permissions (id, name, description, created_at, updated_at, version,
 (gen_random_uuid(), 'PROMOTION_CREATE', 'Tạo khuyến mãi', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, false),
 (gen_random_uuid(), 'PROMOTION_UPDATE', 'Cập nhật khuyến mãi', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, false),
 (gen_random_uuid(), 'PROMOTION_DELETE', 'Xóa khuyến mãi', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, false),
-(gen_random_uuid(), 'BRANCH_VIEW_STATS', 'Xem thống kê chi nhánh', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, false),
+(gen_random_uuid(),     'BRANCH_VIEW_STATS', 'Xem thống kê chi nhánh', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, false),
 (gen_random_uuid(), 'REPORT_VIEW', 'Xem báo cáo thống kê', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, false),
 (gen_random_uuid(), 'REPORT_EXPORT', 'Xuất báo cáo', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, false),
-(gen_random_uuid(), 'STAFF_VIEW', 'Xem danh sách nhân viên', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, false);
+(gen_random_uuid(), 'STAFF_VIEW', 'Xem danh sách nhân viên', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, false),
+(gen_random_uuid(), 'REVIEW_MODERATE', 'Phê duyệt/Từ chối đánh giá', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, false);
 
 -- Admin Permissions (Quản trị viên hệ thống)
 INSERT INTO permissions (id, name, description, created_at, updated_at, version, deleted) VALUES 
@@ -81,7 +86,8 @@ INSERT INTO permissions (id, name, description, created_at, updated_at, version,
 (gen_random_uuid(), 'BRANCH_UPDATE', 'Cập nhật chi nhánh', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, false),
 (gen_random_uuid(), 'BRANCH_DELETE', 'Xóa chi nhánh', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, false),
 (gen_random_uuid(), 'BRANCH_ASSIGN_MANAGER', 'Gán quản lý cho chi nhánh', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, false),
-(gen_random_uuid(), 'BRANCH_REMOVE_MANAGER', 'Gỡ quản lý khỏi chi nhánh', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, false);
+(gen_random_uuid(), 'BRANCH_REMOVE_MANAGER', 'Gỡ quản lý khỏi chi nhánh', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, false),
+(gen_random_uuid(), 'REVIEW_UPDATE_ALL', 'Cập nhật mọi đánh giá (chỉ Admin)', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, false);
 
 -- =====================================================
 -- BƯỚC 2: TẠO CÁC ROLES
@@ -132,7 +138,11 @@ AND p.name IN (
     'PAYMENT_VIEW_OWN',
     'PROFILE_VIEW',
     'PROFILE_UPDATE',
-    'SERVICE_REGISTER'
+    'SERVICE_REGISTER',
+    -- Review permissions
+    'REVIEW_CREATE',
+    'REVIEW_UPDATE_OWN',
+    'REVIEW_DELETE_OWN'
 );
 
 -- STAFF Role: Kế thừa CUSTOMER + Quản lý đặt phòng và check-in/out
@@ -161,7 +171,9 @@ AND p.name IN (
     'CHECKOUT_PROCESS',
     'CUSTOMER_VIEW',
     'PAYMENT_VIEW_ALL',
-    'SERVICE_MANAGE'
+    'SERVICE_MANAGE',
+    -- Review permissions
+    'REVIEW_VIEW_ALL'
 );
 
 -- MANAGER Role: Kế thừa STAFF + Quản lý chi nhánh và báo cáo
@@ -202,7 +214,10 @@ AND p.name IN (
     'BRANCH_VIEW_STATS',
     'REPORT_VIEW',
     'REPORT_EXPORT',
-    'STAFF_VIEW'
+    'STAFF_VIEW',
+    -- Review permissions
+    'REVIEW_VIEW_ALL',
+    'REVIEW_MODERATE'
 );
 
 -- ADMIN Role: Toàn quyền hệ thống
@@ -362,17 +377,16 @@ WHERE u.username = 'customer' AND r.name = 'CUSTOMER';
 
 -- =====================================================
 -- HOÀN THÀNH
--- =====================================================
--- ✅ Tổng số Permissions: 48
--- ✅ Tổng số Roles: 5 (GUEST, CUSTOMER, STAFF, MANAGER, ADMIN)
--- ✅ Sample Users: 4 (admin, manager, staff, customer)
--- ✅ Đầy đủ thuộc tính:
---    - BaseEntity: id, created_at, updated_at, created_by, updated_by, version, deleted
---    - User: avatar_url, assigned_branch_id, active, last_login_at,
---            failed_login_attempts, locked_until, lock_reason
---    - Role: name, description
---    - Permission: name, description
--- =====================================================
+-- Tổng số Permissions: 54 (bao gồm 6 permissions cho Review System)
+-- Tổng số Roles: 5 (GUEST, CUSTOMER, STAFF, MANAGER, ADMIN)
+-- Sample Users: 4 (admin, manager, staff, customer)
+-- Review System Permissions:
+--    - REVIEW_CREATE: Khách hàng tạo đánh giá (CUSTOMER)
+--    - REVIEW_UPDATE_OWN: Khách hàng sửa đánh giá của mình (CUSTOMER)
+--    - REVIEW_DELETE_OWN: Khách hàng xóa đánh giá của mình (CUSTOMER)
+--    - REVIEW_VIEW_ALL: Xem tất cả đánh giá (STAFF, MANAGER, ADMIN)
+--    - REVIEW_MODERATE: Phê duyệt/Từ chối đánh giá (MANAGER, ADMIN)
+--    - REVIEW_UPDATE_ALL: Cập nhật mọi đánh giá (ADMIN only)
 
 -- LƯU Ý:
 -- 1. Chạy script này TRƯỚC khi chạy init-test-data.sql

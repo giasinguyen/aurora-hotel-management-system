@@ -1,107 +1,11 @@
 {
 	"info": {
-		"_postman_id": "aurora-hotel-system-2024",
+		"_postman_id": "2edb7885-d5fe-49c7-9862-88279905ca34",
 		"name": "Aurora Hotel Management System - API Tests",
 		"description": "Comprehensive API Testing Collection for Aurora Hotel System\n\n## Test Flow\n1. **Authentication** - Login and get tokens\n2. **User Management** - Register and manage users\n3. **Branch Management** - Create and manage hotel branches\n4. **Amenity Management** - Manage hotel amenities (WiFi, TV, etc.)\n5. **Facility Management** - Manage branch facilities (Pool, Gym, Spa)\n6. **Room Type Management** - Configure room types\n7. **Room Management** - Manage individual rooms\n8. **Service Management** - Hotel services (Laundry, Room service, etc.)\n9. **Promotion Management** - Discounts and promotions\n10. **Booking Management** - Room bookings\n11. **Booking Room** - Booking-Room relationship\n12. **Service Booking** - Service bookings for guests\n13. **Payment Management** - Process payments\n14. **Role & Permission** - Manage access control\n\n## Authentication\nAll endpoints (except register and login) require Bearer token authentication.\n\n## Default Users\n- **Admin**: username=`admin`, password=`Admin@123`\n- **Manager**: username=`manager`, password=`Manager@123`\n- **Staff**: username=`staff`, password=`Staff@123`\n- **Customer**: username=`customer`, password=`Customer@123`",
-		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "40740215"
 	},
-	"auth": {
-		"type": "bearer",
-		"bearer": [
-			{
-				"key": "token",
-				"value": "{{accessToken}}",
-				"type": "string"
-			}
-		]
-	},
-	"variable": [
-		{
-			"key": "baseUrl",
-			"value": "http://localhost:8080",
-			"type": "string"
-		},
-		{
-			"key": "accessToken",
-			"value": "",
-			"type": "string"
-		},
-		{
-			"key": "refreshToken",
-			"value": "",
-			"type": "string"
-		},
-		{
-			"key": "userId",
-			"value": "",
-			"type": "string"
-		},
-		{
-			"key": "branchId",
-			"value": "",
-			"type": "string"
-		},
-		{
-			"key": "amenityId",
-			"value": "",
-			"type": "string"
-		},
-		{
-			"key": "facilityId",
-			"value": "",
-			"type": "string"
-		},
-		{
-			"key": "roomTypeId",
-			"value": "",
-			"type": "string"
-		},
-		{
-			"key": "roomId",
-			"value": "",
-			"type": "string"
-		},
-		{
-			"key": "serviceId",
-			"value": "",
-			"type": "string"
-		},
-		{
-			"key": "promotionId",
-			"value": "",
-			"type": "string"
-		},
-		{
-			"key": "bookingId",
-			"value": "",
-			"type": "string"
-		},
-		{
-			"key": "bookingRoomId",
-			"value": "",
-			"type": "string"
-		},
-		{
-			"key": "serviceBookingId",
-			"value": "",
-			"type": "string"
-		},
-		{
-			"key": "paymentId",
-			"value": "",
-			"type": "string"
-		},
-		{
-			"key": "roleId",
-			"value": "",
-			"type": "string"
-		},
-		{
-			"key": "permissionId",
-			"value": "",
-			"type": "string"
-		}
-	],
 	"item": [
 		{
 			"name": "01. Authentication",
@@ -124,7 +28,9 @@
 									"    console.log('Admin Access Token:', jsonData.result.token);",
 									"}"
 								],
-								"type": "text/javascript"
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
 							}
 						}
 					],
@@ -133,7 +39,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"username\": \"admin\",\n    \"password\": \"Admin@123\"\n}",
+							"raw": "{\n    \"username\": \"admin\",\n    \"password\": \"password123\"\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -141,9 +47,16 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/auth/token",
-							"host": ["{{baseUrl}}"],
-							"path": ["auth", "token"]
+							"raw": "{{baseUrl}}/api/v1/auth/token",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"auth",
+								"token"
+							]
 						},
 						"description": "Login with admin credentials to get access token"
 					},
@@ -163,7 +76,9 @@
 									"    });",
 									"}"
 								],
-								"type": "text/javascript"
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
 							}
 						}
 					],
@@ -180,9 +95,16 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/auth/introspect",
-							"host": ["{{baseUrl}}"],
-							"path": ["auth", "introspect"]
+							"raw": "{{baseUrl}}/api/v1/auth/introspect",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"auth",
+								"introspect"
+							]
 						},
 						"description": "Check if the current token is valid"
 					},
@@ -203,7 +125,9 @@
 									"    });",
 									"}"
 								],
-								"type": "text/javascript"
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
 							}
 						}
 					],
@@ -220,9 +144,16 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/auth/refresh",
-							"host": ["{{baseUrl}}"],
-							"path": ["auth", "refresh"]
+							"raw": "{{baseUrl}}/api/v1/auth/refresh",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"auth",
+								"refresh"
+							]
 						},
 						"description": "Get a new access token using refresh token"
 					},
@@ -241,7 +172,9 @@
 									"    });",
 									"}"
 								],
-								"type": "text/javascript"
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
 							}
 						}
 					],
@@ -258,9 +191,16 @@
 							}
 						},
 						"url": {
-							"raw": "{{baseUrl}}/auth/logout",
-							"host": ["{{baseUrl}}"],
-							"path": ["auth", "logout"]
+							"raw": "{{baseUrl}}/api/v1/auth/logout",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"auth",
+								"logout"
+							]
 						},
 						"description": "Invalidate the current access token"
 					},
@@ -308,8 +248,13 @@
 						},
 						"url": {
 							"raw": "{{baseUrl}}/users/register",
-							"host": ["{{baseUrl}}"],
-							"path": ["users", "register"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"users",
+								"register"
+							]
 						},
 						"description": "Register a new customer account (no authentication required)"
 					},
@@ -347,8 +292,12 @@
 						},
 						"url": {
 							"raw": "{{baseUrl}}/users",
-							"host": ["{{baseUrl}}"],
-							"path": ["users"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"users"
+							]
 						},
 						"description": "Admin creates a new user with specific roles"
 					},
@@ -377,8 +326,12 @@
 						"header": [],
 						"url": {
 							"raw": "{{baseUrl}}/users",
-							"host": ["{{baseUrl}}"],
-							"path": ["users"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"users"
+							]
 						},
 						"description": "Get list of all users"
 					},
@@ -408,8 +361,13 @@
 						"header": [],
 						"url": {
 							"raw": "{{baseUrl}}/users/paginated?page=0&size=10&sortBy=createdDate&sortDirection=DESC",
-							"host": ["{{baseUrl}}"],
-							"path": ["users", "paginated"],
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"users",
+								"paginated"
+							],
 							"query": [
 								{
 									"key": "page",
@@ -456,8 +414,13 @@
 						"header": [],
 						"url": {
 							"raw": "{{baseUrl}}/users/{{userId}}",
-							"host": ["{{baseUrl}}"],
-							"path": ["users", "{{userId}}"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"users",
+								"{{userId}}"
+							]
 						},
 						"description": "Get specific user by ID"
 					},
@@ -486,8 +449,14 @@
 						"header": [],
 						"url": {
 							"raw": "{{baseUrl}}/users/username/admin",
-							"host": ["{{baseUrl}}"],
-							"path": ["users", "username", "admin"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"users",
+								"username",
+								"admin"
+							]
 						},
 						"description": "Get user by username"
 					},
@@ -524,8 +493,13 @@
 						},
 						"url": {
 							"raw": "{{baseUrl}}/users/{{userId}}",
-							"host": ["{{baseUrl}}"],
-							"path": ["users", "{{userId}}"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"users",
+								"{{userId}}"
+							]
 						},
 						"description": "Update user information"
 					},
@@ -554,8 +528,13 @@
 						"header": [],
 						"url": {
 							"raw": "{{baseUrl}}/users/search?username=admin&page=0&size=10",
-							"host": ["{{baseUrl}}"],
-							"path": ["users", "search"],
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"users",
+								"search"
+							],
 							"query": [
 								{
 									"key": "username",
@@ -597,8 +576,13 @@
 						"header": [],
 						"url": {
 							"raw": "{{baseUrl}}/users/{{userId}}",
-							"host": ["{{baseUrl}}"],
-							"path": ["users", "{{userId}}"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"users",
+								"{{userId}}"
+							]
 						},
 						"description": "Delete a user (soft delete)"
 					},
@@ -644,8 +628,12 @@
 						},
 						"url": {
 							"raw": "{{baseUrl}}/branches",
-							"host": ["{{baseUrl}}"],
-							"path": ["branches"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"branches"
+							]
 						},
 						"description": "Create a new hotel branch"
 					},
@@ -674,8 +662,12 @@
 						"header": [],
 						"url": {
 							"raw": "{{baseUrl}}/branches?page=0&size=10&sortBy=name",
-							"host": ["{{baseUrl}}"],
-							"path": ["branches"],
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"branches"
+							],
 							"query": [
 								{
 									"key": "page",
@@ -718,8 +710,13 @@
 						"header": [],
 						"url": {
 							"raw": "{{baseUrl}}/branches/{{branchId}}",
-							"host": ["{{baseUrl}}"],
-							"path": ["branches", "{{branchId}}"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"branches",
+								"{{branchId}}"
+							]
 						},
 						"description": "Get specific branch by ID"
 					},
@@ -747,8 +744,14 @@
 						"header": [],
 						"url": {
 							"raw": "{{baseUrl}}/branches/code/AURORA_HCM",
-							"host": ["{{baseUrl}}"],
-							"path": ["branches", "code", "AURORA_HCM"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"branches",
+								"code",
+								"AURORA_HCM"
+							]
 						},
 						"description": "Get branch by unique code"
 					},
@@ -785,8 +788,13 @@
 						},
 						"url": {
 							"raw": "{{baseUrl}}/branches/{{branchId}}",
-							"host": ["{{baseUrl}}"],
-							"path": ["branches", "{{branchId}}"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"branches",
+								"{{branchId}}"
+							]
 						},
 						"description": "Update branch information"
 					},
@@ -815,8 +823,13 @@
 						"header": [],
 						"url": {
 							"raw": "{{baseUrl}}/branches/search?keyword=Aurora&page=0&size=10",
-							"host": ["{{baseUrl}}"],
-							"path": ["branches", "search"],
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"branches",
+								"search"
+							],
 							"query": [
 								{
 									"key": "keyword",
@@ -858,8 +871,14 @@
 						"header": [],
 						"url": {
 							"raw": "{{baseUrl}}/branches/city/Ho Chi Minh?page=0&size=10",
-							"host": ["{{baseUrl}}"],
-							"path": ["branches", "city", "Ho Chi Minh"],
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"branches",
+								"city",
+								"Ho Chi Minh"
+							],
 							"query": [
 								{
 									"key": "page",
@@ -897,8 +916,14 @@
 						"header": [],
 						"url": {
 							"raw": "{{baseUrl}}/branches/status/ACTIVE?page=0&size=10",
-							"host": ["{{baseUrl}}"],
-							"path": ["branches", "status", "ACTIVE"],
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"branches",
+								"status",
+								"ACTIVE"
+							],
 							"query": [
 								{
 									"key": "page",
@@ -936,8 +961,14 @@
 						"header": [],
 						"url": {
 							"raw": "{{baseUrl}}/branches/{{branchId}}/manager?managerId={{userId}}",
-							"host": ["{{baseUrl}}"],
-							"path": ["branches", "{{branchId}}", "manager"],
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"branches",
+								"{{branchId}}",
+								"manager"
+							],
 							"query": [
 								{
 									"key": "managerId",
@@ -971,8 +1002,14 @@
 						"header": [],
 						"url": {
 							"raw": "{{baseUrl}}/branches/{{branchId}}/manager",
-							"host": ["{{baseUrl}}"],
-							"path": ["branches", "{{branchId}}", "manager"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"branches",
+								"{{branchId}}",
+								"manager"
+							]
 						},
 						"description": "Remove manager from a branch"
 					},
@@ -1001,8 +1038,14 @@
 						"header": [],
 						"url": {
 							"raw": "{{baseUrl}}/branches/{{branchId}}/statistics",
-							"host": ["{{baseUrl}}"],
-							"path": ["branches", "{{branchId}}", "statistics"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"branches",
+								"{{branchId}}",
+								"statistics"
+							]
 						},
 						"description": "Get statistics for a specific branch"
 					},
@@ -1030,8 +1073,13 @@
 						"header": [],
 						"url": {
 							"raw": "{{baseUrl}}/branches/{{branchId}}",
-							"host": ["{{baseUrl}}"],
-							"path": ["branches", "{{branchId}}"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"branches",
+								"{{branchId}}"
+							]
 						},
 						"description": "Delete a branch (soft delete)"
 					},
@@ -1076,8 +1124,12 @@
 						},
 						"url": {
 							"raw": "{{baseUrl}}/amenities",
-							"host": ["{{baseUrl}}"],
-							"path": ["amenities"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"amenities"
+							]
 						},
 						"description": "Create a new amenity"
 					},
@@ -1106,8 +1158,12 @@
 						"header": [],
 						"url": {
 							"raw": "{{baseUrl}}/amenities",
-							"host": ["{{baseUrl}}"],
-							"path": ["amenities"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"amenities"
+							]
 						},
 						"description": "Get all amenities"
 					},
@@ -1136,8 +1192,13 @@
 						"header": [],
 						"url": {
 							"raw": "{{baseUrl}}/amenities/paginated?page=0&size=10&sortBy=name&sortDirection=ASC",
-							"host": ["{{baseUrl}}"],
-							"path": ["amenities", "paginated"],
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"amenities",
+								"paginated"
+							],
 							"query": [
 								{
 									"key": "page",
@@ -1183,8 +1244,13 @@
 						"header": [],
 						"url": {
 							"raw": "{{baseUrl}}/amenities/{{amenityId}}",
-							"host": ["{{baseUrl}}"],
-							"path": ["amenities", "{{amenityId}}"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"amenities",
+								"{{amenityId}}"
+							]
 						},
 						"description": "Get specific amenity by ID"
 					},
@@ -1212,8 +1278,14 @@
 						"header": [],
 						"url": {
 							"raw": "{{baseUrl}}/amenities/name/WiFi",
-							"host": ["{{baseUrl}}"],
-							"path": ["amenities", "name", "WiFi"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"amenities",
+								"name",
+								"WiFi"
+							]
 						},
 						"description": "Get amenity by name"
 					},
@@ -1250,8 +1322,13 @@
 						},
 						"url": {
 							"raw": "{{baseUrl}}/amenities/{{amenityId}}",
-							"host": ["{{baseUrl}}"],
-							"path": ["amenities", "{{amenityId}}"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"amenities",
+								"{{amenityId}}"
+							]
 						},
 						"description": "Update amenity information"
 					},
@@ -1280,8 +1357,13 @@
 						"header": [],
 						"url": {
 							"raw": "{{baseUrl}}/amenities/search?name=WiFi&page=0&size=10",
-							"host": ["{{baseUrl}}"],
-							"path": ["amenities", "search"],
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"amenities",
+								"search"
+							],
 							"query": [
 								{
 									"key": "name",
@@ -1323,8 +1405,14 @@
 						"header": [],
 						"url": {
 							"raw": "{{baseUrl}}/amenities/type/TECHNOLOGY?page=0&size=10",
-							"host": ["{{baseUrl}}"],
-							"path": ["amenities", "type", "TECHNOLOGY"],
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"amenities",
+								"type",
+								"TECHNOLOGY"
+							],
 							"query": [
 								{
 									"key": "page",
@@ -1362,8 +1450,13 @@
 						"header": [],
 						"url": {
 							"raw": "{{baseUrl}}/amenities/{{amenityId}}",
-							"host": ["{{baseUrl}}"],
-							"path": ["amenities", "{{amenityId}}"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"amenities",
+								"{{amenityId}}"
+							]
 						},
 						"description": "Delete an amenity"
 					},
@@ -1408,8 +1501,12 @@
 						},
 						"url": {
 							"raw": "{{baseUrl}}/facilities",
-							"host": ["{{baseUrl}}"],
-							"path": ["facilities"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"facilities"
+							]
 						},
 						"description": "Create a new facility for a branch"
 					},
@@ -1438,8 +1535,12 @@
 						"header": [],
 						"url": {
 							"raw": "{{baseUrl}}/facilities",
-							"host": ["{{baseUrl}}"],
-							"path": ["facilities"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"facilities"
+							]
 						},
 						"description": "Get all facilities"
 					},
@@ -1468,8 +1569,13 @@
 						"header": [],
 						"url": {
 							"raw": "{{baseUrl}}/facilities/paginated?page=0&size=10&sortBy=name&sortDirection=ASC",
-							"host": ["{{baseUrl}}"],
-							"path": ["facilities", "paginated"],
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"facilities",
+								"paginated"
+							],
 							"query": [
 								{
 									"key": "page",
@@ -1515,8 +1621,13 @@
 						"header": [],
 						"url": {
 							"raw": "{{baseUrl}}/facilities/{{facilityId}}",
-							"host": ["{{baseUrl}}"],
-							"path": ["facilities", "{{facilityId}}"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"facilities",
+								"{{facilityId}}"
+							]
 						},
 						"description": "Get specific facility by ID"
 					},
@@ -1545,8 +1656,14 @@
 						"header": [],
 						"url": {
 							"raw": "{{baseUrl}}/facilities/hotel/{{branchId}}",
-							"host": ["{{baseUrl}}"],
-							"path": ["facilities", "hotel", "{{branchId}}"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"facilities",
+								"hotel",
+								"{{branchId}}"
+							]
 						},
 						"description": "Get all facilities for a specific branch"
 					},
@@ -1575,8 +1692,15 @@
 						"header": [],
 						"url": {
 							"raw": "{{baseUrl}}/facilities/hotel/{{branchId}}/paginated?page=0&size=10&sortBy=name&sortDirection=ASC",
-							"host": ["{{baseUrl}}"],
-							"path": ["facilities", "hotel", "{{branchId}}", "paginated"],
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"facilities",
+								"hotel",
+								"{{branchId}}",
+								"paginated"
+							],
 							"query": [
 								{
 									"key": "page",
@@ -1631,8 +1755,13 @@
 						},
 						"url": {
 							"raw": "{{baseUrl}}/facilities/{{facilityId}}",
-							"host": ["{{baseUrl}}"],
-							"path": ["facilities", "{{facilityId}}"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"facilities",
+								"{{facilityId}}"
+							]
 						},
 						"description": "Update facility information"
 					},
@@ -1661,8 +1790,13 @@
 						"header": [],
 						"url": {
 							"raw": "{{baseUrl}}/facilities/search?name=Pool&page=0&size=10",
-							"host": ["{{baseUrl}}"],
-							"path": ["facilities", "search"],
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"facilities",
+								"search"
+							],
 							"query": [
 								{
 									"key": "name",
@@ -1704,8 +1838,13 @@
 						"header": [],
 						"url": {
 							"raw": "{{baseUrl}}/facilities/{{facilityId}}",
-							"host": ["{{baseUrl}}"],
-							"path": ["facilities", "{{facilityId}}"]
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"facilities",
+								"{{facilityId}}"
+							]
 						},
 						"description": "Delete a facility"
 					},
@@ -1713,6 +1852,775 @@
 				}
 			],
 			"description": "Facility management for branch amenities (Pool, Gym, Spa, Restaurant, etc.)"
+		},
+		{
+			"name": "06. Review & Rating Management",
+			"item": [
+				{
+					"name": "Create Review (Customer)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 201) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.collectionVariables.set('reviewId', jsonData.result.id);",
+									"    pm.test('✅ Review created successfully', function() {",
+									"        pm.expect(jsonData.result.rating).to.be.a('number');",
+									"        pm.expect(jsonData.result.status).to.eql('PENDING');",
+									"    });",
+									"    console.log('Review ID:', jsonData.result.id);",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"bookingId\": \"{{bookingId}}\",\n    \"roomId\": \"{{roomId}}\",\n    \"rating\": 5,\n    \"comment\": \"Absolutely wonderful stay! The room was spotless, staff were incredibly friendly and helpful. The amenities exceeded expectations. Would definitely recommend to friends and family!\",\n    \"photos\": [\n        \"https://example.com/review/photo1.jpg\",\n        \"https://example.com/review/photo2.jpg\"\n    ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/reviews",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"reviews"
+							]
+						},
+						"description": "Create a review for a checked-out booking. Only customers who have completed their stay can review."
+					},
+					"response": []
+				},
+				{
+					"name": "Update Review (Customer)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    pm.test('✅ Review updated successfully', function() {",
+									"        pm.response.to.have.status(200);",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"rating\": 4,\n    \"comment\": \"Updated review: Great experience overall. Room was excellent, though the breakfast could be improved.\",\n    \"photos\": [\n        \"https://example.com/review/updated_photo.jpg\"\n    ]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/reviews/{{reviewId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"reviews",
+								"{{reviewId}}"
+							]
+						},
+						"description": "Update own review. Can only edit within 24 hours of creation."
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Review (Customer)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    pm.test('✅ Review deleted successfully', function() {",
+									"        pm.response.to.have.status(200);",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/reviews/{{reviewId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"reviews",
+								"{{reviewId}}"
+							]
+						},
+						"description": "Delete own review (soft delete). Only the review owner can delete."
+					},
+					"response": []
+				},
+				{
+					"name": "Get My Reviews (Customer)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.test('✅ Retrieved customer reviews', function() {",
+									"        pm.expect(jsonData.result.content).to.be.an('array');",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/reviews/my-reviews?page=0&size=10&sortBy=reviewDate&sortDir=desc",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"reviews",
+								"my-reviews"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "10"
+								},
+								{
+									"key": "sortBy",
+									"value": "reviewDate"
+								},
+								{
+									"key": "sortDir",
+									"value": "desc"
+								}
+							]
+						},
+						"description": "Get all reviews created by the current customer"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Branch Approved Reviews (Public)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.test('✅ Retrieved approved reviews', function() {",
+									"        pm.expect(jsonData.result.content).to.be.an('array');",
+									"        jsonData.result.content.forEach(review => {",
+									"            pm.expect(review.status).to.eql('APPROVED');",
+									"        });",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/reviews/branch/{{branchId}}/approved?page=0&size=20&sortBy=reviewDate&sortDir=desc",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"reviews",
+								"branch",
+								"{{branchId}}",
+								"approved"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "20"
+								},
+								{
+									"key": "sortBy",
+									"value": "reviewDate"
+								},
+								{
+									"key": "sortDir",
+									"value": "desc"
+								}
+							]
+						},
+						"description": "Get approved reviews for a branch (PUBLIC - no authentication required). Only shows approved reviews."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Room Reviews (Public)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.test('✅ Retrieved room reviews', function() {",
+									"        pm.expect(jsonData.result.content).to.be.an('array');",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/reviews/room/{{roomId}}?page=0&size=10&sortBy=reviewDate&sortDir=desc",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"reviews",
+								"room",
+								"{{roomId}}"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "10"
+								},
+								{
+									"key": "sortBy",
+									"value": "reviewDate"
+								},
+								{
+									"key": "sortDir",
+									"value": "desc"
+								}
+							]
+						},
+						"description": "Get reviews for a specific room (PUBLIC). Shows only approved reviews."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Review Statistics (Public)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.test('✅ Retrieved review statistics', function() {",
+									"        pm.expect(jsonData.result.averageRating).to.be.a('number');",
+									"        pm.expect(jsonData.result.totalReviews).to.be.a('number');",
+									"        pm.expect(jsonData.result.ratingDistribution).to.be.an('object');",
+									"    });",
+									"    console.log('Average Rating:', jsonData.result.averageRating);",
+									"    console.log('Total Reviews:', jsonData.result.totalReviews);",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/reviews/statistics/branch/{{branchId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"reviews",
+								"statistics",
+								"branch",
+								"{{branchId}}"
+							]
+						},
+						"description": "Get review statistics for a branch (PUBLIC). Returns average rating, total reviews, and rating distribution (1-5 stars)."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Top Rated Reviews (Public)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.test('✅ Retrieved top rated reviews', function() {",
+									"        pm.expect(jsonData.result.content).to.be.an('array');",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/reviews/branch/{{branchId}}/top-rated?page=0&size=10",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"reviews",
+								"branch",
+								"{{branchId}}",
+								"top-rated"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "10"
+								}
+							]
+						},
+						"description": "Get top rated reviews sorted by helpful count and rating (PUBLIC)."
+					},
+					"response": []
+				},
+				{
+					"name": "Get Recent Reviews (Public)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.test('✅ Retrieved recent reviews', function() {",
+									"        pm.expect(jsonData.result.content).to.be.an('array');",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/reviews/branch/{{branchId}}/recent?page=0&size=10",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"reviews",
+								"branch",
+								"{{branchId}}",
+								"recent"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "10"
+								}
+							]
+						},
+						"description": "Get most recent reviews sorted by review date (PUBLIC)."
+					},
+					"response": []
+				},
+				{
+					"name": "Get All Reviews (Staff)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.test('✅ Retrieved all reviews', function() {",
+									"        pm.expect(jsonData.result.content).to.be.an('array');",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/reviews?page=0&size=20&sortBy=reviewDate&sortDir=desc",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"reviews"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "20"
+								},
+								{
+									"key": "sortBy",
+									"value": "reviewDate"
+								},
+								{
+									"key": "sortDir",
+									"value": "desc"
+								}
+							]
+						},
+						"description": "Get all reviews regardless of status (Staff/Manager/Admin only)"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Branch Reviews - All Status (Staff)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.test('✅ Retrieved branch reviews (all status)', function() {",
+									"        pm.expect(jsonData.result.content).to.be.an('array');",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/reviews/branch/{{branchId}}?page=0&size=20&sortBy=reviewDate&sortDir=desc",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"reviews",
+								"branch",
+								"{{branchId}}"
+							],
+							"query": [
+								{
+									"key": "page",
+									"value": "0"
+								},
+								{
+									"key": "size",
+									"value": "20"
+								},
+								{
+									"key": "sortBy",
+									"value": "reviewDate"
+								},
+								{
+									"key": "sortDir",
+									"value": "desc"
+								}
+							]
+						},
+						"description": "Get all reviews for a branch including PENDING, APPROVED, and REJECTED (Staff/Manager/Admin only)"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Review by ID (Staff)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.test('✅ Retrieved review details', function() {",
+									"        pm.expect(jsonData.result.id).to.not.be.empty;",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/reviews/{{reviewId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"reviews",
+								"{{reviewId}}"
+							]
+						},
+						"description": "Get specific review by ID (Staff/Manager/Admin only)"
+					},
+					"response": []
+				},
+				{
+					"name": "Approve Review (Manager)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.test('✅ Review approved successfully', function() {",
+									"        pm.expect(jsonData.result.status).to.eql('APPROVED');",
+									"        pm.expect(jsonData.result.approvedBy).to.not.be.empty;",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/reviews/{{reviewId}}/approve",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"reviews",
+								"{{reviewId}}",
+								"approve"
+							]
+						},
+						"description": "Approve a pending review (Manager/Admin only). Sets status to APPROVED and makes it visible to public."
+					},
+					"response": []
+				},
+				{
+					"name": "Reject Review (Manager)",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    var jsonData = pm.response.json();",
+									"    pm.test('✅ Review rejected successfully', function() {",
+									"        pm.expect(jsonData.result.status).to.eql('REJECTED');",
+									"        pm.expect(jsonData.result.rejectionReason).to.not.be.empty;",
+									"        pm.expect(jsonData.result.rejectedBy).to.not.be.empty;",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PATCH",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/reviews/{{reviewId}}/reject?reason=Inappropriate content or spam",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"reviews",
+								"{{reviewId}}",
+								"reject"
+							],
+							"query": [
+								{
+									"key": "reason",
+									"value": "Inappropriate content or spam"
+								}
+							]
+						},
+						"description": "Reject a pending review with reason (Manager/Admin only). Review will not be shown to public."
+					},
+					"response": []
+				}
+			],
+			"description": "Review & Rating System - Customers can leave reviews after checkout, managers moderate reviews"
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "{{accessToken}}",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"requests": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"requests": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:8080"
+		},
+		{
+			"key": "accessToken",
+			"value": ""
+		},
+		{
+			"key": "refreshToken",
+			"value": ""
+		},
+		{
+			"key": "userId",
+			"value": ""
+		},
+		{
+			"key": "branchId",
+			"value": ""
+		},
+		{
+			"key": "amenityId",
+			"value": ""
+		},
+		{
+			"key": "facilityId",
+			"value": ""
+		},
+		{
+			"key": "roomTypeId",
+			"value": ""
+		},
+		{
+			"key": "roomId",
+			"value": ""
+		},
+		{
+			"key": "serviceId",
+			"value": ""
+		},
+		{
+			"key": "promotionId",
+			"value": ""
+		},
+		{
+			"key": "bookingId",
+			"value": ""
+		},
+		{
+			"key": "bookingRoomId",
+			"value": ""
+		},
+		{
+			"key": "serviceBookingId",
+			"value": ""
+		},
+		{
+			"key": "paymentId",
+			"value": ""
+		},
+		{
+			"key": "roleId",
+			"value": ""
+		},
+		{
+			"key": "permissionId",
+			"value": ""
+		},
+		{
+			"key": "reviewId",
+			"value": ""
 		}
 	]
 }

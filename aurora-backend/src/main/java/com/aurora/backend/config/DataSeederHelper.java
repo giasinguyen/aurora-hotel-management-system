@@ -10,6 +10,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * DataSeederHelper - Helper methods for DataSeeder
@@ -31,6 +32,8 @@ public class DataSeederHelper {
     private final BookingRoomRepository bookingRoomRepository;
     private final ServiceBookingRepository serviceBookingRepository;
     private final PaymentRepository paymentRepository;
+    private final ReviewRepository reviewRepository;
+    private final UserRepository userRepository;
 
     // =========================================================================
     // FACILITIES
@@ -1348,5 +1351,315 @@ public class DataSeederHelper {
         
         paymentRepository.saveAll(payments);
         log.info("   ✅ Seeded {} payments", payments.size());
+    }
+
+    // =========================================================================
+    // REVIEWS
+    // =========================================================================
+    
+    public void seedReviews(Map<String, Booking> bookings, User customer) {
+        // Idempotency check
+        if (reviewRepository.count() > 0) {
+            log.info("   ⏭️  Reviews already exist (count: {}), skipping...", reviewRepository.count());
+            return;
+        }
+        
+        // Load bookings from DB - only get CHECKED_OUT bookings for reviews
+        List<Booking> allBookings = bookingRepository.findAll();
+        List<Booking> checkedOutBookings = allBookings.stream()
+                .filter(b -> b.getStatus() == Booking.BookingStatus.CHECKED_OUT || 
+                             b.getStatus() == Booking.BookingStatus.COMPLETED)
+                .toList();
+        
+        if (checkedOutBookings.isEmpty()) {
+            log.warn("   ⚠️  No checked-out bookings found to seed reviews");
+            return;
+        }
+        
+        // Load branches and rooms
+        List<Branch> branches = branchRepository.findAll();
+        List<Room> rooms = roomRepository.findAll();
+        
+        if (branches.isEmpty() || rooms.isEmpty()) {
+            log.warn("   ⚠️  No branches or rooms found to seed reviews");
+            return;
+        }
+        
+        List<Review> reviews = new ArrayList<>();
+        
+        // Review 1: APPROVED - 5 sao (cho booking đã checkout)
+        if (checkedOutBookings.size() > 0) {
+            Booking b = checkedOutBookings.get(0);
+            Review r1 = Review.builder()
+                    .booking(b)
+                    .customer(customer)
+                    .branch(b.getBranch())
+                    .room(rooms.isEmpty() ? null : rooms.get(0))
+                    .rating(5)
+                    .comment("Trải nghiệm tuyệt vời! Phòng rất sạch sẽ và thoải mái. Nhân viên phục vụ nhiệt tình, chu đáo. View từ phòng đẹp tuyệt vời. Chắc chắn sẽ quay lại!")
+                    .photos(Arrays.asList(
+                        "https://example.com/reviews/room1.jpg",
+                        "https://example.com/reviews/view1.jpg"
+                    ))
+                    .isVerified(true)
+                    .helpfulCount(15)
+                    .status(Review.ReviewStatus.APPROVED)
+                    .reviewDate(LocalDateTime.now().minusDays(8))
+                    .approvedAt(LocalDateTime.now().minusDays(7))
+                    .approvedBy("manager")
+                    .build();
+            reviews.add(r1);
+        }
+        
+        // Create more CHECKED_OUT bookings for testing if needed
+        if (checkedOutBookings.size() < 3) {
+            // Create additional checked-out bookings for review testing
+            for (int i = checkedOutBookings.size(); i < 3 && i < allBookings.size(); i++) {
+                Booking booking = allBookings.get(i);
+                if (booking.getStatus() != Booking.BookingStatus.CHECKED_OUT) {
+                    booking.setStatus(Booking.BookingStatus.CHECKED_OUT);
+                    booking.setActualCheckoutTime(LocalDateTime.now().minusDays(10 + i));
+                    bookingRepository.save(booking);
+                    checkedOutBookings = bookingRepository.findAll().stream()
+                        .filter(b -> b.getStatus() == Booking.BookingStatus.CHECKED_OUT || 
+                                   b.getStatus() == Booking.BookingStatus.COMPLETED)
+                        .toList();
+                }
+            }
+        }
+        
+        // Review 2: APPROVED - 4 sao
+        if (checkedOutBookings.size() > 1) {
+            Booking b = checkedOutBookings.get(1);
+            Review r2 = Review.builder()
+                    .booking(b)
+                    .customer(customer)
+                    .branch(b.getBranch())
+                    .room(rooms.size() > 1 ? rooms.get(1) : null)
+                    .rating(4)
+                    .comment("Khách sạn tốt, vị trí thuận lợi. Phòng rộng rãi và sạch sẽ. Dịch vụ ăn sáng phong phú. Tuy nhiên wifi hơi chậm. Nhìn chung đáng giá tiền.")
+                    .photos(Arrays.asList(
+                        "https://example.com/reviews/breakfast.jpg",
+                        "https://example.com/reviews/room2.jpg",
+                        "https://example.com/reviews/bathroom.jpg"
+                    ))
+                    .isVerified(true)
+                    .helpfulCount(8)
+                    .status(Review.ReviewStatus.APPROVED)
+                    .reviewDate(LocalDateTime.now().minusDays(6))
+                    .approvedAt(LocalDateTime.now().minusDays(5))
+                    .approvedBy("manager")
+                    .build();
+            reviews.add(r2);
+        }
+        
+        // Review 3: APPROVED - 5 sao với nhiều ảnh
+        if (checkedOutBookings.size() > 2) {
+            Booking b = checkedOutBookings.get(2);
+            Review r3 = Review.builder()
+                    .booking(b)
+                    .customer(customer)
+                    .branch(b.getBranch())
+                    .room(rooms.size() > 2 ? rooms.get(2) : null)
+                    .rating(5)
+                    .comment("Xuất sắc! Đây là lần thứ 3 tôi ở đây và lần nào cũng hài lòng. Phòng được upgrade miễn phí. Spa rất tuyệt. Bể bơi sạch sẽ. Nhân viên luôn mỉm cười và sẵn sàng hỗ trợ.")
+                    .photos(Arrays.asList(
+                        "https://example.com/reviews/pool.jpg",
+                        "https://example.com/reviews/spa.jpg",
+                        "https://example.com/reviews/room_view.jpg",
+                        "https://example.com/reviews/lobby.jpg",
+                        "https://example.com/reviews/restaurant.jpg"
+                    ))
+                    .isVerified(true)
+                    .helpfulCount(23)
+                    .status(Review.ReviewStatus.APPROVED)
+                    .reviewDate(LocalDateTime.now().minusDays(4))
+                    .approvedAt(LocalDateTime.now().minusDays(3))
+                    .approvedBy("admin")
+                    .build();
+            reviews.add(r3);
+        }
+        
+        // Review 4: PENDING - Chờ duyệt
+        if (checkedOutBookings.size() > 0) {
+            // Create new checked out booking for pending review
+            Branch branch = branches.isEmpty() ? null : branches.get(0);
+            Booking newBooking = Booking.builder()
+                    .branch(branch)
+                    .customer(customer)
+                    .bookingCode("BK-REV-" + System.currentTimeMillis())
+                    .checkin(LocalDate.now().minusDays(5))
+                    .checkout(LocalDate.now().minusDays(2))
+                    .status(Booking.BookingStatus.CHECKED_OUT)
+                    .actualCheckoutTime(LocalDateTime.now().minusDays(2))
+                    .subtotalPrice(new BigDecimal("4500000"))
+                    .discountAmount(BigDecimal.ZERO)
+                    .totalPrice(new BigDecimal("4500000"))
+                    .build();
+            Booking savedBooking = bookingRepository.save(newBooking);
+            
+            Review r4 = Review.builder()
+                    .booking(savedBooking)
+                    .customer(customer)
+                    .branch(savedBooking.getBranch())
+                    .room(rooms.size() > 3 ? rooms.get(3) : null)
+                    .rating(5)
+                    .comment("Phòng đẹp, view tuyệt vời. Giường ngủ rất thoải mái. Ăn sáng ngon. Nhân viên thân thiện. Sẽ giới thiệu cho bạn bè.")
+                    .photos(Arrays.asList(
+                        "https://example.com/reviews/new_room.jpg"
+                    ))
+                    .isVerified(true)
+                    .helpfulCount(0)
+                    .status(Review.ReviewStatus.PENDING)
+                    .reviewDate(LocalDateTime.now().minusHours(12))
+                    .build();
+            reviews.add(r4);
+        }
+        
+        // Review 5: PENDING - Mới tạo
+        if (checkedOutBookings.size() > 0) {
+            // Create another checked out booking for pending review
+            Branch branch = branches.size() > 1 ? branches.get(1) : branches.get(0);
+            Booking newBooking2 = Booking.builder()
+                    .branch(branch)
+                    .customer(customer)
+                    .bookingCode("BK-REV2-" + System.currentTimeMillis())
+                    .checkin(LocalDate.now().minusDays(8))
+                    .checkout(LocalDate.now().minusDays(6))
+                    .status(Booking.BookingStatus.CHECKED_OUT)
+                    .actualCheckoutTime(LocalDateTime.now().minusDays(6))
+                    .subtotalPrice(new BigDecimal("3200000"))
+                    .discountAmount(BigDecimal.ZERO)
+                    .totalPrice(new BigDecimal("3200000"))
+                    .build();
+            Booking savedBooking2 = bookingRepository.save(newBooking2);
+            
+            Review r5 = Review.builder()
+                    .booking(savedBooking2)
+                    .customer(customer)
+                    .branch(savedBooking2.getBranch())
+                    .rating(4)
+                    .comment("Khách sạn tốt, phòng sạch sẽ. Dịch vụ chu đáo. Vị trí thuận tiện. Giá cả hợp lý.")
+                    .isVerified(true)
+                    .helpfulCount(0)
+                    .status(Review.ReviewStatus.PENDING)
+                    .reviewDate(LocalDateTime.now().minusHours(6))
+                    .build();
+            reviews.add(r5);
+        }
+        
+        // Review 6: REJECTED - Bị từ chối
+        if (checkedOutBookings.size() > 0) {
+            // Create another checked out booking for rejected review
+            Branch branch = branches.size() > 1 ? branches.get(1) : branches.get(0);
+            Booking newBooking3 = Booking.builder()
+                    .branch(branch)
+                    .customer(customer)
+                    .bookingCode("BK-REV3-" + System.currentTimeMillis())
+                    .checkin(LocalDate.now().minusDays(15))
+                    .checkout(LocalDate.now().minusDays(12))
+                    .status(Booking.BookingStatus.CHECKED_OUT)
+                    .actualCheckoutTime(LocalDateTime.now().minusDays(12))
+                    .subtotalPrice(new BigDecimal("2800000"))
+                    .discountAmount(BigDecimal.ZERO)
+                    .totalPrice(new BigDecimal("2800000"))
+                    .build();
+            Booking savedBooking3 = bookingRepository.save(newBooking3);
+            
+            Review r6 = Review.builder()
+                    .booking(savedBooking3)
+                    .customer(customer)
+                    .branch(savedBooking3.getBranch())
+                    .rating(2)
+                    .comment("Không hài lòng lắm. Phòng nhỏ hơn mong đợi.")
+                    .isVerified(true)
+                    .helpfulCount(0)
+                    .status(Review.ReviewStatus.REJECTED)
+                    .reviewDate(LocalDateTime.now().minusDays(11))
+                    .rejectionReason("Nội dung không đủ chi tiết và thiếu tính xây dựng")
+                    .rejectedAt(LocalDateTime.now().minusDays(10))
+                    .rejectedBy("manager")
+                    .build();
+            reviews.add(r6);
+        }
+        
+        // Review 7: APPROVED - 3 sao (trung bình)
+        if (checkedOutBookings.size() > 0) {
+            Branch branch = branches.isEmpty() ? null : branches.get(0);
+            Booking newBooking4 = Booking.builder()
+                    .branch(branch)
+                    .customer(customer)
+                    .bookingCode("BK-REV4-" + System.currentTimeMillis())
+                    .checkin(LocalDate.now().minusDays(20))
+                    .checkout(LocalDate.now().minusDays(18))
+                    .status(Booking.BookingStatus.CHECKED_OUT)
+                    .actualCheckoutTime(LocalDateTime.now().minusDays(18))
+                    .subtotalPrice(new BigDecimal("3500000"))
+                    .discountAmount(BigDecimal.ZERO)
+                    .totalPrice(new BigDecimal("3500000"))
+                    .build();
+            Booking savedBooking4 = bookingRepository.save(newBooking4);
+            
+            Review r7 = Review.builder()
+                    .booking(savedBooking4)
+                    .customer(customer)
+                    .branch(savedBooking4.getBranch())
+                    .room(rooms.size() > 4 ? rooms.get(4) : null)
+                    .rating(3)
+                    .comment("Khách sạn ở mức trung bình. Phòng sạch nhưng hơi cũ. Nhân viên thân thiện. Vị trí tốt nhưng giá hơi cao so với chất lượng. Cần cải thiện thêm về trang thiết bị.")
+                    .photos(Arrays.asList(
+                        "https://example.com/reviews/avg_room.jpg"
+                    ))
+                    .isVerified(true)
+                    .helpfulCount(5)
+                    .status(Review.ReviewStatus.APPROVED)
+                    .reviewDate(LocalDateTime.now().minusDays(17))
+                    .approvedAt(LocalDateTime.now().minusDays(16))
+                    .approvedBy("manager")
+                    .build();
+            reviews.add(r7);
+        }
+        
+        // Review 8: APPROVED - 4 sao (cho gia đình)
+        if (checkedOutBookings.size() > 0) {
+            Branch branch = branches.size() > 1 ? branches.get(1) : branches.get(0);
+            Booking newBooking5 = Booking.builder()
+                    .branch(branch)
+                    .customer(customer)
+                    .bookingCode("BK-REV5-" + System.currentTimeMillis())
+                    .checkin(LocalDate.now().minusDays(25))
+                    .checkout(LocalDate.now().minusDays(22))
+                    .status(Booking.BookingStatus.CHECKED_OUT)
+                    .actualCheckoutTime(LocalDateTime.now().minusDays(22))
+                    .subtotalPrice(new BigDecimal("6500000"))
+                    .discountAmount(BigDecimal.ZERO)
+                    .totalPrice(new BigDecimal("6500000"))
+                    .build();
+            Booking savedBooking5 = bookingRepository.save(newBooking5);
+            
+            Review r8 = Review.builder()
+                    .booking(savedBooking5)
+                    .customer(customer)
+                    .branch(savedBooking5.getBranch())
+                    .room(rooms.size() > 5 ? rooms.get(5) : null)
+                    .rating(4)
+                    .comment("Rất phù hợp cho gia đình. Phòng rộng, có khu vui chơi cho trẻ em. Bể bơi sạch sẽ, con tôi rất thích. Nhân viên nhiệt tình. Buffet sáng đa dạng. Giá hợp lý cho gia đình.")
+                    .photos(Arrays.asList(
+                        "https://example.com/reviews/family_room.jpg",
+                        "https://example.com/reviews/kids_area.jpg",
+                        "https://example.com/reviews/pool_kids.jpg"
+                    ))
+                    .isVerified(true)
+                    .helpfulCount(18)
+                    .status(Review.ReviewStatus.APPROVED)
+                    .reviewDate(LocalDateTime.now().minusDays(21))
+                    .approvedAt(LocalDateTime.now().minusDays(20))
+                    .approvedBy("manager")
+                    .build();
+            reviews.add(r8);
+        }
+        
+        reviewRepository.saveAll(reviews);
+        log.info("   ✅ Seeded {} reviews", reviews.size());
     }
 }
