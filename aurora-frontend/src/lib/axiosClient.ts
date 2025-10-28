@@ -1,37 +1,64 @@
 import axios from "axios";
+import type { InternalAxiosRequestConfig, AxiosError } from "axios";
+import type { AppDispatch } from "@/features/store";
+import type { ApiResponse } from "@/types/api.types";
+import { ErrorCodeNames } from "@/types/errorCodes";
+import { clearAuth } from "@/features/slices/auth/authSlice";
 
-const BASE_URL = import.meta.env.VITE_API_URL;
+// Setup dispatch từ store để sử dụng
+// trong đây
+let dispatchRef: AppDispatch;
 
-const instance = axios.create({
-  baseURL: BASE_URL,
-  timeout: 10000,
+export const setupAxiosInterceptors = (dispatch: AppDispatch) => {
+  dispatchRef = dispatch;
+};
+
+// Cấu hình mặc định cho các request
+const axiosClient = axios.create({
+  baseURL: "http://localhost:8080",
+  withCredentials: true,
 });
 
-instance.interceptors.request.use(
-  async function (config) {
-    const access_token = localStorage.getItem("access_token");
+// Interceptor: Tự động gắn Access Token vào mỗi request
+// CHO TRƯỜNG HỢP ACCESS TOKEN ĐƯỢC LƯU Ở LOCAL STORAGE
+axiosClient.interceptors.request.use((config: InternalAxiosRequestConfig) => {
+  const accessToken = localStorage.getItem("access_token");
+  if (accessToken) {
+    config.headers.Authorization = `Bearer ${accessToken}`;
+  }
+  return config;
+});
 
-    if (access_token) {
-      config.headers["Authorization"] = `Bearer ${access_token}`;
+// Interceptor: Xử lý lỗi 401 - Auto logout
+
+axiosClient.interceptors.response.use(
+  (response) => response,
+  async (error: AxiosError) => {
+    // Check lỗi có phải thuộc lại lỗi JWT Token
+    const { response } = error;
+    const errorCode = (response?.data as ApiResponse<null>)?.errorCode;
+    const isUnauthorized =
+      response?.status === 401 &&
+      (errorCode === ErrorCodeNames.UNAUTHORIZED || 
+       errorCode === ErrorCodeNames.UNAUTHENTICATED);
+
+    if (isUnauthorized) {
+      // Token hết hạn -> Logout trực tiếp
+      dispatchRef(clearAuth());
+
+      // Redirect to login page (avoid redirect loop if already on login page)
+      const currentPath = window.location.pathname;
+      
+      if (!currentPath.startsWith("/login") && !currentPath.startsWith("/register")) {
+        setTimeout(() => {
+          window.location.href = "/login";
+        }, 500);
+      }
     }
 
-    return config;
-  },
-  function (error) {
     return Promise.reject(error);
-  }
+  },
 );
 
-instance.interceptors.response.use(
-  function (response) {
-    return response.data;
-  },
-  function (error) {
-    if (error.response && error.response.data) {
-      return error.response.data;
-    }
-    return Promise.reject(error);
-  }
-);
 
-export default instance;
+export default axiosClient;

@@ -45,6 +45,18 @@ public class UserController {
                 .build();
     }
 
+    @GetMapping("/myInfo")
+    @RequirePermission(PermissionConstants.Customer.PROFILE_VIEW)
+    ApiResponse<UserResponse> getMyInfo() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String currentUsername = authentication.getName();
+        log.info("Fetching current user info for: {}", currentUsername);
+        
+        return ApiResponse.<UserResponse>builder()
+                .result(userService.getUserByUsername(currentUsername))
+                .build();
+    }
+
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     @RequirePermission(PermissionConstants.Admin.USER_CREATE)
