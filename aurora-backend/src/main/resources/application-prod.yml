@@ -25,3 +25,20 @@ logging:
     name: logs/aurora-backend.log
     max-size: 10MB
     max-history: 30
+
+# Langchain4j
+langchain4j:
+  google-ai-gemini:
+    chat-model:
+      api-key: ${GEMINI_AI_KEY}
+      model-name: gemini-2.5-flash
+      log-requests-and-responses: true
+    streaming-chat-model:
+      api-key: ${GEMINI_AI_KEY}
+      model-name: gemini-2.5-flash
+      log-requests-and-responses: true
+    embedding-model:
+      api-key: ${GEMINI_AI_KEY}
+      model-name: text-embedding-004
+      output-dimensionality: 768
+      log-requests-and-responses: false

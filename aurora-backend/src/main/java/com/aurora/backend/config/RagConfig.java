@@ -14,18 +14,36 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class RagConfig {
+    @Value("${spring.datasource.username:admin}")
+    private String dbUsername;
+
+    @Value("${spring.datasource.password:admin}")
+    private String dbPassword;
+
+    @Value("${spring.datasource.url}")
+    private String dbUrl;
+
     @Value("${langchain4j.google-ai-gemini.embedding-model.output-dimensionality:768}")
     private int outputDimension;
 
     @Bean
     public EmbeddingStore<TextSegment> embeddingStore() {
+        String url = dbUrl.replace("jdbc:postgresql://", "");
+        String[] urlParts = url.split("/");
+        String hostAndPort = urlParts[0];
+        String database = urlParts[1];
+
+        String[] hostPortParts = hostAndPort.split(":");
+        String host = hostPortParts[0];
+        int port = hostPortParts.length > 1 ? Integer.parseInt(hostPortParts[1]) : 5432;
+
         return PgVectorEmbeddingStore
                 .builder()
-                .host("localhost")
-                .port(5432)
-                .database("rag_demo")
-                .user("postgres")
-                .password("root")
+                .host(host)
+                .database(database)
+                .port(port)
+                .user(dbUsername)
+                .password(dbPassword)
                 .table("langchain_store")
                 .dropTableFirst(false)
                 .createTable(true)

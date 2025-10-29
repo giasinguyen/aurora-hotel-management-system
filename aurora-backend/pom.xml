@@ -86,6 +86,16 @@
             <artifactId>langchain4j-document-parser-apache-tika</artifactId>
             <version>1.7.1-beta14</version>
         </dependency>
+<!--        <dependency>-->
+<!--            <groupId>dev.langchain4j</groupId>-->
+<!--            <artifactId>langchain4j-reactor</artifactId>-->
+<!--            <version>1.7.1-beta14</version>-->
+<!--        </dependency>-->
+<!--        <dependency>-->
+<!--            <groupId>org.springframework.boot</groupId>-->
+<!--            <artifactId>spring-boot-starter-webflux</artifactId>-->
+<!--            <version>4.0.0-M3</version>-->
+<!--        </dependency>-->
 
         <!-- Dotenv for loading .env file -->
         <dependency>
@@ -136,6 +146,11 @@
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-test</artifactId>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 
