@@ -76,9 +76,24 @@ public class Payment extends BaseEntity {
     @Column(length = 1000)
     String notes;
     
-    // Processed by (staff username for manual payments)
     @Column(length = 100)
     String processedBy;
+    
+    // VNPay specific fields
+    @Column(length = 100, unique = true)
+    String vnpayTxnRef;      // Mã đơn hàng gửi tới VNPay (unique, format: AURORA_YYYYMMDDHHMMSS_BOOKINGCODE)
+    
+    @Column(length = 50)
+    String vnpayResponseCode; // Response code từ VNPay (00 = success, other = error codes)
+    
+    @Column(length = 50)
+    String vnpayBankCode;     // Mã ngân hàng (VNBANK, INTCARD, NCB, etc.)
+    
+    @Column(columnDefinition = "TEXT")
+    String vnpaySecureHash;   // Secure hash từ VNPay (for audit and verification)
+    
+    @Column(length = 20)
+    String vnpayCardType;     // Loại thẻ: ATM, CREDIT, etc.
 
     // Payment Method Enum
     public enum PaymentMethod {
