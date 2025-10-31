@@ -28,6 +28,9 @@ import RegisterPage from "@/pages/client/guest/auth/Register";
 import ForgotPasswordPage from "@/pages/client/guest/auth/ForgotPassword";
 import ResetPasswordPage from "@/pages/client/guest/auth/ResetPassword";
 
+// Payment pages
+import PaymentReturn from "@/pages/client/PaymentReturn";
+
 // ==================== CUSTOMER PAGES (client/customer - cần đăng nhập) ====================
 // Customer account & profile
 import CustomerProfilePage from "@/pages/client/customer/account/Profile";
@@ -137,6 +140,9 @@ const router = createBrowserRouter([
       { path: "login", element: <LoginPage /> },
       { path: "forgot-password", element: <ForgotPasswordPage /> },
       { path: "reset-password", element: <ResetPasswordPage /> },
+
+      // Guest - Payment Return (public for VNPay redirect)
+      { path: "payment/return", element: <PaymentReturn /> },
 
       // ==================== CUSTOMER ROUTES (cần đăng nhập) ====================
       { path: "customer/profile", element: <CustomerProfilePage /> },

@@ -32,6 +32,12 @@ public class PermissionAspect {
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.toSet());
 
+        // ADMIN có tất cả quyền - bypass permission check
+        if (userPermissions.contains("ROLE_ADMIN")) {
+            log.debug("User {} has ADMIN role - permission check bypassed", authentication.getName());
+            return;
+        }
+
         String[] requiredPermissions = requirePermission.value();
         RequirePermission.LogicType logic = requirePermission.logic();
 

@@ -35,7 +35,13 @@ public class SecurityConfig {
             "/api/v1/auth/logout",
             "/api/v1/auth/refresh-token",
             "/api/v1/auth/refresh",
-            "/api/v1/rag/"
+            "/api/v1/rag/",
+            
+            // VNPay IPN callback - MUST be public for VNPay server-to-server callback
+            "/api/v1/payments/vnpay/ipn",
+            
+            // Test endpoints - For testing purposes only (remove in production)
+            "/api/v1/test/**"
     };
     
     private static final String[] PUBLIC_GET_ENDPOINTS = {
@@ -49,6 +55,9 @@ public class SecurityConfig {
             "/api/v1/services",
             "/api/v1/services/{id}",
             "/api/v1/rag/*",
+            
+            // VNPay return URL - Public for customer redirect after payment
+            "/api/v1/payments/vnpay/return"
     };
 
     @Bean
@@ -61,6 +70,7 @@ public class SecurityConfig {
         http.authorizeHttpRequests(request -> request
                 .requestMatchers(HttpMethod.POST, PUBLIC_POST_ENDPOINTS).permitAll()
                 .requestMatchers(HttpMethod.GET, PUBLIC_GET_ENDPOINTS).permitAll()
+                .requestMatchers(HttpMethod.DELETE, "/api/v1/test/**").permitAll() // Test cleanup endpoint
                 .anyRequest().authenticated());
 
         http.oauth2ResourceServer(oauth2 -> oauth2.jwt(jwtConfigurer -> jwtConfigurer
