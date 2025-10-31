@@ -162,6 +162,15 @@ public enum ErrorCode {
     REVIEW_NOT_OWNER(2509, "You can only edit your own reviews", HttpStatus.FORBIDDEN),
     REJECTION_REASON_REQUIRED(2510, "Rejection reason is required", HttpStatus.BAD_REQUEST),
     REVIEW_ALREADY_MODERATED(2511, "Review has already been moderated", HttpStatus.BAD_REQUEST),
+    
+    // VNPay payment errors
+    BOOKING_NOT_CONFIRMED(2600, "Booking must be confirmed before payment", HttpStatus.BAD_REQUEST),
+    PAYMENT_ALREADY_PROCESSED(2601, "Payment has already been processed", HttpStatus.BAD_REQUEST),
+    INVALID_VNPAY_SIGNATURE(2602, "Invalid VNPay signature", HttpStatus.BAD_REQUEST),
+    PAYMENT_AMOUNT_MISMATCH(2603, "Payment amount does not match booking total", HttpStatus.BAD_REQUEST),
+    VNPAY_PAYMENT_FAILED(2604, "VNPay payment failed", HttpStatus.PAYMENT_REQUIRED),
+    PAYMENT_EXPIRED(2605, "Payment session has expired", HttpStatus.BAD_REQUEST),
+    VNPAY_TXN_REF_NOT_FOUND(2606, "VNPay transaction reference not found", HttpStatus.NOT_FOUND),
     ;
 
     ErrorCode(int code, String message, HttpStatusCode statusCode) {

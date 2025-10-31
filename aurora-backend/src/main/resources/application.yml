@@ -80,3 +80,12 @@ langchain4j:
       model-name: text-embedding-004
       output-dimensionality: 768
       log-requests-and-responses: false
+
+# VNPay Configuration
+vnpay:
+  tmn-code: ${VNPAY_TMN_CODE:3GZ6D197}
+  hash-secret: ${VNPAY_HASH_SECRET:GXONS066262VR15QOF8S4BTEN38DX3HV}
+  pay-url: https://sandbox.vnpayment.vn/paymentv2/vpcpay.html
+  return-url: ${VNPAY_RETURN_URL:http://localhost:5173/payment/return}
+  ipn-url: ${VNPAY_IPN_URL:http://localhost:8080/api/v1/payments/vnpay/ipn}
+  timezone: Asia/Ho_Chi_Minh
