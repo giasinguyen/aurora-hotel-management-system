@@ -1,5 +1,5 @@
-import axiosClient from '@/lib/axiosClient';
-import type { ApiResponse } from '@/types/api.types';
+import instance from '@/config/axiosClient';
+import type { ApiResponse } from '@/types/apiResponse';
 import type {
   VnPayPaymentRequest,
   VnPayPaymentResponse,
@@ -36,7 +36,7 @@ export const vnpayService = {
   createPaymentUrl: async (
     request: VnPayPaymentRequest
   ): Promise<ApiResponse<VnPayPaymentResponse>> => {
-    const response = await axiosClient.post<ApiResponse<VnPayPaymentResponse>>(
+    const response = await instance.post<ApiResponse<VnPayPaymentResponse>>(
       VNPAY_ENDPOINTS.CREATE,
       request
     );
@@ -57,7 +57,7 @@ export const vnpayService = {
   getPaymentResult: async (
     params: URLSearchParams
   ): Promise<ApiResponse<VnPayReturnResponse>> => {
-    const response = await axiosClient.get<ApiResponse<VnPayReturnResponse>>(
+    const response = await instance.get<ApiResponse<VnPayReturnResponse>>(
       VNPAY_ENDPOINTS.RETURN,
       { params }
     );
