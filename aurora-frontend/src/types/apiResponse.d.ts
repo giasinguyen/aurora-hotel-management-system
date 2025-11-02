@@ -1,10 +1,10 @@
-export interface IApiResponse<T> {
+export interface ApiResponse<T> {
+  code: number;
   message: string;
-  errorCode: string;
-  data: T;
+  result: T;
 }
 
-export interface IPageResponse<T> {
+export interface PageResponseDto<T> {
   content: T[];
   page: number;
   size: number;
@@ -12,8 +12,11 @@ export interface IPageResponse<T> {
   totalPages: number;
 }
 
-export interface IPaginationParams {
+export interface PaginationParams {
   page: number;
   size: number;
-  filter: string | null;
+  filter?: string | null;
+  sortBy?: string;
+  sortDirection?: "ASC" | "DESC";
 }
+

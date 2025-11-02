@@ -26,6 +26,7 @@ public enum ErrorCode {
     DOB_INVALID(1014, "Date of birth must be in the past", HttpStatus.BAD_REQUEST),
     ACCOUNT_LOCKED(1015, "Account is locked due to too many failed login attempts", HttpStatus.UNAUTHORIZED),
     WEAK_PASSWORD(1016, "Password must be at least 8 characters with uppercase, lowercase, digit and special character", HttpStatus.BAD_REQUEST),
+    SESSION_NOT_FOUND(1017, "Session not found or already expired", HttpStatus.NOT_FOUND),
     
     // Amenity errors
     AMENITY_EXISTED(1100, "Amenity already exists", HttpStatus.BAD_REQUEST),
@@ -147,6 +148,29 @@ public enum ErrorCode {
     BRANCH_CITY_REQUIRED(2407, "City is required", HttpStatus.BAD_REQUEST),
     BRANCH_DISTRICT_REQUIRED(2408, "District is required", HttpStatus.BAD_REQUEST),
     BRANCH_WARD_REQUIRED(2409, "Ward is required", HttpStatus.BAD_REQUEST),
+    
+    // Review errors
+    REVIEW_NOT_FOUND(2500, "Review not found", HttpStatus.NOT_FOUND),
+    REVIEW_ALREADY_EXISTS(2501, "Review already exists for this booking", HttpStatus.BAD_REQUEST),
+    REVIEW_NOT_ALLOWED(2502, "Only checked-out customers can review", HttpStatus.FORBIDDEN),
+    REVIEW_EDIT_EXPIRED(2503, "Review can only be edited within 24 hours", HttpStatus.FORBIDDEN),
+    RATING_REQUIRED(2504, "Rating is required", HttpStatus.BAD_REQUEST),
+    RATING_INVALID(2505, "Rating must be between 1 and 5", HttpStatus.BAD_REQUEST),
+    COMMENT_REQUIRED(2506, "Comment is required", HttpStatus.BAD_REQUEST),
+    COMMENT_TOO_SHORT(2507, "Comment must be at least 10 characters", HttpStatus.BAD_REQUEST),
+    TOO_MANY_PHOTOS(2508, "Maximum 5 photos allowed", HttpStatus.BAD_REQUEST),
+    REVIEW_NOT_OWNER(2509, "You can only edit your own reviews", HttpStatus.FORBIDDEN),
+    REJECTION_REASON_REQUIRED(2510, "Rejection reason is required", HttpStatus.BAD_REQUEST),
+    REVIEW_ALREADY_MODERATED(2511, "Review has already been moderated", HttpStatus.BAD_REQUEST),
+    
+    // VNPay payment errors
+    BOOKING_NOT_CONFIRMED(2600, "Booking must be confirmed before payment", HttpStatus.BAD_REQUEST),
+    PAYMENT_ALREADY_PROCESSED(2601, "Payment has already been processed", HttpStatus.BAD_REQUEST),
+    INVALID_VNPAY_SIGNATURE(2602, "Invalid VNPay signature", HttpStatus.BAD_REQUEST),
+    PAYMENT_AMOUNT_MISMATCH(2603, "Payment amount does not match booking total", HttpStatus.BAD_REQUEST),
+    VNPAY_PAYMENT_FAILED(2604, "VNPay payment failed", HttpStatus.PAYMENT_REQUIRED),
+    PAYMENT_EXPIRED(2605, "Payment session has expired", HttpStatus.BAD_REQUEST),
+    VNPAY_TXN_REF_NOT_FOUND(2606, "VNPay transaction reference not found", HttpStatus.NOT_FOUND),
     ;
 
     ErrorCode(int code, String message, HttpStatusCode statusCode) {

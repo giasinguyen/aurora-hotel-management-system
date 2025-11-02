@@ -8,10 +8,17 @@
     "gallery": "GALLERY"
   },
   "buttons": {
-    "bookNow": "BOOK NOW",
+    "login": "LOGIN",
+    "register": "REGISTER",
     "search": "Search"
   },
   "navigation": {
     "menu": "Menu"
+  },
+  "user": {
+    "myAccount": "My Account",
+    "profile": "Profile",
+    "settings": "Settings",
+    "logout": "Log out"
   }
 }

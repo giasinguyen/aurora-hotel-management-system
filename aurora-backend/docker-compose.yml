@@ -31,5 +31,94 @@ services:
     depends_on:
       - rag_postgres
 
+  redis:
+    image: redis:7.2-alpine
+    container_name: aurora-redis
+    restart: unless-stopped
+    environment:
+      TZ: Asia/Ho_Chi_Minh
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    command: redis-server --appendonly yes --requirepass admin
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "admin", "ping"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+
 volumes:
   rag_pgdata:
+  redis_data:
+
+# RUN ALL SERVICES: docker-compose up -d
+
+## =============================================================================
+## DOCKER COMMANDS
+## =============================================================================
+
+## Start all services (PostgreSQL + pgAdmin + Redis)
+# docker-compose up -d
+
+## Stop all services
+# docker-compose down
+
+## Stop and remove all data
+# docker-compose down -v
+
+## Check status
+# docker-compose ps
+
+## View logs
+# docker-compose logs -f
+# docker-compose logs -f rag_postgres
+# docker-compose logs -f redis
+
+## =============================================================================
+## REDIS COMMANDS (Password: admin)
+## =============================================================================
+
+## 1. Connect to Redis CLI with password
+# docker exec -it aurora-redis redis-cli -a admin
+
+## 2. Query Data in Redis
+# --- Check all keys ---
+# docker exec -it aurora-redis redis-cli -a admin KEYS "*"
+
+# --- Check auth refresh token keys ---
+# docker exec -it aurora-redis redis-cli -a admin KEYS "auth::refresh_token:*"
+
+# --- Get specific key value ---
+# docker exec -it aurora-redis redis-cli -a admin GET "auth::refresh_token:userId:hash"
+
+# --- Count total keys ---
+# docker exec -it aurora-redis redis-cli -a admin DBSIZE
+
+# --- Get key info (type, TTL) ---
+# docker exec -it aurora-redis redis-cli -a admin TYPE "auth::refresh_token:userId:hash"
+# docker exec -it aurora-redis redis-cli -a admin TTL "auth::refresh_token:userId:hash"
+
+# --- Get all session metadata for a user ---
+# docker exec -it aurora-redis redis-cli -a admin --scan --pattern "auth::refresh_token:*"
+
+# --- View specific session metadata (JSON format) ---
+# docker exec -it aurora-redis redis-cli -a admin GET "auth::refresh_token:userId:hash"
+
+# --- Delete specific session ---
+# docker exec -it aurora-redis redis-cli -a admin DEL "auth::refresh_token:userId:hash"
+
+# --- Delete all keys (DANGER!) ---
+# docker exec -it aurora-redis redis-cli -a admin FLUSHALL
+
+## 3. Monitor Redis in real-time
+# docker exec -it aurora-redis redis-cli -a admin MONITOR
+
+## 4. Redis Info (memory, stats, etc.)
+# docker exec -it aurora-redis redis-cli -a admin INFO
+# docker exec -it aurora-redis redis-cli -a admin INFO memory
+# docker exec -it aurora-redis redis-cli -a admin INFO stats
+
+## 5. Check Redis connection
+# docker exec -it aurora-redis redis-cli -a admin PING
+# Expected output: PONG

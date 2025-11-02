@@ -1,6 +1,7 @@
 import { Link, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard,
+  CalendarCheck,
   BedDouble,
   Utensils,
   Users,
@@ -11,7 +12,6 @@ import {
   ChevronLeft,
   ChevronRight,
   Hotel,
-  LogIn,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -30,6 +30,17 @@ const menuItems = [
     icon: LayoutDashboard,
     href: '/manager',
   },
+  // ===== Kế thừa từ Staff =====
+  {
+    title: 'Bookings',
+    icon: CalendarCheck,
+    href: '/manager/booking',
+    children: [
+      { title: 'Booking List', href: '/manager/booking' },
+      { title: 'Create Booking', href: '/manager/booking/upsert' },
+    ],
+  },
+  // ===== Chức năng riêng của Manager =====
   {
     title: 'Rooms',
     icon: BedDouble,
@@ -69,6 +80,7 @@ const menuItems = [
     icon: BarChart3,
     href: '/manager/reports',
     children: [
+      { title: 'Shift Report', href: '/manager/reports/shift' },
       { title: 'Revenue Report', href: '/manager/reports/revenue' },
       { title: 'Occupancy Report', href: '/manager/reports/occupancy' },
     ],
@@ -218,30 +230,6 @@ export default function Sidebar({ className }: SidebarProps) {
             );
           })}
         </div>
-
-        <Separator className="my-4" />
-
-        {/* Quick Actions */}
-        {!collapsed && (
-          <div className="space-y-2">
-            <p className="px-3 text-xs font-semibold text-gray-500">QUICK ACTIONS</p>
-            <Link
-              to="/manager/checkinout"
-              className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-gray-700 transition-all"
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = `${APP_COLOR.MANAGER}20`;
-                e.currentTarget.style.color = APP_COLOR.MANAGER;
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = 'transparent';
-                e.currentTarget.style.color = '#374151';
-              }}
-            >
-              <LogIn className="h-5 w-5" />
-              <span>Check-in / Check-out</span>
-            </Link>
-          </div>
-        )}
 
         <Separator className="my-4" />
 

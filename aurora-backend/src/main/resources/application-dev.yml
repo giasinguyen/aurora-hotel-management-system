@@ -21,3 +21,20 @@ logging:
     org.hibernate.SQL: DEBUG
     org.hibernate.type.descriptor.sql.BasicBinder: TRACE
     org.springframework.security: DEBUG
+
+# Langchain4j
+langchain4j:
+  google-ai-gemini:
+    chat-model:
+      api-key: ${GEMINI_AI_KEY}
+      model-name: gemini-2.5-flash
+      log-requests-and-responses: true
+    streaming-chat-model:
+      api-key: ${GEMINI_AI_KEY}
+      model-name: gemini-2.5-flash
+      log-requests-and-responses: true
+    embedding-model:
+      api-key: ${GEMINI_AI_KEY}
+      model-name: text-embedding-004
+      output-dimensionality: 768
+      log-requests-and-responses: false

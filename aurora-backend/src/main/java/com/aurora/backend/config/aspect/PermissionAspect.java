@@ -22,14 +22,21 @@ public class PermissionAspect {
     @Before("@annotation(requirePermission)")
     public void checkPermission(RequirePermission requirePermission) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        
+
         if (authentication == null || !authentication.isAuthenticated()) {
+            log.error("Authentication is null or not authenticated");
             throw new AppException(ErrorCode.UNAUTHENTICATED);
         }
 
         Set<String> userPermissions = authentication.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
                 .collect(Collectors.toSet());
+
+        // ADMIN có tất cả quyền - bypass permission check
+        if (userPermissions.contains("ROLE_ADMIN")) {
+            log.debug("User {} has ADMIN role - permission check bypassed", authentication.getName());
+            return;
+        }
 
         String[] requiredPermissions = requirePermission.value();
         RequirePermission.LogicType logic = requirePermission.logic();
@@ -40,8 +47,10 @@ public class PermissionAspect {
         };
 
         if (!hasPermission) {
-            log.warn("User {} không có quyền: {}", 
-                    authentication.getName(), 
+            log.warn("User {} không có quyền. User permissions: {} | Required ({}): {}",
+                    authentication.getName(),
+                    userPermissions,
+                    logic,
                     String.join(", ", requiredPermissions));
             throw new AppException(ErrorCode.UNAUTHORIZED);
         }
