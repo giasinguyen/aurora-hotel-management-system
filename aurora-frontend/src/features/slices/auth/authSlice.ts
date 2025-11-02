@@ -1,83 +1,168 @@
-import { createSlice, type PayloadAction } from '@reduxjs/toolkit';
-import { loginUser, logoutUser, getCurrentUser } from './authThunk';
-import type { User, AuthState } from '../../../types/auth';
+import type { UserSessionResponse } from "@/types/user.d.ts";
+import { createSlice } from "@reduxjs/toolkit";
+import { getAccount, login, logout, refreshToken } from "./authThunk";
 
-const initialState: AuthState = {
-  user: null,
-  token: localStorage.getItem('token'),
+// ===========================================
+// Slice
+// ===========================================
+type AuthState = {
+  user: UserSessionResponse;
+  isLogin: boolean;
+  isLoading: boolean;
+  error: string | null;
+};
+
+const initialValue: AuthState = {
+  user: {
+    id: "",
+    username: "",
+    email: "",
+    firstName: "",
+    lastName: "",
+    avatarUrl: "",
+    roles: [],
+    permissions: [],
+    branchId: "",
+    branchName: "",
+    updatedAt: "",
+  },
+  isLogin: false,
   isLoading: false,
-  isAuthenticated: !!localStorage.getItem('token'),
   error: null,
 };
 
 const authSlice = createSlice({
-  name: 'auth',
-  initialState,
+  name: "auth",
+  initialState: initialValue,
   reducers: {
-    clearError: (state) => {
-      state.error = null;
-    },
-    setCredentials: (state, action: PayloadAction<{ user: User; token: string }>) => {
+    updateTokenManually(state, action) {
       state.user = action.payload.user;
-      state.token = action.payload.token;
-      state.isAuthenticated = true;
-      state.error = null;
-      localStorage.setItem('token', action.payload.token);
-    },
-    clearCredentials: (state) => {
-      state.user = null;
-      state.token = null;
-      state.isAuthenticated = false;
-      state.error = null;
-      localStorage.removeItem('token');
+      localStorage.setItem("access_token", action.payload.accessToken);
+      state.isLogin = true;
     },
   },
   extraReducers: (builder) => {
     builder
-      // Login cases
-      .addCase(loginUser.pending, (state) => {
+      // LOGIN
+      .addCase(login.pending, (state) => {
         state.isLoading = true;
         state.error = null;
       })
-      .addCase(loginUser.fulfilled, (state, action) => {
-        state.isLoading = false;
+      .addCase(login.fulfilled, (state, action) => {
         state.user = action.payload.user;
-        state.token = action.payload.token;
-        state.isAuthenticated = true;
-        state.error = null;
-        localStorage.setItem('token', action.payload.token);
+        localStorage.setItem("access_token", action.payload.accessToken);
+
+        state.isLogin = true;
+        state.isLoading = false;
       })
-      .addCase(loginUser.rejected, (state, action) => {
+      .addCase(login.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload as string;
-        state.isAuthenticated = false;
       })
-      // Get current user cases
-      .addCase(getCurrentUser.pending, (state) => {
+
+      // LOGOUT
+      .addCase(logout.pending, (state) => {
         state.isLoading = true;
-      })
-      .addCase(getCurrentUser.fulfilled, (state, action) => {
-        state.isLoading = false;
-        state.user = action.payload;
-        state.isAuthenticated = true;
-      })
-      .addCase(getCurrentUser.rejected, (state) => {
-        state.isLoading = false;
-        state.isAuthenticated = false;
-        state.user = null;
-        state.token = null;
-        localStorage.removeItem('token');
-      })
-      // Logout cases
-      .addCase(logoutUser.fulfilled, (state) => {
-        state.user = null;
-        state.token = null;
-        state.isAuthenticated = false;
         state.error = null;
-        localStorage.removeItem('token');
+      })
+      .addCase(logout.fulfilled, (state) => {
+        state.user = {
+          id: "",
+          username: "",
+          email: "",
+          firstName: "",
+          lastName: "",
+          avatarUrl: "",
+          roles: [],
+          permissions: [],
+          branchId: "",
+          branchName: "",
+          updatedAt: "",
+        };
+        state.isLogin = false;
+        state.isLoading = false;
+        localStorage.removeItem("access_token");
+      })
+      .addCase(logout.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload as string;
+        
+        // Always clear auth state on logout, even if API fails
+        state.user = {
+          id: "",
+          username: "",
+          email: "",
+          firstName: "",
+          lastName: "",
+          avatarUrl: "",
+          roles: [],
+          permissions: [],
+          branchId: "",
+          branchName: "",
+          updatedAt: "",
+        };
+        state.isLogin = false;
+        localStorage.removeItem("access_token");
+      })
+
+      // GET ACCOUNT
+      .addCase(getAccount.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(getAccount.fulfilled, (state, action) => {
+        state.user = action.payload;
+
+        state.isLogin = true;
+        state.isLoading = false;
+      })
+      .addCase(getAccount.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload as string;
+        
+        // Clear authentication state when getAccount fails (token expired/invalid)
+        state.user = {
+          id: "",
+          username: "",
+          email: "",
+          firstName: "",
+          lastName: "",
+          avatarUrl: "",
+          roles: [],
+          permissions: [],
+          branchId: "",
+          branchName: "",
+          updatedAt: "",
+        };
+        state.isLogin = false;
+        localStorage.removeItem("access_token");
+      })
+
+      // REFRESH TOKEN
+      .addCase(refreshToken.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(refreshToken.fulfilled, (state, action) => {
+        state.user = action.payload.user;
+        localStorage.setItem("access_token", action.payload.accessToken);
+
+        state.isLogin = true;
+        state.isLoading = false;
+      })
+      .addCase(refreshToken.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload as string;
+
+        localStorage.removeItem("access_token");
+        state.isLogin = false;
       });
   },
 });
 
-export const { clearError, setCredentials, clearCredentials } = authSlice.actions;
+// ===========================================
+// EXPORT REDUCER
+// ===========================================
+export const { updateTokenManually } = authSlice.actions;
 export default authSlice.reducer;
+

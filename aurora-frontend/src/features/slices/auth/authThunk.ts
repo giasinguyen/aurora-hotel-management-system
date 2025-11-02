@@ -1,70 +1,70 @@
-import { createAsyncThunk } from '@reduxjs/toolkit';
-import axiosClient from '../../../lib/axiosClient';
-import type { User, LoginCredentials, AuthResponse, RegisterCredentials } from '../../../types/auth';
+import {
+  getUserSession,
+  loginApi,
+  logoutApi,
+  refreshTokenApi,
+} from "@/services/authApi";
+import type { LoginRequest } from "@/types/user.d.ts";
+import { createAsyncThunk } from "@reduxjs/toolkit";
+import axios from "axios";
+import { toast } from "sonner";
 
-// Login thunk
-export const loginUser = createAsyncThunk<
-  AuthResponse,
-  LoginCredentials,
-  { rejectValue: string }
->(
-  'auth/loginUser',
-  async (credentials, { rejectWithValue }) => {
+// ===========================================
+// ASYNC THUNK
+// ===========================================
+export const login = createAsyncThunk(
+  "auth/login",
+  async (data: LoginRequest, thunkAPI) => {
     try {
-      const response = await axiosClient.post('/auth/login', credentials);
-      return response.data;
-    } catch (error: any) {
-      const message = error.response?.data?.message || 'Đăng nhập thất bại';
-      return rejectWithValue(message);
+      const res = await loginApi(data);
+      return res.data.result;
+    } catch (err: unknown) {
+      const message = getErrorMessage(err, "Đăng nhập thất bại");
+      toast.error(message);
+      return thunkAPI.rejectWithValue(message);
     }
   }
 );
 
-// Get current user thunk
-export const getCurrentUser = createAsyncThunk<
-  User,
-  void,
-  { rejectValue: string }
->(
-  'auth/getCurrentUser',
-  async (_, { rejectWithValue }) => {
+export const logout = createAsyncThunk("auth/logout", async (_, thunkAPI) => {
+  try {
+    await logoutApi();
+  } catch (err: unknown) {
+    const message = getErrorMessage(err, "Đăng xuất thất bại");
+    return thunkAPI.rejectWithValue(message);
+  }
+});
+
+export const getAccount = createAsyncThunk(
+  "auth/account",
+  async (_, thunkAPI) => {
     try {
-      const response = await axiosClient.get('/auth/me');
-      return response.data;
-    } catch (error: any) {
-      const message = error.response?.data?.message || 'Lấy thông tin người dùng thất bại';
-      return rejectWithValue(message);
+      const res = await getUserSession();
+      return res.data.result;
+    } catch (err: unknown) {
+      const message = getErrorMessage(err, "Lấy thông tin tài khoản thất bại");
+      return thunkAPI.rejectWithValue(message);
     }
   }
 );
 
-// Logout thunk
-export const logoutUser = createAsyncThunk(
-  'auth/logoutUser',
-  async () => {
+export const refreshToken = createAsyncThunk(
+  "auth/refresh-token",
+  async (_, thunkAPI) => {
     try {
-      await axiosClient.post('/auth/logout');
-    } catch (error) {
-      // Even if logout fails on server, we still clear local state
-      console.error('Logout error:', error);
+      const res = await refreshTokenApi();
+      return res.data.result;
+    } catch (err: unknown) {
+      const message = getErrorMessage(err, "Làm mới phiên đăng nhập thất bại");
+      return thunkAPI.rejectWithValue(message);
     }
   }
 );
 
-// Register thunk (optional)
-export const registerUser = createAsyncThunk<
-  AuthResponse,
-  RegisterCredentials,
-  { rejectValue: string }
->(
-  'auth/registerUser',
-  async (userData, { rejectWithValue }) => {
-    try {
-      const response = await axiosClient.post('/auth/register', userData);
-      return response.data;
-    } catch (error: any) {
-      const message = error.response?.data?.message || 'Đăng ký thất bại';
-      return rejectWithValue(message);
-    }
+export const getErrorMessage = (err: unknown, message: string): string => {
+  let res = message;
+  if (axios.isAxiosError(err)) {
+    res = err.response?.data?.message || message;
   }
-);
+  return res;
+};

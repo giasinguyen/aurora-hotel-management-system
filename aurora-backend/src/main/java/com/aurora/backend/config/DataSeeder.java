@@ -45,6 +45,7 @@ public class DataSeeder {
     private final BookingRoomRepository bookingRoomRepository;
     private final ServiceBookingRepository serviceBookingRepository;
     private final PaymentRepository paymentRepository;
+    private final ReviewRepository reviewRepository;
     private final PasswordEncoder passwordEncoder;
     private final DataSeederHelper helper;
 
@@ -103,8 +104,12 @@ public class DataSeeder {
                 helper.seedServiceBookings(bookings, services, customer);
                 
                 // 12. Seed Payments
-                log.info("💳 [12/12] Seeding payments...");
+                log.info("💳 [12/13] Seeding payments...");
                 helper.seedPayments(bookings);
+                
+                // 13. Seed Reviews
+                log.info("⭐ [13/13] Seeding reviews...");
+                helper.seedReviews(bookings, customer);
                 
                 long endTime = System.currentTimeMillis();
                 long duration = (endTime - startTime) / 1000;
@@ -123,7 +128,8 @@ public class DataSeeder {
                 log.info("║  ├─ Bookings:         {:>4}                                 ║", bookingRepository.count());
                 log.info("║  ├─ Booking Rooms:    {:>4}                                 ║", bookingRoomRepository.count());
                 log.info("║  ├─ Service Bookings: {:>4}                                 ║", serviceBookingRepository.count());
-                log.info("║  └─ Payments:         {:>4}                                 ║", paymentRepository.count());
+                log.info("║  ├─ Payments:         {:>4}                                 ║", paymentRepository.count());
+                log.info("║  └─ Reviews:          {:>4}                                 ║", reviewRepository.count());
                 log.info("║                                                            ║");
                 log.info("║  ⏱️  Completed in {} seconds                                ║", duration);
                 log.info("╚════════════════════════════════════════════════════════════╝");

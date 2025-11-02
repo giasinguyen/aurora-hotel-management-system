@@ -3,12 +3,10 @@ import {
   LayoutDashboard,
   CalendarCheck,
   Users,
-  ClipboardList,
   BarChart3,
   ChevronLeft,
   ChevronRight,
   Hotel,
-  LogIn,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -34,7 +32,6 @@ const menuItems = [
     children: [
       { title: 'Booking List', href: '/staff/booking' },
       { title: 'Create Booking', href: '/staff/booking/upsert' },
-      { title: 'Check-in / Check-out', href: '/staff/checkinout' },
     ],
   },
   {
@@ -43,20 +40,9 @@ const menuItems = [
     href: '/staff/customers/upsert',
   },
   {
-    title: 'Requests',
-    icon: ClipboardList,
-    href: '/staff/customer-requests',
-    children: [
-      { title: 'All Requests', href: '/staff/customer-requests' },
-      { title: 'Late Checkout', href: '/staff/customer-requests/late-checkout' },
-      { title: 'Early Checkin', href: '/staff/customer-requests/early-checkin' },
-      { title: 'Issue Reports', href: '/staff/customer-requests/issue-reports' },
-    ],
-  },
-  {
     title: 'Reports',
     icon: BarChart3,
-    href: '/staff/reports',
+    href: '/staff/reports/shift',
     children: [
       { title: 'Shift Report', href: '/staff/reports/shift' },
     ],
@@ -206,30 +192,6 @@ export default function Sidebar({ className }: SidebarProps) {
             );
           })}
         </div>
-
-        <Separator className="my-4" />
-
-        {/* Quick Actions */}
-        {!collapsed && (
-          <div className="space-y-2">
-            <p className="px-3 text-xs font-semibold text-gray-500">QUICK ACTIONS</p>
-            <Link
-              to="/staff/checkinout"
-              className="flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-gray-700 transition-all"
-              onMouseEnter={(e) => {
-                e.currentTarget.style.backgroundColor = `${APP_COLOR.STAFF}20`;
-                e.currentTarget.style.color = APP_COLOR.STAFF;
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.backgroundColor = 'transparent';
-                e.currentTarget.style.color = '#374151';
-              }}
-            >
-              <LogIn className="h-5 w-5" />
-              <span>Check-in / Check-out</span>
-            </Link>
-          </div>
-        )}
 
         <Separator className="my-4" />
 

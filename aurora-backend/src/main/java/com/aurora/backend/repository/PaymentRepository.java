@@ -15,57 +15,51 @@ import java.util.Optional;
 
 @Repository
 public interface PaymentRepository extends JpaRepository<Payment, String> {
-    List<Payment> findByBookingId(String bookingId);
-    Page<Payment> findByBookingId(String bookingId, Pageable pageable);
-    Page<Payment> findByMethod(String method, Pageable pageable);
-    Page<Payment> findByStatus(String status, Pageable pageable);
-    Optional<Payment> findByProviderTxnId(String providerTxnId);
-    
-    // Additional methods with entities for service layer
-    Page<Payment> findByBooking(Booking booking, Pageable pageable);
-    
-    @Query("SELECT p FROM Payment p WHERE " +
-           "(:booking IS NULL OR p.booking = :booking) AND " +
-           "(:method IS NULL OR :method = '' OR p.method = :method) AND " +
-           "(:status IS NULL OR :status = '' OR p.status = :status)")
-    Page<Payment> findByFilters(@Param("booking") Booking booking,
-                               @Param("method") String method,
-                               @Param("status") String status,
-                               Pageable pageable);
-    
-    /**
-     * Calculate total paid amount for a booking (only successful payments)
-     */
-    @Query("SELECT COALESCE(SUM(p.amount), 0) FROM Payment p " +
-           "WHERE p.booking.id = :bookingId " +
-           "AND p.status = 'SUCCESS'")
-    BigDecimal getTotalPaidAmount(@Param("bookingId") String bookingId);
-    
-    /**
-     * Calculate total refunded amount for a booking
-     */
-    @Query("SELECT COALESCE(SUM(p.refundAmount), 0) FROM Payment p " +
-           "WHERE p.booking.id = :bookingId " +
-           "AND p.status IN ('REFUNDED', 'PARTIALLY_REFUNDED')")
-    BigDecimal getTotalRefundedAmount(@Param("bookingId") String bookingId);
-    
-    /**
-     * Get all successful payments for a booking
-     */
-    @Query("SELECT p FROM Payment p " +
-           "WHERE p.booking.id = :bookingId " +
-           "AND p.status = 'SUCCESS' " +
-           "ORDER BY p.paidAt DESC")
-    List<Payment> findSuccessfulPaymentsByBooking(@Param("bookingId") String bookingId);
-    
-    /**
-     * Check if booking is fully paid
-     */
-    @Query("SELECT CASE WHEN (SELECT COALESCE(SUM(p.amount), 0) FROM Payment p " +
-           "WHERE p.booking.id = :bookingId AND p.status = 'SUCCESS') >= :totalPrice " +
-           "THEN true ELSE false END")
-    boolean isBookingFullyPaid(
-        @Param("bookingId") String bookingId,
-        @Param("totalPrice") BigDecimal totalPrice
-    );
+       List<Payment> findByBookingId(String bookingId);
+
+       Page<Payment> findByBookingId(String bookingId, Pageable pageable);
+
+       Page<Payment> findByMethod(String method, Pageable pageable);
+
+       Page<Payment> findByStatus(String status, Pageable pageable);
+
+       Optional<Payment> findByProviderTxnId(String providerTxnId);
+
+       Page<Payment> findByBooking(Booking booking, Pageable pageable);
+
+       @Query("SELECT p FROM Payment p WHERE " +
+                     "(:booking IS NULL OR p.booking = :booking) AND " +
+                     "(:method IS NULL OR :method = '' OR p.method = :method) AND " +
+                     "(:status IS NULL OR :status = '' OR p.status = :status)")
+       Page<Payment> findByFilters(@Param("booking") Booking booking,
+                     @Param("method") String method,
+                     @Param("status") String status,
+                     Pageable pageable);
+
+       @Query("SELECT COALESCE(SUM(p.amount), 0) FROM Payment p " +
+                     "WHERE p.booking.id = :bookingId " +
+                     "AND p.status = 'SUCCESS'")
+       BigDecimal getTotalPaidAmount(@Param("bookingId") String bookingId);
+
+       @Query("SELECT COALESCE(SUM(p.refundAmount), 0) FROM Payment p " +
+                     "WHERE p.booking.id = :bookingId " +
+                     "AND p.status IN ('REFUNDED', 'PARTIALLY_REFUNDED')")
+       BigDecimal getTotalRefundedAmount(@Param("bookingId") String bookingId);
+
+       @Query("SELECT p FROM Payment p " +
+                     "WHERE p.booking.id = :bookingId " +
+                     "AND p.status = 'SUCCESS' " +
+                     "ORDER BY p.paidAt DESC")
+       List<Payment> findSuccessfulPaymentsByBooking(@Param("bookingId") String bookingId);
+
+       @Query("SELECT CASE WHEN (SELECT COALESCE(SUM(p.amount), 0) FROM Payment p " +
+                     "WHERE p.booking.id = :bookingId AND p.status = 'SUCCESS') >= :totalPrice " +
+                     "THEN true ELSE false END")
+       boolean isBookingFullyPaid(
+                     @Param("bookingId") String bookingId,
+                     @Param("totalPrice") BigDecimal totalPrice);
+
+       Optional<Payment> findByVnpayTxnRef(String vnpayTxnRef);
+
+       List<Payment> findByBookingAndStatus(Booking booking, Payment.PaymentStatus status);
 }

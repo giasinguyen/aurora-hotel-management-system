@@ -1,4 +1,10 @@
-import { Link, useLocation } from 'react-router-dom';
+import {
+  User,
+  LogOut,
+  LockKeyhole,
+  LayoutDashboard,
+} from "lucide-react";
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -6,82 +12,200 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { User, Settings, LogOut } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+} from "@/components/ui/dropdown-menu";
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from "@/components/ui/avatar";
+import { useAppDispatch, useAppSelector } from "@/hooks/useRedux";
+import { logout } from "@/features/slices/auth/authThunk";
+import { Link } from "react-router-dom";
+import { Badge } from "@/components/ui/badge";
+import { useEffect, useState } from "react";
 
 interface UserMenuProps {
-  userName?: string;
-  userEmail?: string;
-  userAvatar?: string;
-  onLogout?: () => void;
+  blackTheme?: boolean;
 }
 
-export default function UserMenu({
-  userName = 'User',
-  userEmail = 'user@aurora.com',
-  userAvatar,
-  onLogout,
-}: UserMenuProps) {
-  const location = useLocation();
-  const initials = userName
-    .split(' ')
-    .map((n) => n[0])
-    .join('')
-    .toUpperCase();
+const UserMenu = ({ blackTheme }: UserMenuProps) => {
+  const { user } = useAppSelector((state) => state.auth);
+  const dispatch = useAppDispatch();
 
-  // Xác định role từ URL để link đúng trang profile
-  const getProfileLink = () => {
-    const pathParts = location.pathname.split('/');
-    const role = pathParts[1]; // staff, manager, admin, hoặc customer
-    
-    if (['staff', 'manager', 'admin'].includes(role)) {
-      return `/${role}/profile`;
-    }
-    return '/customer/profile'; // fallback cho customer
+  const [avatarVersion, setAvatarVersion] = useState(Date.now());
+
+  const handleLogout = () => {
+    dispatch(logout());
   };
+
+  useEffect(() => {
+    if (user?.updatedAt) {
+      setAvatarVersion(Date.now());
+    }
+  }, [user?.updatedAt]);
+
+  const fullName = `${user.firstName || ""} ${user.lastName || ""}`.trim() || user.username || "User";
+  const initials = fullName
+    .split(" ")
+    .map((n) => n[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase() || "U";
 
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="flex items-center gap-2">
-          <Avatar className="h-8 w-8">
-            {userAvatar && <AvatarImage src={userAvatar} alt={userName} />}
-            <AvatarFallback>{initials}</AvatarFallback>
-          </Avatar>
-          <div className="hidden md:block text-left">
-            <p className="text-sm font-medium">{userName}</p>
-            <p className="text-xs text-gray-500">{userEmail}</p>
+        <Button
+          variant="ghost"
+          className={`group flex h-auto items-center gap-3 px-3 py-2 transition-colors ${
+            blackTheme ? "hover:bg-blue-300" : "hover:bg-orange-300"
+          }`}
+        >
+          <div className="flex items-center gap-3">
+            <Avatar className="h-9 w-9 ring-2 ring-blue-100 transition-all group-hover:ring-orange-200">
+              <AvatarImage
+                src={
+                  user.avatarUrl
+                    ? `${user.avatarUrl}?v=${avatarVersion}`
+                    : undefined
+                }
+                alt={fullName}
+              />
+              <AvatarFallback className="bg-gradient-to-br from-blue-500 to-blue-600 font-semibold text-white">
+                {initials}
+              </AvatarFallback>
+            </Avatar>
           </div>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-56">
-        <DropdownMenuLabel>My Account</DropdownMenuLabel>
+      <DropdownMenuContent
+        align="end"
+        className="w-72 p-2"
+        sideOffset={5}
+        alignOffset={-5}
+      >
+        {/* User Info Header */}
+        <div className="mb-2 flex items-center gap-3 rounded-lg bg-gradient-to-r from-blue-50 to-blue-100 p-3">
+          <Avatar className="h-12 w-12 ring-2 ring-white">
+            <AvatarImage
+              src={
+                user.avatarUrl ? `${user.avatarUrl}?v=${avatarVersion}` : undefined
+              }
+              alt={fullName}
+            />
+            <AvatarFallback className="bg-gradient-to-br from-blue-500 to-blue-600 font-semibold text-white">
+              {initials}
+            </AvatarFallback>
+          </Avatar>
+          <div className="min-w-0 flex-1">
+            <p className="truncate font-semibold text-gray-900">
+              {fullName}
+            </p>
+            <p className="truncate text-sm text-gray-600">
+              {user.email || "user@example.com"}
+            </p>
+            {user.roles && user.roles.length > 0 && (
+              <Badge>{user.roles[0]}</Badge>
+            )}
+          </div>
+        </div>
+
+        <DropdownMenuLabel>Tài khoản của tôi</DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuItem asChild>
-          <Link to={getProfileLink()}>
-            <User className="mr-2 h-4 w-4" />
-            <span>Profile</span>
+
+        {/* Role-specific dashboard links */}
+        {user.roles && user.roles.includes("ADMIN") && (
+          <DropdownMenuItem>
+            <Link
+              to={"/admin"}
+              className="flex cursor-pointer items-center gap-3 rounded-lg"
+            >
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-purple-100">
+                <LayoutDashboard className="h-4 w-4 text-purple-600" />
+              </div>
+              <div className="min-w-0">
+                <p className="font-medium">Trang quản trị</p>
+              </div>
+            </Link>
+          </DropdownMenuItem>
+        )}
+
+        {user.roles && user.roles.includes("MANAGER") && (
+          <DropdownMenuItem>
+            <Link
+              to={"/manager"}
+              className="flex cursor-pointer items-center gap-3 rounded-lg"
+            >
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-indigo-100">
+                <LayoutDashboard className="h-4 w-4 text-indigo-600" />
+              </div>
+              <div className="min-w-0">
+                <p className="font-medium">Trang quản lý</p>
+              </div>
+            </Link>
+          </DropdownMenuItem>
+        )}
+
+        {user.roles && user.roles.includes("STAFF") && (
+          <DropdownMenuItem>
+            <Link
+              to={"/staff"}
+              className="flex cursor-pointer items-center gap-3 rounded-lg"
+            >
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-cyan-100">
+                <LayoutDashboard className="h-4 w-4 text-cyan-600" />
+              </div>
+              <div className="min-w-0">
+                <p className="font-medium">Trang nhân viên</p>
+              </div>
+            </Link>
+          </DropdownMenuItem>
+        )}
+
+        <DropdownMenuItem>
+          <Link
+            to={"/profile"}
+            className="flex cursor-pointer items-center gap-3 rounded-lg"
+          >
+            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-blue-100">
+              <User className="h-4 w-4 text-gray-600" />
+            </div>
+            <div className="min-w-0">
+              <p className="font-medium">Thông tin người dùng</p>
+            </div>
           </Link>
         </DropdownMenuItem>
+
         <DropdownMenuItem>
-          <Settings className="mr-2 h-4 w-4" />
-          <span>Settings</span>
+          <Link
+            to={"/sessions"}
+            className="flex cursor-pointer items-center gap-3 rounded-lg"
+          >
+            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-blue-100">
+              <LockKeyhole className="h-4 w-4 text-gray-600" />
+            </div>
+            <div className="min-w-0">
+              <p className="font-medium">Bảo mật</p>
+            </div>
+          </Link>
         </DropdownMenuItem>
+
         <DropdownMenuSeparator />
+
         <DropdownMenuItem
-          className="text-red-600"
-          onClick={() => {
-            if (onLogout) {
-              onLogout();
-            }
-          }}
+          onClick={handleLogout}
+          className="flex cursor-pointer items-center gap-3 rounded-lg text-red-600 hover:bg-red-50 hover:text-red-700"
         >
-          <LogOut className="mr-2 h-4 w-4" />
-          <span>Log out</span>
+          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-red-100">
+            <LogOut className="h-4 w-4 text-red-600" />
+          </div>
+          <div className="min-w-0">
+            <p className="font-medium">Đăng xuất</p>
+          </div>
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );
-}
+};
+
+export default UserMenu;

@@ -1,18 +1,33 @@
 package com.aurora.backend.service;
 
-import com.aurora.backend.dto.request.AuthenticationRequest;
-import com.aurora.backend.dto.request.IntrospectRequest;
-import com.aurora.backend.dto.request.LogoutRequest;
-import com.aurora.backend.dto.request.RefreshRequest;
-import com.aurora.backend.dto.response.AuthenticationResponse;
-import com.aurora.backend.dto.response.IntrospectResponse;
+import com.aurora.backend.dto.request.LoginRequest;
+import com.aurora.backend.dto.request.RegisterRequest;
+import com.aurora.backend.dto.request.SessionMetaRequest;
+import com.aurora.backend.dto.response.AuthResult;
+import com.aurora.backend.dto.response.SessionMetaResponse;
+import com.aurora.backend.dto.response.UserDetailsResponse;
+import com.aurora.backend.dto.response.UserSessionResponse;
 import com.nimbusds.jose.JOSEException;
+import org.springframework.http.ResponseCookie;
 
 import java.text.ParseException;
+import java.util.List;
 
 public interface AuthenticationService {
-    IntrospectResponse introspect(IntrospectRequest request) throws JOSEException, ParseException;
-    AuthenticationResponse authenticate(AuthenticationRequest request);
-    AuthenticationResponse refreshToken(RefreshRequest request) throws ParseException, JOSEException;
-    void logout(LogoutRequest request) throws ParseException, JOSEException;
+    
+    UserSessionResponse handleRegister(RegisterRequest request);
+    
+    AuthResult handleLogin(LoginRequest request);
+    
+    ResponseCookie handleLogout(String refreshToken);
+    
+    UserDetailsResponse getCurrentUserDetails();
+    
+    AuthResult handleRefresh(String refreshToken, SessionMetaRequest sessionMetaRequest) throws ParseException, JOSEException;
+    
+    void removeSelfSession(String sessionId);
+    
+    List<SessionMetaResponse> getAllSelfSessionMetas(String refreshToken) throws ParseException, JOSEException;
+    
+    UserSessionResponse getCurrentUser();
 }

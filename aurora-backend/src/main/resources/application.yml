@@ -2,10 +2,10 @@ server:
   port: 8080
 
 spring:
-  # profiles:
-  #   active: dev
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE}
   datasource:
-    url: ${DB_URL:jdbc:postgresql://localhost:5432/aurora_hotel}
+    url: ${DB_URL}
     driver-class-name: org.postgresql.Driver
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
@@ -15,7 +15,14 @@ spring:
       connection-timeout: 30000
       idle-timeout: 600000
       max-lifetime: 1800000
-  
+
+  # Spring Vector Store Init Configuration
+  sql:
+    init:
+      mode: always
+      encoding: UTF-8
+      schema-locations: classpath:db/init-vector-store.sql
+
   jpa:
     hibernate:
       ddl-auto: update
@@ -29,9 +36,56 @@ spring:
           batch_size: 20
         order_inserts: true
         order_updates: true
+  
+  # Redis Configuration
+  data:
+    redis:
+      host: ${REDIS_HOST}
+      port: ${REDIS_PORT}
+      password: ${REDIS_PASSWORD}
+      timeout: 60000
+      lettuce:
+        pool:
+          max-active: 8
+          max-idle: 8
+          min-idle: 0
+          max-wait: -1ms
+
+  #  Multipart file config
+  spring:
+    servlet:
+      multipart:
+        max-file-size: 10MB
+        max-request-size: 10MB
 
 # JWT Configuration
 jwt:
   signerKey: ${JWT_SIGNER_KEY}
-  valid-duration: ${JWT_VALID_DURATION:3600}
-  refreshable-duration: ${JWT_REFRESHABLE_DURATION:86400}
+  valid-duration: ${ACCESS_TOKEN_VALID_DURATION}
+  refreshable-duration: ${REFRESH_TOKEN_VALID_DURATION}
+
+# Langchain4j
+langchain4j:
+  google-ai-gemini:
+    chat-model:
+      api-key: ${GEMINI_AI_KEY}
+      model-name: gemini-2.5-flash
+      log-requests-and-responses: true
+    streaming-chat-model:
+      api-key: ${GEMINI_AI_KEY}
+      model-name: gemini-2.5-flash
+      log-requests-and-responses: true
+    embedding-model:
+      api-key: ${GEMINI_AI_KEY}
+      model-name: text-embedding-004
+      output-dimensionality: 768
+      log-requests-and-responses: false
+
+# VNPay Configuration
+vnpay:
+  tmn-code: ${VNPAY_TMN_CODE:3GZ6D197}
+  hash-secret: ${VNPAY_HASH_SECRET:GXONS066262VR15QOF8S4BTEN38DX3HV}
+  pay-url: https://sandbox.vnpayment.vn/paymentv2/vpcpay.html
+  return-url: ${VNPAY_RETURN_URL:http://localhost:5173/payment/return}
+  ipn-url: ${VNPAY_IPN_URL:http://localhost:8080/api/v1/payments/vnpay/ipn}
+  timezone: Asia/Ho_Chi_Minh
