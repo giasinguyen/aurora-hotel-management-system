@@ -42,6 +42,7 @@ public class SecurityConfig {
             "/api/v1/services",
             "/api/v1/services/{id}",
             "/api/v1/rag/*",
+            "/api/v1/document/*"
     };
 
     @Bean

@@ -2,6 +2,8 @@ server:
   port: 8080
 
 spring:
+  main:
+    allow-bean-definition-overriding: true
   datasource:
     url: ${DB_URL:jdbc:postgresql://localhost:5432/aurora_hotel}
     driver-class-name: org.postgresql.Driver
