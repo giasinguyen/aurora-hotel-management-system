@@ -2,6 +2,8 @@ server:
   port: 8080
 
 spring:
+  main:
+    allow-bean-definition-overriding: true
   profiles:
     active: ${SPRING_PROFILES_ACTIVE}
   datasource:

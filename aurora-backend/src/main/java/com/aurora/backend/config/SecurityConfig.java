@@ -55,7 +55,7 @@ public class SecurityConfig {
             "/api/v1/services",
             "/api/v1/services/{id}",
             "/api/v1/rag/*",
-            
+            "/api/v1/document/*"
             // VNPay return URL - Public for customer redirect after payment
             "/api/v1/payments/vnpay/return"
     };
