@@ -40,14 +40,10 @@ public class EmbeddingService {
     private final DocumentParser documentParser = new ApacheTikaDocumentParser();
     private final DocumentSplitter documentSplitter = DocumentSplitters.recursive(1000, 200);
 
-    /**
-     * Xóa embeddings của file khỏi vector store
-     */
     public void deleteFileEmbeddings(Long fileId) {
         try {
             log.info("Bắt đầu xóa embeddings của file ID: {}", fileId);
 
-            // Tìm tất cả embeddings của file này
             List<String> embeddingIds = findEmbeddingIdsByFileId(fileId);
 
             if (embeddingIds.isEmpty()) {
@@ -55,7 +51,6 @@ public class EmbeddingService {
                 return;
             }
 
-            // Xóa từng embedding
             for (String embeddingId : embeddingIds) {
                 embeddingStore.remove(embeddingId);
             }
@@ -74,17 +69,14 @@ public class EmbeddingService {
         try {
             log.info("Bắt đầu index file: {} (ID: {})", meta.getFilename(), meta.getId());
 
-            // Kiểm tra xem file content có tồn tại không
             if (meta.getFileContent() == null || meta.getFileContent().getContent() == null) {
                 throw new IOException("File content không tồn tại trong database");
             }
 
-            // Đọc và parse document từ byte array
             byte[] fileBytes = meta.getFileContent().getContent();
             Document document = documentParser.parse(new java.io.ByteArrayInputStream(fileBytes));
             log.debug("Đã parse document, độ dài: {} ký tự", document.text().length());
 
-            // Split document thành các chunks
             List<TextSegment> segments = documentSplitter.split(document);
             log.info("Đã chia document thành {} chunks", segments.size());
 
@@ -93,12 +85,10 @@ public class EmbeddingService {
                 return;
             }
 
-            // Tạo metadata cho từng chunk
             List<TextSegment> segmentsWithMetadata = new ArrayList<>();
             for (int i = 0; i < segments.size(); i++) {
                 TextSegment segment = segments.get(i);
 
-                // Thêm metadata vào segment
                 Map<String, String> metadata = new HashMap<>();
                 metadata.put(METADATA_DOCUMENT_ID, meta.getId().toString());
                 metadata.put(METADATA_FILENAME, meta.getFilename());
@@ -114,11 +104,9 @@ public class EmbeddingService {
                 segmentsWithMetadata.add(segmentWithMetadata);
             }
 
-            // Tạo embeddings và lưu vào store
             List<Embedding> embeddings = embeddingModel.embedAll(segmentsWithMetadata).content();
             log.debug("Đã tạo {} embeddings", embeddings.size());
 
-            // Lưu embeddings kèm theo text segments vào store
             embeddingStore.addAll(embeddings, segmentsWithMetadata);
 
             log.info("Hoàn thành index file: {} với {} chunks", meta.getFilename(), segments.size());
@@ -139,10 +127,8 @@ public class EmbeddingService {
         log.info("Bắt đầu reindex file: {} (ID: {})", meta.getFilename(), meta.getId());
 
         try {
-            // Xóa embeddings cũ nếu có
             deleteFileEmbeddings(meta.getId());
 
-            // Tạo embeddings mới
             indexFile(meta);
 
             log.info("Hoàn thành reindex file: {}", meta.getFilename());
@@ -174,14 +160,13 @@ public class EmbeddingService {
             // Với InMemoryEmbeddingStore hoặc PgVector, ta có thể search với filter
             // Tìm kiếm với một query giả để lấy tất cả kết quả có metadata khớp
             EmbeddingSearchRequest searchRequest = EmbeddingSearchRequest.builder()
-                    .queryEmbedding(embeddingModel.embed("dummy").content()) // Embedding giả
-                    .maxResults(1000) // Số lượng tối đa
-                    .minScore(0.0) // Không filter theo score
+                    .queryEmbedding(embeddingModel.embed("dummy").content())
+                    .maxResults(1000)
+                    .minScore(0.0)
                     .build();
 
             EmbeddingSearchResult<TextSegment> searchResult = embeddingStore.search(searchRequest);
 
-            // Filter kết quả theo documentId trong metadata
             for (EmbeddingMatch<TextSegment> match : searchResult.matches()) {
                 TextSegment segment = match.embedded();
                 if (segment != null && segment.metadata() != null) {
@@ -207,7 +192,6 @@ public class EmbeddingService {
             return new FileIndexInfo(fileId, false, 0, null);
         }
 
-        // Lấy thông tin từ chunk đầu tiên
         try {
             EmbeddingSearchRequest searchRequest = EmbeddingSearchRequest.builder()
                     .queryEmbedding(embeddingModel.embed("dummy").content())

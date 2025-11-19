@@ -6,15 +6,17 @@ import dev.langchain4j.rag.content.retriever.ContentRetriever;
 import dev.langchain4j.rag.query.Query;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.MediaType;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Flux;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/rag")
+@RequestMapping("/api/v1/rag")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "*", allowedHeaders = "*")
 public class RagController {
 
     private final GeminiService geminiRagService;
@@ -26,7 +28,6 @@ public class RagController {
     }
 
     @GetMapping(value = "/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    @CrossOrigin(origins = "*", allowedHeaders = "*", exposedHeaders = "*")
     public Flux<String> stream(@RequestParam(defaultValue = "dịch vụ của khách sạn aurora") String message,
                                @RequestParam(required = false, defaultValue = "1") String chatId
     ) {

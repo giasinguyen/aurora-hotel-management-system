@@ -107,6 +107,9 @@ public class DocumentService {
         log.info("Đã xóa file khỏi database: {} (ID: {})", metadata.getFilename(), id);
     }
 
+    public boolean isDocumentHasFile() {
+        return documentRepository.count() > 0;
+    }
 
     public void reindexAllFiles() {
         List<DocumentMetadata> allFiles = documentRepository.findAll();
@@ -124,21 +127,43 @@ public class DocumentService {
         log.info("Hoàn thành reindex tất cả files");
     }
 
-
     public boolean isFileIndexed(Long id) {
         return embeddingService.isFileIndexed(id);
     }
-
 
     public DocumentMetadata getFileWithContent(Long id) {
         return documentRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("File not found"));
     }
 
-
     public boolean hasFileContent(Long id) {
         DocumentMetadata metadata = documentRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("File not found"));
         return metadata.getFileContent() != null && metadata.getFileContent().getContent() != null;
+    }
+
+    public void loadFileFromBytes(String filename, String contentType, byte[] fileBytes) throws IOException {
+        DocumentMetadata metadata = DocumentMetadata.builder()
+                .filename(filename)
+                .fileType(contentType)
+                .size(fileBytes.length)
+                .build();
+
+        DocumentContent content = DocumentContent.builder()
+                .document(metadata)
+                .content(fileBytes)
+                .build();
+
+        metadata.setFileContent(content);
+
+        DocumentMetadata savedMetadata = documentRepository.save(metadata);
+
+        try {
+            embeddingService.indexFile(savedMetadata);
+            log.info("Đã tạo embeddings cho file: {}", savedMetadata.getFilename());
+        } catch (Exception e) {
+            log.error("Lỗi khi tạo embeddings cho file {}: {}", savedMetadata.getFilename(), e.getMessage(), e);
+        }
+
     }
 }
