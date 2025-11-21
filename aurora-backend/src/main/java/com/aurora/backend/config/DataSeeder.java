@@ -84,33 +84,32 @@ public class DataSeeder {
                 // 7. Seed Promotions
                 log.info("🎁 [7/12] Seeding promotions...");
                 Map<String, Promotion> promotions = helper.seedPromotions(branches);
-                
+
                 // 8. Get sample customer (from init-roles-permissions.sql)
                 log.info("👤 [8/12] Loading sample customer...");
                 User customer = userRepository.findByUsername("customer")
                         .orElseThrow(() -> new RuntimeException("❌ Customer user not found! Please run init-roles-permissions.sql first"));
                 log.info("   ✅ Found customer: {}", customer.getUsername());
-                
+
                 // 9. Seed Bookings
                 log.info("📅 [9/12] Seeding bookings...");
                 Map<String, Booking> bookings = helper.seedBookings(branches, customer, promotions);
-                
+
                 // 10. Seed Booking Rooms
                 log.info("🛏️  [10/12] Seeding booking rooms...");
                 helper.seedBookingRooms(bookings, rooms);
-                
+
                 // 11. Seed Service Bookings
                 log.info("💆 [11/12] Seeding service bookings...");
                 helper.seedServiceBookings(bookings, services, customer);
-                
+
                 // 12. Seed Payments
                 log.info("💳 [12/13] Seeding payments...");
                 helper.seedPayments(bookings);
-                
+
                 // 13. Seed Reviews
                 log.info("⭐ [13/13] Seeding reviews...");
                 helper.seedReviews(bookings, customer);
-                
                 long endTime = System.currentTimeMillis();
                 long duration = (endTime - startTime) / 1000;
                 
