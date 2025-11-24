@@ -33,11 +33,8 @@ public class SecurityConfig {
             "/api/v1/auth/logout",
             "/api/v1/auth/refresh-token",
             "/api/v1/auth/refresh",
-            "/api/v1/rag/",
             "/api/v1/rag/**",
-            "/api/v1/document",
-            "/api/v1/document/",
-            "/api/v1/document/**",
+            "/api/v1/documents/**",
 
             // VNPay IPN callback - MUST be public for VNPay server-to-server callback
             "/api/v1/payments/vnpay/ipn",
@@ -48,16 +45,16 @@ public class SecurityConfig {
     private static final String[] PUBLIC_GET_ENDPOINTS = {
             "/api/v1/test/**",
             "/actuator/**",
-            "/api/v1/hotels/**",
+            "/api/v1/branches/**",
             "/api/v1/rooms/search",
             "/api/v1/rooms/{id}",
-            "/api/v1/promotions",
-            "/api/v1/promotions/{id}",
-            "/api/v1/services",
-            "/api/v1/services/{id}",
+            "/api/v1/room-types/**",
+            "/api/v1/promotions/**",
+            "/api/v1/services/**",
+            "/api/v1/facilities/**",
+            "/api/v1/amenities/**",
             "/api/v1/rag/**",
-            "/api/v1/document",
-            "/api/v1/document/**",
+            "/api/v1/documents/**",
             // VNPay return URL - Public for customer redirect after payment
             "/api/v1/payments/vnpay/return"
     };
