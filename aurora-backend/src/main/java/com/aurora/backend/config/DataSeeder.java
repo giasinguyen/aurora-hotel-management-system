@@ -8,20 +8,21 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
+import org.springframework.core.annotation.Order;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * DataSeeder - Tự động insert dữ liệu test vào database
- * 
+ * <p>
  * Chỉ chạy khi profile = "dev" hoặc "local"
  * Sử dụng Spring Data JPA để đảm bảo type-safe và tự động map đúng tên cột
- * 
+ *
  * @author Aurora Hotel System
  * @version 2.0
  */
@@ -50,37 +51,38 @@ public class DataSeeder {
     private final DataSeederHelper helper;
 
     @Bean
+    @Order(1)
     CommandLineRunner initDatabase() {
         return args -> {
             log.info("🌱 Starting database seeding process...");
-            
+
             try {
                 long startTime = System.currentTimeMillis();
-                
+
                 // 1. Seed Branches
                 log.info("📍 [1/12] Seeding branches...");
                 Map<String, Branch> branches = seedBranches();
-                
+
                 // 2. Seed Amenities
                 log.info("🛋️  [2/12] Seeding amenities...");
                 Map<String, Amenity> amenities = seedAmenities();
-                
+
                 // 3. Seed Facilities
                 log.info("🏊 [3/12] Seeding facilities...");
                 helper.seedFacilities(branches);
-                
+
                 // 4. Seed Room Types
                 log.info("🛏️  [4/12] Seeding room types...");
                 Map<String, RoomType> roomTypes = helper.seedRoomTypes(branches, amenities);
-                
+
                 // 5. Seed Rooms
                 log.info("🚪 [5/12] Seeding rooms...");
                 Map<String, Room> rooms = helper.seedRooms(branches, roomTypes);
-                
+
                 // 6. Seed Services
                 log.info("💆 [6/12] Seeding services...");
                 Map<String, Service> services = helper.seedServices(branches);
-                
+
                 // 7. Seed Promotions
                 log.info("🎁 [7/12] Seeding promotions...");
                 Map<String, Promotion> promotions = helper.seedPromotions(branches);
@@ -110,9 +112,10 @@ public class DataSeeder {
                 // 13. Seed Reviews
                 log.info("⭐ [13/13] Seeding reviews...");
                 helper.seedReviews(bookings, customer);
+
                 long endTime = System.currentTimeMillis();
                 long duration = (endTime - startTime) / 1000;
-                
+
                 log.info("╔════════════════════════════════════════════════════════════╗");
                 log.info("║          ✅ DATABASE SEEDING COMPLETED SUCCESSFULLY!        ║");
                 log.info("╠════════════════════════════════════════════════════════════╣");
@@ -132,7 +135,7 @@ public class DataSeeder {
                 log.info("║                                                            ║");
                 log.info("║  ⏱️  Completed in {} seconds                                ║", duration);
                 log.info("╚════════════════════════════════════════════════════════════╝");
-                
+
             } catch (Exception e) {
                 log.error("╔════════════════════════════════════════════════════════════╗");
                 log.error("║              ❌ DATABASE SEEDING FAILED!                    ║");
@@ -149,14 +152,14 @@ public class DataSeeder {
 
     private Map<String, Branch> seedBranches() {
         Map<String, Branch> branches = new HashMap<>();
-        
+
         // Idempotency check
         if (branchRepository.count() > 0) {
             log.info("⏭️  Branches already exist, skipping seed");
             branchRepository.findAll().forEach(b -> branches.put(b.getCode().toLowerCase().replace("aur-", ""), b));
             return branches;
         }
-        
+
         // Branch 1: Hanoi
         Branch hanoi = Branch.builder()
                 .name("Aurora Grand Hotel Hanoi")
@@ -178,7 +181,7 @@ public class DataSeeder {
                 .checkOutTime(LocalTime.of(12, 0))
                 .build();
         branches.put("hanoi", branchRepository.save(hanoi));
-        
+
         // Branch 2: Ho Chi Minh
         Branch hcm = Branch.builder()
                 .name("Aurora Grand Hotel Ho Chi Minh")
@@ -200,7 +203,7 @@ public class DataSeeder {
                 .checkOutTime(LocalTime.of(12, 0))
                 .build();
         branches.put("hcm", branchRepository.save(hcm));
-        
+
         // Branch 3: Da Nang
         Branch danang = Branch.builder()
                 .name("Aurora Beach Resort Da Nang")
@@ -222,7 +225,7 @@ public class DataSeeder {
                 .checkOutTime(LocalTime.of(12, 0))
                 .build();
         branches.put("danang", branchRepository.save(danang));
-        
+
         // Branch 4: Nha Trang (Under Maintenance)
         Branch nhatrang = Branch.builder()
                 .name("Aurora Bay Resort Nha Trang")
@@ -244,7 +247,7 @@ public class DataSeeder {
                 .checkOutTime(LocalTime.of(12, 0))
                 .build();
         branches.put("nhatrang", branchRepository.save(nhatrang));
-        
+
         // Assign manager to Hanoi branch
         User manager = userRepository.findByUsername("manager").orElse(null);
         if (manager != null) {
@@ -253,7 +256,7 @@ public class DataSeeder {
             manager.setAssignedBranch(hanoi);
             userRepository.save(manager);
         }
-        
+
         log.info("   ✅ Seeded {} branches", branches.size());
         return branches;
     }
@@ -263,15 +266,15 @@ public class DataSeeder {
         if (amenityRepository.count() > 0) {
             log.info("   ⏭️  Amenities already exist (count: {}), skipping...", amenityRepository.count());
             Map<String, Amenity> amenities = new HashMap<>();
-            amenityRepository.findAll().forEach(a -> 
-                amenities.put(a.getName().toLowerCase().replace(" ", "_").replace("-", "_"), a)
+            amenityRepository.findAll().forEach(a ->
+                    amenities.put(a.getName().toLowerCase().replace(" ", "_").replace("-", "_"), a)
             );
             return amenities;
         }
-        
+
         Map<String, Amenity> amenities = new HashMap<>();
         List<Amenity> amenityList = new ArrayList<>();
-        
+
         // Technology Amenities
         amenityList.add(Amenity.builder()
                 .name("High-Speed WiFi")
@@ -281,7 +284,7 @@ public class DataSeeder {
                 .active(true)
                 .displayOrder(1)
                 .build());
-        
+
         amenityList.add(Amenity.builder()
                 .name("Smart TV 55 inch")
                 .type(Amenity.AmenityType.TECHNOLOGY)
@@ -290,7 +293,7 @@ public class DataSeeder {
                 .active(true)
                 .displayOrder(2)
                 .build());
-        
+
         amenityList.add(Amenity.builder()
                 .name("Bluetooth Speaker")
                 .type(Amenity.AmenityType.TECHNOLOGY)
@@ -299,7 +302,7 @@ public class DataSeeder {
                 .active(true)
                 .displayOrder(3)
                 .build());
-        
+
         amenityList.add(Amenity.builder()
                 .name("Work Desk & Chair")
                 .type(Amenity.AmenityType.TECHNOLOGY)
@@ -308,7 +311,7 @@ public class DataSeeder {
                 .active(true)
                 .displayOrder(4)
                 .build());
-        
+
         // Bathroom Amenities
         amenityList.add(Amenity.builder()
                 .name("Rain Shower")
@@ -318,7 +321,7 @@ public class DataSeeder {
                 .active(true)
                 .displayOrder(5)
                 .build());
-        
+
         amenityList.add(Amenity.builder()
                 .name("Bathtub")
                 .type(Amenity.AmenityType.BATHROOM)
@@ -327,7 +330,7 @@ public class DataSeeder {
                 .active(true)
                 .displayOrder(6)
                 .build());
-        
+
         amenityList.add(Amenity.builder()
                 .name("Premium Toiletries")
                 .type(Amenity.AmenityType.BATHROOM)
@@ -336,7 +339,7 @@ public class DataSeeder {
                 .active(true)
                 .displayOrder(7)
                 .build());
-        
+
         amenityList.add(Amenity.builder()
                 .name("Hair Dryer")
                 .type(Amenity.AmenityType.BATHROOM)
@@ -345,7 +348,7 @@ public class DataSeeder {
                 .active(true)
                 .displayOrder(8)
                 .build());
-        
+
         amenityList.add(Amenity.builder()
                 .name("Towel Warmer")
                 .type(Amenity.AmenityType.BATHROOM)
@@ -354,7 +357,7 @@ public class DataSeeder {
                 .active(true)
                 .displayOrder(9)
                 .build());
-        
+
         // Bedroom Amenities
         amenityList.add(Amenity.builder()
                 .name("King Size Bed")
@@ -364,7 +367,7 @@ public class DataSeeder {
                 .active(true)
                 .displayOrder(10)
                 .build());
-        
+
         amenityList.add(Amenity.builder()
                 .name("Premium Bedding")
                 .type(Amenity.AmenityType.COMFORT)
@@ -373,7 +376,7 @@ public class DataSeeder {
                 .active(true)
                 .displayOrder(11)
                 .build());
-        
+
         amenityList.add(Amenity.builder()
                 .name("Blackout Curtains")
                 .type(Amenity.AmenityType.COMFORT)
@@ -382,7 +385,7 @@ public class DataSeeder {
                 .active(true)
                 .displayOrder(12)
                 .build());
-        
+
         amenityList.add(Amenity.builder()
                 .name("Air Conditioning")
                 .type(Amenity.AmenityType.COMFORT)
@@ -391,7 +394,7 @@ public class DataSeeder {
                 .active(true)
                 .displayOrder(13)
                 .build());
-        
+
         amenityList.add(Amenity.builder()
                 .name("Safe Box")
                 .type(Amenity.AmenityType.SAFETY)
@@ -400,7 +403,7 @@ public class DataSeeder {
                 .active(true)
                 .displayOrder(14)
                 .build());
-        
+
         // Entertainment Amenities
         amenityList.add(Amenity.builder()
                 .name("Mini Bar")
@@ -410,7 +413,7 @@ public class DataSeeder {
                 .active(true)
                 .displayOrder(15)
                 .build());
-        
+
         amenityList.add(Amenity.builder()
                 .name("Coffee Machine")
                 .type(Amenity.AmenityType.ENTERTAINMENT)
@@ -419,7 +422,7 @@ public class DataSeeder {
                 .active(true)
                 .displayOrder(16)
                 .build());
-        
+
         amenityList.add(Amenity.builder()
                 .name("Tea Set")
                 .type(Amenity.AmenityType.ENTERTAINMENT)
@@ -428,7 +431,7 @@ public class DataSeeder {
                 .active(true)
                 .displayOrder(17)
                 .build());
-        
+
         amenityList.add(Amenity.builder()
                 .name("Balcony")
                 .type(Amenity.AmenityType.COMFORT)
@@ -437,13 +440,13 @@ public class DataSeeder {
                 .active(true)
                 .displayOrder(18)
                 .build());
-        
+
         // Save all
         List<Amenity> savedAmenities = amenityRepository.saveAll(amenityList);
         for (int i = 0; i < savedAmenities.size(); i++) {
             amenities.put("amenity_" + (i + 1), savedAmenities.get(i));
         }
-        
+
         log.info("   ✅ Seeded {} amenities", amenities.size());
         return amenities;
     }
