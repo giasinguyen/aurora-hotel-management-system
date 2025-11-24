@@ -35,6 +35,24 @@ public class DataSeederHelper {
     private final ReviewRepository reviewRepository;
     private final UserRepository userRepository;
 
+    /**
+     * Kiểm tra xem dữ liệu mẫu đã tồn tại chưa để tránh seed trùng lặp
+     */
+    public boolean hasExistingSampleData() {
+        return branchRepository.count() > 0
+                || amenityRepository.count() > 0
+                || facilityRepository.count() > 0
+                || roomTypeRepository.count() > 0
+                || roomRepository.count() > 0
+                || serviceRepository.count() > 0
+                || promotionRepository.count() > 0
+                || bookingRepository.count() > 0
+                || bookingRoomRepository.count() > 0
+                || serviceBookingRepository.count() > 0
+                || paymentRepository.count() > 0
+                || reviewRepository.count() > 0;
+    }
+
     // =========================================================================
     // FACILITIES
     // =========================================================================

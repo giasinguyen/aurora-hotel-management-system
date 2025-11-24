@@ -5,11 +5,11 @@
 -- =====================================================
 
 -- Xóa dữ liệu cũ (nếu có) - Đúng thứ tự foreign keys
-DELETE FROM user_roles;           -- Xóa TẤT CẢ user-role mappings
-DELETE FROM role_permissions;     -- Xóa role-permission mappings
-DELETE FROM users WHERE username IN ('admin', 'manager', 'staff', 'customer');  -- Xóa sample users
-DELETE FROM roles;                -- Xóa roles
-DELETE FROM permissions;          -- Cuối cùng xóa permissions
+-- DELETE FROM user_roles;           -- Xóa TẤT CẢ user-role mappings
+-- DELETE FROM role_permissions;     -- Xóa role-permission mappings
+-- DELETE FROM users WHERE username IN ('admin', 'manager', 'staff', 'customer');  -- Xóa sample users
+-- DELETE FROM roles;                -- Xóa roles
+-- DELETE FROM permissions;          -- Cuối cùng xóa permissions
 
 -- =====================================================
 -- BƯỚC 1: TẠO CÁC PERMISSIONS
@@ -21,7 +21,8 @@ INSERT INTO permissions (id, name, description, created_at, updated_at, version,
 (gen_random_uuid(), 'ROOM_VIEW', 'Xem thông tin phòng và giá', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, false),
 (gen_random_uuid(), 'ROOM_SEARCH', 'Tìm kiếm phòng trống', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, false),
 (gen_random_uuid(), 'PROMOTION_VIEW', 'Xem khuyến mãi', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, false),
-(gen_random_uuid(), 'SERVICE_VIEW', 'Xem dịch vụ bổ sung', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, false);
+(gen_random_uuid(), 'SERVICE_VIEW', 'Xem dịch vụ bổ sung', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, false)
+ON CONFLICT (name) DO NOTHING;
 
 -- Customer Permissions (Khách hàng đã đăng ký)
 INSERT INTO permissions (id, name, description, created_at, updated_at, version, deleted) VALUES 
@@ -36,7 +37,8 @@ INSERT INTO permissions (id, name, description, created_at, updated_at, version,
 (gen_random_uuid(), 'SERVICE_REGISTER', 'Đăng ký dịch vụ bổ sung', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, false),
 (gen_random_uuid(), 'REVIEW_CREATE', 'Tạo đánh giá cho booking đã hoàn thành', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, false),
 (gen_random_uuid(), 'REVIEW_UPDATE_OWN', 'Cập nhật đánh giá của mình (trong 24h)', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, false),
-(gen_random_uuid(), 'REVIEW_DELETE_OWN', 'Xóa đánh giá của mình', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, false);
+(gen_random_uuid(), 'REVIEW_DELETE_OWN', 'Xóa đánh giá của mình', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, false)
+ON CONFLICT (name) DO NOTHING;
 
 -- Staff Permissions (Nhân viên lễ tân)
 INSERT INTO permissions (id, name, description, created_at, updated_at, version, deleted) VALUES 
@@ -50,7 +52,8 @@ INSERT INTO permissions (id, name, description, created_at, updated_at, version,
 (gen_random_uuid(), 'CUSTOMER_VIEW', 'Xem thông tin khách hàng', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, false),
 (gen_random_uuid(), 'PAYMENT_VIEW_ALL', 'Xem tất cả thanh toán', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, false),
 (gen_random_uuid(), 'SERVICE_MANAGE', 'Quản lý dịch vụ bổ sung', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, false),
-(gen_random_uuid(), 'REVIEW_VIEW_ALL', 'Xem tất cả đánh giá', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, false);
+(gen_random_uuid(), 'REVIEW_VIEW_ALL', 'Xem tất cả đánh giá', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, false)
+ON CONFLICT (name) DO NOTHING;
 
 -- Manager Permissions (Quản lý)
 INSERT INTO permissions (id, name, description, created_at, updated_at, version, deleted) VALUES 
@@ -66,7 +69,8 @@ INSERT INTO permissions (id, name, description, created_at, updated_at, version,
 (gen_random_uuid(), 'REPORT_VIEW', 'Xem báo cáo thống kê', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, false),
 (gen_random_uuid(), 'REPORT_EXPORT', 'Xuất báo cáo', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, false),
 (gen_random_uuid(), 'STAFF_VIEW', 'Xem danh sách nhân viên', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, false),
-(gen_random_uuid(), 'REVIEW_MODERATE', 'Phê duyệt/Từ chối đánh giá', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, false);
+(gen_random_uuid(), 'REVIEW_MODERATE', 'Phê duyệt/Từ chối đánh giá', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, false)
+ON CONFLICT (name) DO NOTHING;
 
 -- Admin Permissions (Quản trị viên hệ thống)
 INSERT INTO permissions (id, name, description, created_at, updated_at, version, deleted) VALUES 
@@ -88,7 +92,8 @@ INSERT INTO permissions (id, name, description, created_at, updated_at, version,
 (gen_random_uuid(), 'BRANCH_DELETE', 'Xóa chi nhánh', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, false),
 (gen_random_uuid(), 'BRANCH_ASSIGN_MANAGER', 'Gán quản lý cho chi nhánh', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, false),
 (gen_random_uuid(), 'BRANCH_REMOVE_MANAGER', 'Gỡ quản lý khỏi chi nhánh', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, false),
-(gen_random_uuid(), 'REVIEW_UPDATE_ALL', 'Cập nhật mọi đánh giá (chỉ Admin)', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, false);
+(gen_random_uuid(), 'REVIEW_UPDATE_ALL', 'Cập nhật mọi đánh giá (chỉ Admin)', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, false)
+ON CONFLICT (name) DO NOTHING;
 
 -- =====================================================
 -- BƯỚC 2: TẠO CÁC ROLES
@@ -99,7 +104,8 @@ INSERT INTO roles (id, name, description, created_at, updated_at, version, delet
 (gen_random_uuid(), 'CUSTOMER', 'Khách hàng đã đăng ký - có thể đặt phòng và sử dụng dịch vụ', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, false),
 (gen_random_uuid(), 'STAFF', 'Nhân viên lễ tân - quản lý đặt phòng và check-in/out', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, false),
 (gen_random_uuid(), 'MANAGER', 'Quản lý khách sạn - giám sát và điều hành', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, false),
-(gen_random_uuid(), 'ADMIN', 'Quản trị viên hệ thống - toàn quyền kỹ thuật', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, false);
+(gen_random_uuid(), 'ADMIN', 'Quản trị viên hệ thống - toàn quyền kỹ thuật', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, false)
+ON CONFLICT (name) DO NOTHING;
 
 -- =====================================================
 -- BƯỚC 3: GÁN PERMISSIONS CHO ROLES
@@ -116,7 +122,8 @@ AND p.name IN (
     'ROOM_SEARCH',
     'PROMOTION_VIEW',
     'SERVICE_VIEW'
-);
+)
+ON CONFLICT DO NOTHING;
 
 -- CUSTOMER Role: Kế thừa GUEST + Đặt phòng và quản lý tài khoản
 INSERT INTO role_permissions (role_id, permission_id)
@@ -144,7 +151,8 @@ AND p.name IN (
     'REVIEW_CREATE',
     'REVIEW_UPDATE_OWN',
     'REVIEW_DELETE_OWN'
-);
+)
+ON CONFLICT DO NOTHING;
 
 -- STAFF Role: Kế thừa CUSTOMER + Quản lý đặt phòng và check-in/out
 INSERT INTO role_permissions (role_id, permission_id)
@@ -175,7 +183,8 @@ AND p.name IN (
     'SERVICE_MANAGE',
     -- Review permissions
     'REVIEW_VIEW_ALL'
-);
+)
+ON CONFLICT DO NOTHING;
 
 -- MANAGER Role: Kế thừa STAFF + Quản lý chi nhánh và báo cáo
 INSERT INTO role_permissions (role_id, permission_id)
@@ -219,14 +228,16 @@ AND p.name IN (
     -- Review permissions
     'REVIEW_VIEW_ALL',
     'REVIEW_MODERATE'
-);
+)
+ON CONFLICT DO NOTHING;
 
 -- ADMIN Role: Toàn quyền hệ thống
 INSERT INTO role_permissions (role_id, permission_id)
 SELECT r.id, p.id
 FROM roles r
 CROSS JOIN permissions p
-WHERE r.name = 'ADMIN';
+WHERE r.name = 'ADMIN'
+ON CONFLICT DO NOTHING;
 
 -- =====================================================
 -- BƯỚC 4: TẠO USER MẪU (Optional - WITH FULL ATTRIBUTES)
@@ -264,12 +275,14 @@ VALUES (
     CURRENT_TIMESTAMP,
     0, -- Version
     false -- Không bị xóa
-);
+)
+ON CONFLICT (username) DO NOTHING;
 
 INSERT INTO user_roles (user_id, role_id)
 SELECT u.id, r.id
 FROM users u, roles r
-WHERE u.username = 'admin' AND r.name = 'ADMIN';
+WHERE u.username = 'admin' AND r.name = 'ADMIN'
+ON CONFLICT DO NOTHING;
 
 -- Manager user (Full attributes - sẽ được assign vào branch sau)
 INSERT INTO users (
@@ -299,12 +312,14 @@ VALUES (
     CURRENT_TIMESTAMP,
     0,
     false
-);
+)
+ON CONFLICT (username) DO NOTHING;
 
 INSERT INTO user_roles (user_id, role_id)
 SELECT u.id, r.id
 FROM users u, roles r
-WHERE u.username = 'manager' AND r.name = 'MANAGER';
+WHERE u.username = 'manager' AND r.name = 'MANAGER'
+ON CONFLICT DO NOTHING;
 
 -- Staff user (Full attributes - sẽ được assign vào branch sau)
 INSERT INTO users (
@@ -334,12 +349,14 @@ VALUES (
     CURRENT_TIMESTAMP,
     0,
     false
-);
+)
+ON CONFLICT (username) DO NOTHING;
 
 INSERT INTO user_roles (user_id, role_id)
 SELECT u.id, r.id
 FROM users u, roles r
-WHERE u.username = 'staff' AND r.name = 'STAFF';
+WHERE u.username = 'staff' AND r.name = 'STAFF'
+ON CONFLICT DO NOTHING;
 
 -- Customer user (Full attributes - không có assigned_branch_id)
 INSERT INTO users (
@@ -369,12 +386,14 @@ VALUES (
     CURRENT_TIMESTAMP,
     0,
     false
-);
+)
+ON CONFLICT (username) DO NOTHING;
 
 INSERT INTO user_roles (user_id, role_id)
 SELECT u.id, r.id
 FROM users u, roles r
-WHERE u.username = 'customer' AND r.name = 'CUSTOMER';
+WHERE u.username = 'customer' AND r.name = 'CUSTOMER'
+ON CONFLICT DO NOTHING;
 
 -- =====================================================
 -- HOÀN THÀNH

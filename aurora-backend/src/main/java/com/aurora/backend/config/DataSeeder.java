@@ -54,6 +54,11 @@ public class DataSeeder {
     @Order(1)
     CommandLineRunner initDatabase() {
         return args -> {
+            if (helper.hasExistingSampleData()) {
+                log.info("🌱 Sample data already detected in the database. Skipping seeding process.");
+                return;
+            }
+
             log.info("🌱 Starting database seeding process...");
 
             try {

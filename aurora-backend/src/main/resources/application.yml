@@ -17,14 +17,14 @@ spring:
       connection-timeout: 30000
       idle-timeout: 600000
       max-lifetime: 1800000
-
   # Database Initial Configuration
   sql:
     init:
       mode: always
       encoding: UTF-8
-      schema-locations: classpath:db/init-vector-store.sql
-
+      schema-locations:
+        - classpath:db/init-vector-store.sql
+        - classpath:db/init-roles-permissions.sql
   jpa:
     hibernate:
       ddl-auto: update
@@ -38,6 +38,7 @@ spring:
           batch_size: 20
         order_inserts: true
         order_updates: true
+    defer-datasource-initialization: true
   
   # Redis Configuration
   data:
