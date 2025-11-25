@@ -26,8 +26,6 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
-    private final CustomJwtDecoder customJwtDecoder;
-
     private static final String[] PUBLIC_POST_ENDPOINTS = {
             // Auth endpoints - Session management with Redis
             "/api/v1/auth/register",
@@ -36,14 +34,17 @@ public class SecurityConfig {
             "/api/v1/auth/refresh-token",
             "/api/v1/auth/refresh",
             "/api/v1/rag/",
-            
+            "/api/v1/rag/**",
+            "/api/v1/document",
+            "/api/v1/document/",
+            "/api/v1/document/**",
+
             // VNPay IPN callback - MUST be public for VNPay server-to-server callback
             "/api/v1/payments/vnpay/ipn",
-            
+
             // Test endpoints - For testing purposes only (remove in production)
             "/api/v1/test/**"
     };
-    
     private static final String[] PUBLIC_GET_ENDPOINTS = {
             "/api/v1/test/**",
             "/actuator/**",
@@ -54,11 +55,13 @@ public class SecurityConfig {
             "/api/v1/promotions/{id}",
             "/api/v1/services",
             "/api/v1/services/{id}",
-            "/api/v1/rag/*",
-            
+            "/api/v1/rag/**",
+            "/api/v1/document",
+            "/api/v1/document/**",
             // VNPay return URL - Public for customer redirect after payment
             "/api/v1/payments/vnpay/return"
     };
+    private final CustomJwtDecoder customJwtDecoder;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -70,6 +73,8 @@ public class SecurityConfig {
         http.authorizeHttpRequests(request -> request
                 .requestMatchers(HttpMethod.POST, PUBLIC_POST_ENDPOINTS).permitAll()
                 .requestMatchers(HttpMethod.GET, PUBLIC_GET_ENDPOINTS).permitAll()
+                .requestMatchers(HttpMethod.PUT, "/api/v1/document/**").permitAll() // TODO: Delete this in production
+                .requestMatchers(HttpMethod.DELETE, "/api/v1/document/**").permitAll() // TODO: Delete this in production
                 .requestMatchers(HttpMethod.DELETE, "/api/v1/test/**").permitAll() // Test cleanup endpoint
                 .anyRequest().authenticated());
 
@@ -80,16 +85,16 @@ public class SecurityConfig {
                 .accessDeniedHandler(new JwtAccessDeniedHandler()));
 
         http.csrf(AbstractHttpConfigurer::disable);
-        
+
         http.cors(cors -> cors.configurationSource(corsConfigurationSource()));
 
         return http.build();
     }
-    
+
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        
+
         // Allow frontend origins
         configuration.setAllowedOrigins(Arrays.asList(
                 "http://localhost:3000",
@@ -97,22 +102,22 @@ public class SecurityConfig {
                 "http://127.0.0.1:3000",
                 "http://127.0.0.1:5173"
         ));
-        
+
         // Allow all HTTP methods
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
-        
+
         // Allow all headers
         configuration.setAllowedHeaders(List.of("*"));
-        
+
         // Allow credentials (cookies, authorization headers)
         configuration.setAllowCredentials(true);
-        
+
         // Max age for preflight requests
         configuration.setMaxAge(3600L);
-        
+
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
-        
+
         return source;
     }
 
@@ -120,10 +125,10 @@ public class SecurityConfig {
     JwtAuthenticationConverter jwtAuthenticationConverter() {
         JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
         jwtGrantedAuthoritiesConverter.setAuthorityPrefix("");
-        
+
         JwtAuthenticationConverter authenticationConverter = new JwtAuthenticationConverter();
         authenticationConverter.setJwtGrantedAuthoritiesConverter(jwtGrantedAuthoritiesConverter);
-        
+
         return authenticationConverter;
     }
 }
