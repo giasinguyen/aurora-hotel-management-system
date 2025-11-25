@@ -23,6 +23,7 @@ spring:
       mode: always
       encoding: UTF-8
       schema-locations:
+        - classpath:db/fix-email-verified.sql
         - classpath:db/init-vector-store.sql
         - classpath:db/init-roles-permissions.sql
   jpa:

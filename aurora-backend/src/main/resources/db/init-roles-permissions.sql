@@ -250,7 +250,7 @@ ON CONFLICT DO NOTHING;
 -- Admin user (Full attributes)
 INSERT INTO users (
     id, username, password, first_name, last_name, dob, phone, email, address,
-    avatar_url, assigned_branch_id, active, last_login_at, 
+    avatar_url, assigned_branch_id, active, email_verified, last_login_at, 
     failed_login_attempts, locked_until, lock_reason,
     created_at, updated_at, version, deleted
 )
@@ -265,8 +265,9 @@ VALUES (
     'admin@aurorahotel.com',
     'System Office - Aurora Hotel HQ',
     'https://i.pravatar.cc/150?img=33', -- Avatar mẫu
-    NULL, -- Admin không thuộc chi nhánh cụ thể
-    true, -- Active
+    NULL,
+    true,
+    true,
     NULL, -- Chưa login lần nào
     0, -- Không có failed attempts
     NULL, -- Không bị khóa
@@ -287,7 +288,7 @@ ON CONFLICT DO NOTHING;
 -- Manager user (Full attributes - sẽ được assign vào branch sau)
 INSERT INTO users (
     id, username, password, first_name, last_name, dob, phone, email, address,
-    avatar_url, assigned_branch_id, active, last_login_at, 
+    avatar_url, assigned_branch_id, active, email_verified, last_login_at, 
     failed_login_attempts, locked_until, lock_reason,
     created_at, updated_at, version, deleted
 )
@@ -302,7 +303,8 @@ VALUES (
     'manager@aurorahotel.com',
     'Hanoi, Vietnam',
     'https://i.pravatar.cc/150?img=12',
-    NULL, -- Sẽ được assign sau khi tạo branch
+    NULL,
+    true,
     true,
     NULL,
     0,
@@ -324,7 +326,7 @@ ON CONFLICT DO NOTHING;
 -- Staff user (Full attributes - sẽ được assign vào branch sau)
 INSERT INTO users (
     id, username, password, first_name, last_name, dob, phone, email, address,
-    avatar_url, assigned_branch_id, active, last_login_at, 
+    avatar_url, assigned_branch_id, active, email_verified, last_login_at, 
     failed_login_attempts, locked_until, lock_reason,
     created_at, updated_at, version, deleted
 )
@@ -339,7 +341,8 @@ VALUES (
     'staff@aurorahotel.com',
     'Hanoi, Vietnam',
     'https://i.pravatar.cc/150?img=47',
-    NULL, -- Sẽ được assign sau khi tạo branch
+    NULL,
+    true,
     true,
     NULL,
     0,
@@ -361,7 +364,7 @@ ON CONFLICT DO NOTHING;
 -- Customer user (Full attributes - không có assigned_branch_id)
 INSERT INTO users (
     id, username, password, first_name, last_name, dob, phone, email, address,
-    avatar_url, assigned_branch_id, active, last_login_at, 
+    avatar_url, assigned_branch_id, active, email_verified, last_login_at, 
     failed_login_attempts, locked_until, lock_reason,
     created_at, updated_at, version, deleted
 )
@@ -376,7 +379,8 @@ VALUES (
     'customer@gmail.com',
     '123 Le Loi, District 1, Ho Chi Minh City, Vietnam',
     'https://i.pravatar.cc/150?img=68',
-    NULL, -- Customer không có assigned branch
+    NULL,
+    true,
     true,
     NULL,
     0,
