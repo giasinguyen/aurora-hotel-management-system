@@ -2,7 +2,7 @@
 	"info": {
 		"_postman_id": "a746e4af-4d13-46e1-873d-6741fcdfe74c",
 		"name": "Aurora Hotel Management System",
-		"description": "Comprehensive API Testing Collection for Aurora Hotel System\n\n## Test Flow\n1. **Authentication** - Login and get tokens\n2. **User Management** - Register and manage users\n3. **Branch Management** - Create and manage hotel branches\n4. **Amenity Management** - Manage hotel amenities (WiFi, TV, etc.)\n5. **Facility Management** - Manage branch facilities (Pool, Gym, Spa)\n6. **Room Type Management** - Configure room types\n7. **Room Management** - Manage individual rooms\n8. **Service Management** - Hotel services (Laundry, Room service, etc.)\n9. **Promotion Management** - Discounts and promotions\n10. **Booking Management** - Room bookings\n11. **Booking Room** - Booking-Room relationship\n12. **Service Booking** - Service bookings for guests\n13. **Payment Management** - Process payments\n14. **Role & Permission** - Manage access control\n\n## Authentication\nAll endpoints (except register and login) require Bearer token authentication.\n\n## Default Users\n- **Admin**: username=`admin`, password=`Admin@123`\n- **Manager**: username=`manager`, password=`Manager@123`\n- **Staff**: username=`staff`, password=`Staff@123`\n- **Customer**: username=`customer`, password=`Customer@123`",
+		"description": "Comprehensive API Testing Collection for Aurora Hotel System\n\n## Test Flow\n1. **Authentication** - Login and get tokens\n2. **User Management** - Register and manage users\n3. **Branch Management** - Create and manage hotel branches\n4. **Amenity Management** - Manage hotel amenities (WiFi, TV, etc.)\n5. **Facility Management** - Manage branch facilities (Pool, Gym, Spa)\n6. **Room Type Management** - Configure room types\n7. **Room Management** - Manage individual rooms\n8. **Service Management** - Hotel services (Laundry, Room service, etc.)\n9. **Promotion Management** - Discounts and promotions\n10. **Booking Management** - Room bookings\n11. **Booking Room** - Booking-Room relationship\n12. **Service Booking** - Service bookings for guests\n13. **Payment Management** - Process payments\n14. **Role & Permission** - Manage access control\n15. **Review & Rating** - Customer reviews and ratings\n16. **RAG (AI Chat)** - AI-powered chat using hotel knowledge base\n17. **Document Management** - Upload, manage, and download documents\n\n## Authentication\nAll endpoints (except register and login) require Bearer token authentication.\n\n## Default Users\n- **Admin**: username=`admin`, password=`Admin@123`\n- **Manager**: username=`manager`, password=`Manager@123`\n- **Staff**: username=`staff`, password=`Staff@123`\n- **Customer**: username=`customer`, password=`Customer@123`\n\n## New Features\n- **RAG AI Chat**: Intelligent responses using retrieval augmented generation\n- **Document Management**: Full CRUD operations for document handling",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "40740215"
 	},
@@ -2645,6 +2645,260 @@
 				}
 			],
 			"description": "Review & Rating System - Customers can leave reviews after checkout, managers moderate reviews"
+		},
+		{
+			"name": "07. RAG (AI Chat) Management",
+			"item": [
+				{
+					"name": "Chat Sync",
+					"event": [
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/rag/sync?message=dịch vụ của khách sạn aurora&chatId=1",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"rag",
+								"sync"
+							],
+							"query": [
+								{
+									"key": "message",
+									"value": "dịch vụ của khách sạn aurora",
+									"description": "The message/question to ask the AI system"
+								},
+								{
+									"key": "chatId",
+									"value": "1",
+									"description": "Optional chat session ID for conversation continuity"
+								}
+							]
+						},
+						"description": "Synchronous chat with AI using RAG (Retrieval Augmented Generation). Returns complete response at once."
+					},
+					"response": []
+				},
+				{
+					"name": "Chat Stream",
+					"event": [
+					],
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "text/event-stream"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/rag/stream?message=dịch vụ của khách sạn aurora&chatId=1",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"rag",
+								"stream"
+							],
+							"query": [
+								{
+									"key": "message",
+									"value": "dịch vụ của khách sạn aurora",
+									"description": "The message/question to ask the AI system (default: 'dịch vụ của khách sạn aurora')"
+								},
+								{
+									"key": "chatId",
+									"value": "1",
+									"description": "Optional chat session ID for conversation continuity (default: '1')"
+								}
+							]
+						},
+						"description": "Streaming chat with AI using RAG. Returns response as Server-Sent Events (SSE) for real-time streaming."
+					},
+					"response": []
+				},
+				{
+					"name": "Test Content Retriever",
+					"event": [
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/rag/retriever?message=aurora có ưu đãi gì?",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"rag",
+								"retriever"
+							],
+							"query": [
+								{
+									"key": "message",
+									"value": "aurora có ưu đãi gì?",
+									"description": "Query to test content retrieval (default: 'aurora có ưu đãi gì?')"
+								}
+							]
+						},
+						"description": "Test the content retriever component. Returns raw retrieved content without AI processing."
+					},
+					"response": []
+				}
+			],
+			"description": "RAG (Retrieval Augmented Generation) AI Chat System - Provides intelligent responses using hotel knowledge base"
+		},
+		{
+			"name": "08. Document Management",
+			"item": [
+				{
+					"name": "Upload Document",
+					"event": [
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": [],
+									"description": "The document file to upload"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/document/upload",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"document",
+								"upload"
+							]
+						},
+						"description": "Upload a new document file. Returns document metadata including ID, filename, file type, and upload timestamp."
+					},
+					"response": []
+				},
+				{
+					"name": "List All Documents",
+					"event": [
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/document",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"document"
+							]
+						},
+						"description": "Get list of all uploaded documents with their metadata (ID, filename, file type, size, upload date)."
+					},
+					"response": []
+				},
+				{
+					"name": "Download Document",
+					"event": [
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/document/{{documentId}}/download",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"document",
+								"{{documentId}}",
+								"download"
+							]
+						},
+						"description": "Download a specific document by ID. Returns the file with appropriate content type and filename headers."
+					},
+					"response": []
+				},
+				{
+					"name": "Update Document",
+					"event": [
+					],
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": [],
+									"description": "The new document file to replace the existing one"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/document/{{documentId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"document",
+								"{{documentId}}"
+							]
+						},
+						"description": "Update an existing document by replacing it with a new file. Returns updated document metadata."
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Document",
+					"event": [
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/document/{{documentId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"document",
+								"{{documentId}}"
+							]
+						},
+						"description": "Delete a document by ID. This permanently removes the document and its metadata."
+					},
+					"response": []
+				}
+			],
+			"description": "Document Management System - Upload, download, update, and delete documents for the hotel system"
 		}
 	],
 	"auth": {
@@ -2756,6 +3010,10 @@
 		},
 		{
 			"key": "sessionId",
+			"value": ""
+		},
+		{
+			"key": "documentId",
 			"value": ""
 		}
 	]
