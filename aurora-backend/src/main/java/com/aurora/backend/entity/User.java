@@ -74,6 +74,11 @@ public class User extends BaseEntity {
     @Column(nullable = false)
     @Builder.Default
     Boolean active = true;
+    
+    // Email verification status
+    @Column(nullable = false)
+    @Builder.Default
+    Boolean emailVerified = false;
 
     // Security tracking
     LocalDateTime lastLoginAt;

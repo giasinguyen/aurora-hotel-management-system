@@ -377,9 +377,282 @@
 						"description": "Logout and clear refresh token cookie. Invalidates the current session."
 					},
 					"response": []
+				},
+				{
+					"name": "Forgot Password",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    pm.test('✅ Password reset email sent', function() {",
+									"        pm.response.to.have.status(200);",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"admin@aurora.com\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/auth/forgot-password",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"auth",
+								"forgot-password"
+							]
+						},
+						"description": "Request password reset email with reset token"
+					},
+					"response": []
+				},
+				{
+					"name": "Reset Password",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    pm.test('✅ Password reset successful', function() {",
+									"        pm.response.to.have.status(200);",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"token\": \"RESET_TOKEN_FROM_EMAIL\",\n    \"newPassword\": \"NewPassword@123\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/auth/reset-password",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"auth",
+								"reset-password"
+							]
+						},
+						"description": "Reset password using token from email"
+					},
+					"response": []
+				},
+				{
+					"name": "Change Password",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    pm.test('✅ Password changed successfully', function() {",
+									"        pm.response.to.have.status(200);",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"oldPassword\": \"password123\",\n    \"newPassword\": \"NewPassword@123\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/auth/change-password",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"auth",
+								"change-password"
+							]
+						},
+						"description": "Change password for authenticated user (requires old password)"
+					},
+					"response": []
+				},
+				{
+					"name": "Send Verification Email",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    pm.test('✅ Verification email sent', function() {",
+									"        pm.response.to.have.status(200);",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/auth/send-verification-email",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"auth",
+								"send-verification-email"
+							]
+						},
+						"description": "Send email verification link to user's email"
+					},
+					"response": []
+				},
+				{
+					"name": "Verify Email",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    pm.test('✅ Email verified successfully', function() {",
+									"        pm.response.to.have.status(200);",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"token\": \"VERIFICATION_TOKEN_FROM_EMAIL\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/auth/verify-email",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"auth",
+								"verify-email"
+							]
+						},
+						"description": "Verify email using token from email link"
+					},
+					"response": []
+				},
+				{
+					"name": "Resend Verification Email",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200) {",
+									"    pm.test('✅ Verification email resent', function() {",
+									"        pm.response.to.have.status(200);",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "noauth"
+						},
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"user@example.com\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/auth/resend-verification-email",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"v1",
+								"auth",
+								"resend-verification-email"
+							]
+						},
+						"description": "Resend email verification link"
+					},
+					"response": []
 				}
 			],
-			"description": "Authentication endpoints with Redis session management - Register, Login, Logout, Token refresh, and Session management"
+			"description": "Authentication endpoints with Redis session management - Register, Login, Logout, Token refresh, Session management, Password reset, and Email verification"
 		},
 		{
 			"name": "02. User Management",
@@ -2645,6 +2918,734 @@
 				}
 			],
 			"description": "Review & Rating System - Customers can leave reviews after checkout, managers moderate reviews"
+		},
+		{
+			"name": "10. Booking Management",
+			"item": [
+				{
+					"name": "Booking Workflow",
+					"item": [
+						{
+							"name": "Confirm Booking",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"if (pm.response.code === 200) {",
+											"    pm.test('✅ Booking confirmed successfully', function() {",
+											"        pm.response.to.have.status(200);",
+											"        const jsonData = pm.response.json();",
+											"        pm.expect(jsonData.result.status).to.eql('CONFIRMED');",
+											"    });",
+											"}"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"staffNotes\": \"Room inspected and ready for guest\",\n    \"estimatedArrival\": \"2024-12-25T14:00:00\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/v1/bookings/{{bookingId}}/confirm",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"bookings",
+										"{{bookingId}}",
+										"confirm"
+									]
+								},
+								"description": "Staff confirms pending booking - validates availability and moves status to CONFIRMED"
+							},
+							"response": []
+						},
+						{
+							"name": "Modify Booking",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"if (pm.response.code === 200) {",
+											"    pm.test('✅ Booking modified successfully', function() {",
+											"        pm.response.to.have.status(200);",
+											"    });",
+											"}"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "PUT",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"checkinDate\": \"2024-12-25\",\n    \"checkoutDate\": \"2024-12-28\",\n    \"numberOfGuests\": 3,\n    \"customerNotes\": \"Extended stay by 1 day\",\n    \"roomIds\": [\"{{roomId}}\"]\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/v1/bookings/{{bookingId}}/modify",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"bookings",
+										"{{bookingId}}",
+										"modify"
+									]
+								},
+								"description": "Customer modifies their booking - changes dates, guests, or rooms"
+							},
+							"response": []
+						},
+						{
+							"name": "Cancel Booking",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"if (pm.response.code === 200) {",
+											"    pm.test('✅ Booking cancelled with refund info', function() {",
+											"        pm.response.to.have.status(200);",
+											"        const jsonData = pm.response.json();",
+											"        pm.expect(jsonData.result).to.have.property('refundAmount');",
+											"        pm.expect(jsonData.result).to.have.property('refundPercentage');",
+											"    });",
+											"}"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"cancellationReason\": \"Change of travel plans\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/v1/bookings/{{bookingId}}/cancel",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"bookings",
+										"{{bookingId}}",
+										"cancel"
+									]
+								},
+								"description": "Cancel booking with automatic refund calculation based on cancellation policy"
+							},
+							"response": []
+						},
+						{
+							"name": "Check-in Guest",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"if (pm.response.code === 200) {",
+											"    pm.test('✅ Guest checked in successfully', function() {",
+											"        pm.response.to.have.status(200);",
+											"        const jsonData = pm.response.json();",
+											"        pm.expect(jsonData.result.status).to.eql('CHECKED_IN');",
+											"    });",
+											"}"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/api/v1/bookings/{{bookingId}}/check-in",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"bookings",
+										"{{bookingId}}",
+										"check-in"
+									]
+								},
+								"description": "Check-in guest for confirmed booking - changes status to CHECKED_IN"
+							},
+							"response": []
+						},
+						{
+							"name": "Check-out Guest",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"if (pm.response.code === 200) {",
+											"    pm.test('✅ Guest checked out successfully', function() {",
+											"        pm.response.to.have.status(200);",
+											"        const jsonData = pm.response.json();",
+											"        pm.expect(jsonData.result.status).to.eql('CHECKED_OUT');",
+											"    });",
+											"}"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/api/v1/bookings/{{bookingId}}/check-out",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"bookings",
+										"{{bookingId}}",
+										"check-out"
+									]
+								},
+								"description": "Check-out guest from room - finalizes stay and allows review creation"
+							},
+							"response": []
+						},
+						{
+							"name": "Mark No-Show",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"if (pm.response.code === 200) {",
+											"    pm.test('✅ Booking marked as no-show', function() {",
+											"        pm.response.to.have.status(200);",
+											"        const jsonData = pm.response.json();",
+											"        pm.expect(jsonData.result.status).to.eql('NO_SHOW');",
+											"    });",
+											"}"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/api/v1/bookings/{{bookingId}}/no-show",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"bookings",
+										"{{bookingId}}",
+										"no-show"
+									]
+								},
+								"description": "Mark booking as no-show when guest doesn't arrive - may apply penalty fees"
+							},
+							"response": []
+						}
+					],
+					"description": "Booking lifecycle management - confirmation, modification, cancellation, check-in, check-out, no-show handling"
+				},
+				{
+					"name": "Room Availability",
+					"item": [
+						{
+							"name": "Check Room Availability",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"if (pm.response.code === 200) {",
+											"    pm.test('✅ Room availability checked', function() {",
+											"        pm.response.to.have.status(200);",
+											"        const jsonData = pm.response.json();",
+											"        pm.expect(jsonData.result).to.have.property('isAvailable');",
+											"    });",
+											"}"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/api/v1/room-availability/check/{{roomId}}?checkinDate=2024-12-25&checkoutDate=2024-12-28",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"room-availability",
+										"check",
+										"{{roomId}}"
+									],
+									"query": [
+										{
+											"key": "checkinDate",
+											"value": "2024-12-25",
+											"description": "Check-in date (YYYY-MM-DD)"
+										},
+										{
+											"key": "checkoutDate",
+											"value": "2024-12-28",
+											"description": "Check-out date (YYYY-MM-DD)"
+										}
+									]
+								},
+								"description": "Check if a specific room is available for given date range (PUBLIC)"
+							},
+							"response": []
+						},
+						{
+							"name": "Check Multiple Rooms",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"if (pm.response.code === 200) {",
+											"    pm.test('✅ Multiple rooms availability checked', function() {",
+											"        pm.response.to.have.status(200);",
+											"        const jsonData = pm.response.json();",
+											"        pm.expect(jsonData.result).to.be.an('array');",
+											"    });",
+											"}"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "POST",
+								"header": [],
+								"body": {
+									"mode": "raw",
+									"raw": "{\n    \"roomIds\": [\"{{roomId}}\", \"room-id-2\", \"room-id-3\"],\n    \"checkinDate\": \"2024-12-25\",\n    \"checkoutDate\": \"2024-12-28\"\n}",
+									"options": {
+										"raw": {
+											"language": "json"
+										}
+									}
+								},
+								"url": {
+									"raw": "{{baseUrl}}/api/v1/room-availability/check-multiple",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"room-availability",
+										"check-multiple"
+									]
+								},
+								"description": "Check availability for multiple rooms at once (PUBLIC)"
+							},
+							"response": []
+						},
+						{
+							"name": "Find Available Rooms",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"if (pm.response.code === 200) {",
+											"    pm.test('✅ Available rooms found', function() {",
+											"        pm.response.to.have.status(200);",
+											"        const jsonData = pm.response.json();",
+											"        pm.expect(jsonData.result).to.be.an('array');",
+											"    });",
+											"}"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/api/v1/room-availability/find-available?roomTypeId={{roomTypeId}}&checkinDate=2024-12-25&checkoutDate=2024-12-28",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"room-availability",
+										"find-available"
+									],
+									"query": [
+										{
+											"key": "roomTypeId",
+											"value": "{{roomTypeId}}",
+											"description": "Optional: Filter by room type"
+										},
+										{
+											"key": "checkinDate",
+											"value": "2024-12-25",
+											"description": "Check-in date (YYYY-MM-DD)"
+										},
+										{
+											"key": "checkoutDate",
+											"value": "2024-12-28",
+											"description": "Check-out date (YYYY-MM-DD)"
+										},
+										{
+											"key": "branchId",
+											"value": "{{branchId}}",
+											"description": "Optional: Filter by branch",
+											"disabled": true
+										}
+									]
+								},
+								"description": "Find all available rooms matching criteria (PUBLIC)"
+							},
+							"response": []
+						},
+						{
+							"name": "Get Availability Calendar",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"if (pm.response.code === 200) {",
+											"    pm.test('✅ Calendar data retrieved', function() {",
+											"        pm.response.to.have.status(200);",
+											"        const jsonData = pm.response.json();",
+											"        pm.expect(jsonData.result).to.be.an('array');",
+											"    });",
+											"}"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/api/v1/room-availability/calendar/{{roomId}}?startDate=2024-12-01&endDate=2024-12-31",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"room-availability",
+										"calendar",
+										"{{roomId}}"
+									],
+									"query": [
+										{
+											"key": "startDate",
+											"value": "2024-12-01",
+											"description": "Start date (YYYY-MM-DD)"
+										},
+										{
+											"key": "endDate",
+											"value": "2024-12-31",
+											"description": "End date (YYYY-MM-DD)"
+										}
+									]
+								},
+								"description": "Get room availability calendar for date range (PUBLIC)"
+							},
+							"response": []
+						},
+						{
+							"name": "Count Available Rooms",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"if (pm.response.code === 200) {",
+											"    pm.test('✅ Available room count retrieved', function() {",
+											"        pm.response.to.have.status(200);",
+											"        const jsonData = pm.response.json();",
+											"        pm.expect(jsonData.result).to.be.a('number');",
+											"    });",
+											"}"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"auth": {
+									"type": "noauth"
+								},
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/api/v1/room-availability/count-available?checkinDate=2024-12-25&checkoutDate=2024-12-28",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"room-availability",
+										"count-available"
+									],
+									"query": [
+										{
+											"key": "checkinDate",
+											"value": "2024-12-25",
+											"description": "Check-in date (YYYY-MM-DD)"
+										},
+										{
+											"key": "checkoutDate",
+											"value": "2024-12-28",
+											"description": "Check-out date (YYYY-MM-DD)"
+										},
+										{
+											"key": "roomTypeId",
+											"value": "{{roomTypeId}}",
+											"description": "Optional: Filter by room type",
+											"disabled": true
+										},
+										{
+											"key": "branchId",
+											"value": "{{branchId}}",
+											"description": "Optional: Filter by branch",
+											"disabled": true
+										}
+									]
+								},
+								"description": "Count total available rooms for criteria (PUBLIC)"
+							},
+							"response": []
+						},
+						{
+							"name": "Detect Booking Conflicts",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"if (pm.response.code === 200) {",
+											"    pm.test('✅ Conflicts detected', function() {",
+											"        pm.response.to.have.status(200);",
+											"        const jsonData = pm.response.json();",
+											"        pm.expect(jsonData.result).to.be.an('array');",
+											"    });",
+											"}"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "GET",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/api/v1/room-availability/conflicts/{{roomId}}?checkinDate=2024-12-25&checkoutDate=2024-12-28",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"room-availability",
+										"conflicts",
+										"{{roomId}}"
+									],
+									"query": [
+										{
+											"key": "checkinDate",
+											"value": "2024-12-25",
+											"description": "Check-in date (YYYY-MM-DD)"
+										},
+										{
+											"key": "checkoutDate",
+											"value": "2024-12-28",
+											"description": "Check-out date (YYYY-MM-DD)"
+										},
+										{
+											"key": "excludeBookingId",
+											"value": "",
+											"description": "Optional: Exclude specific booking from conflict check",
+											"disabled": true
+										}
+									]
+								},
+								"description": "Detect booking conflicts for room in date range (Staff/Manager)"
+							},
+							"response": []
+						},
+						{
+							"name": "Lock Room Temporarily",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"if (pm.response.code === 200) {",
+											"    pm.test('✅ Room locked successfully', function() {",
+											"        pm.response.to.have.status(200);",
+											"        const jsonData = pm.response.json();",
+											"        pm.expect(jsonData.result).to.have.property('lockToken');",
+											"        pm.collectionVariables.set('lockToken', jsonData.result.lockToken);",
+											"    });",
+											"}"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/api/v1/room-availability/lock?roomId={{roomId}}&checkinDate=2024-12-25&checkoutDate=2024-12-28&userId={{userId}}",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"room-availability",
+										"lock"
+									],
+									"query": [
+										{
+											"key": "roomId",
+											"value": "{{roomId}}",
+											"description": "Room to lock"
+										},
+										{
+											"key": "checkinDate",
+											"value": "2024-12-25",
+											"description": "Check-in date (YYYY-MM-DD)"
+										},
+										{
+											"key": "checkoutDate",
+											"value": "2024-12-28",
+											"description": "Check-out date (YYYY-MM-DD)"
+										},
+										{
+											"key": "userId",
+											"value": "{{userId}}",
+											"description": "User creating the lock"
+										}
+									]
+								},
+								"description": "Temporarily lock room during booking process (15 min expiry) - prevents double booking"
+							},
+							"response": []
+						},
+						{
+							"name": "Unlock Room",
+							"event": [
+								{
+									"listen": "test",
+									"script": {
+										"exec": [
+											"if (pm.response.code === 200) {",
+											"    pm.test('✅ Room unlocked successfully', function() {",
+											"        pm.response.to.have.status(200);",
+											"        const jsonData = pm.response.json();",
+											"        pm.expect(jsonData.result).to.be.true;",
+											"    });",
+											"}"
+										],
+										"type": "text/javascript"
+									}
+								}
+							],
+							"request": {
+								"method": "POST",
+								"header": [],
+								"url": {
+									"raw": "{{baseUrl}}/api/v1/room-availability/unlock?lockToken={{lockToken}}",
+									"host": [
+										"{{baseUrl}}"
+									],
+									"path": [
+										"api",
+										"v1",
+										"room-availability",
+										"unlock"
+									],
+									"query": [
+										{
+											"key": "lockToken",
+											"value": "{{lockToken}}",
+											"description": "Lock token from lock operation"
+										}
+									]
+								},
+								"description": "Release temporary room lock using lock token"
+							},
+							"response": []
+						}
+					],
+					"description": "Room availability checking, calendar, locking mechanism for booking flow - includes public endpoints for availability search"
+				}
+			],
+			"description": "Complete booking workflow management - confirmation, modification, cancellation, check-in/out, no-show handling, and room availability system with temporary locking"
 		},
 		{
 			"name": "07. RAG (AI Chat) Management",

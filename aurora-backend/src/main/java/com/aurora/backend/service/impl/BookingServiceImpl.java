@@ -1,7 +1,11 @@
 package com.aurora.backend.service.impl;
 
+import com.aurora.backend.dto.request.BookingCancellationRequest;
+import com.aurora.backend.dto.request.BookingConfirmRequest;
 import com.aurora.backend.dto.request.BookingCreationRequest;
+import com.aurora.backend.dto.request.BookingModificationRequest;
 import com.aurora.backend.dto.request.BookingUpdateRequest;
+import com.aurora.backend.dto.response.BookingCancellationResponse;
 import com.aurora.backend.dto.response.BookingResponse;
 import com.aurora.backend.entity.Booking;
 import com.aurora.backend.entity.Branch;
@@ -13,6 +17,7 @@ import com.aurora.backend.repository.BookingRepository;
 import com.aurora.backend.repository.BranchRepository;
 import com.aurora.backend.repository.UserRepository;
 import com.aurora.backend.service.BookingService;
+import com.aurora.backend.service.RefundService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
@@ -22,6 +27,10 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.UUID;
 
 @Component
@@ -35,6 +44,7 @@ public class BookingServiceImpl implements BookingService {
     BranchRepository branchRepository;
     UserRepository userRepository;
     BookingMapper bookingMapper;
+    RefundService refundService;
 
     @Override
     @Transactional
@@ -163,5 +173,207 @@ public class BookingServiceImpl implements BookingService {
     
     private String generateBookingCode() {
         return "BK" + System.currentTimeMillis() + UUID.randomUUID().toString().substring(0, 4).toUpperCase();
+    }
+    
+    // ==================== BOOKING WORKFLOW IMPLEMENTATIONS ====================
+    
+    @Override
+    @Transactional
+    public BookingResponse confirmBooking(BookingConfirmRequest request) {
+        log.info("Confirming booking: {}", request.getBookingId());
+        
+        Booking booking = bookingRepository.findById(request.getBookingId())
+                .orElseThrow(() -> new AppException(ErrorCode.BOOKING_NOT_FOUND));
+        
+        // Validate current status
+        if (booking.getStatus() != Booking.BookingStatus.PENDING) {
+            throw new AppException(ErrorCode.BOOKING_NOT_EXISTED); // Custom error needed
+        }
+        
+        // Update status to CONFIRMED
+        booking.setStatus(Booking.BookingStatus.CONFIRMED);
+        
+        // TODO: Send confirmation email/SMS
+        booking.setEmailSent(true);
+        
+        Booking confirmedBooking = bookingRepository.save(booking);
+        log.info("Booking confirmed successfully: {}", confirmedBooking.getBookingCode());
+        
+        return bookingMapper.toBookingResponse(confirmedBooking);
+    }
+    
+    @Override
+    @Transactional
+    public BookingResponse modifyBooking(BookingModificationRequest request) {
+        log.info("Modifying booking: {}", request.getBookingId());
+        
+        Booking booking = bookingRepository.findById(request.getBookingId())
+                .orElseThrow(() -> new AppException(ErrorCode.BOOKING_NOT_FOUND));
+        
+        // Validate modification is allowed (24h before checkin)
+        long hoursUntilCheckin = ChronoUnit.HOURS.between(LocalDateTime.now(), booking.getCheckin().atStartOfDay());
+        if (hoursUntilCheckin < 24) {
+            throw new AppException(ErrorCode.BOOKING_NOT_EXISTED); // Custom error: MODIFICATION_TOO_LATE
+        }
+        
+        // Validate booking status
+        if (booking.getStatus() != Booking.BookingStatus.PENDING && 
+            booking.getStatus() != Booking.BookingStatus.CONFIRMED) {
+            throw new AppException(ErrorCode.BOOKING_NOT_EXISTED); // Custom error: CANNOT_MODIFY_BOOKING
+        }
+        
+        // Update booking details
+        if (request.getNewCheckin() != null) {
+            booking.setCheckin(request.getNewCheckin());
+        }
+        
+        if (request.getNewCheckout() != null) {
+            booking.setCheckout(request.getNewCheckout());
+        }
+        
+        Booking modifiedBooking = bookingRepository.save(booking);
+        log.info("Booking modified successfully: {}", modifiedBooking.getBookingCode());
+        
+        return bookingMapper.toBookingResponse(modifiedBooking);
+    }
+    
+    @Override
+    @Transactional
+    public BookingCancellationResponse cancelBooking(BookingCancellationRequest request) {
+        log.info("Cancelling booking: {}", request.getBookingId());
+        
+        Booking booking = bookingRepository.findById(request.getBookingId())
+                .orElseThrow(() -> new AppException(ErrorCode.BOOKING_NOT_FOUND));
+        
+        // Validate booking can be cancelled
+        if (booking.getStatus() == Booking.BookingStatus.CANCELLED ||
+            booking.getStatus() == Booking.BookingStatus.COMPLETED ||
+            booking.getStatus() == Booking.BookingStatus.CHECKED_OUT) {
+            throw new AppException(ErrorCode.BOOKING_NOT_EXISTED); // Custom error: CANNOT_CANCEL_BOOKING
+        }
+        
+        // Calculate refund
+        long daysUntilCheckin = ChronoUnit.DAYS.between(LocalDate.now(), booking.getCheckin());
+        BigDecimal refundAmount = refundService.calculateRefundAmount(booking);
+        int refundPercentage = refundService.getRefundPercentage(daysUntilCheckin);
+        String refundPolicy = refundService.getRefundPolicyExplanation(daysUntilCheckin);
+        
+        // Update booking status
+        booking.setStatus(Booking.BookingStatus.CANCELLED);
+        booking.setCancelledAt(LocalDateTime.now());
+        booking.setCancellationReason(request.getReason());
+        
+        // Process refund
+        if (refundAmount.compareTo(BigDecimal.ZERO) > 0) {
+            refundService.processRefund(booking, refundAmount);
+        }
+        
+        bookingRepository.save(booking);
+        
+        log.info("Booking cancelled: {} with refund: {} VND ({}%)", 
+                 booking.getBookingCode(), refundAmount, refundPercentage);
+        
+        return BookingCancellationResponse.builder()
+                .bookingId(booking.getId())
+                .bookingCode(booking.getBookingCode())
+                .cancelledAt(booking.getCancelledAt())
+                .cancellationReason(booking.getCancellationReason())
+                .refundAmount(refundAmount)
+                .refundPercentage(refundPercentage)
+                .refundPolicy(refundPolicy)
+                .message("Booking cancelled successfully")
+                .build();
+    }
+    
+    @Override
+    @Transactional
+    public BookingResponse checkInBooking(String bookingId, String checkedInBy) {
+        log.info("Checking in booking: {}", bookingId);
+        
+        Booking booking = bookingRepository.findById(bookingId)
+                .orElseThrow(() -> new AppException(ErrorCode.BOOKING_NOT_FOUND));
+        
+        // Validate status
+        if (booking.getStatus() != Booking.BookingStatus.CONFIRMED) {
+            throw new AppException(ErrorCode.BOOKING_NOT_CONFIRMED);
+        }
+        
+        // Update status
+        booking.setStatus(Booking.BookingStatus.CHECKED_IN);
+        booking.setActualCheckinTime(LocalDateTime.now());
+        booking.setCheckedInBy(checkedInBy);
+        
+        Booking checkedInBooking = bookingRepository.save(booking);
+        log.info("Booking checked in successfully: {}", checkedInBooking.getBookingCode());
+        
+        return bookingMapper.toBookingResponse(checkedInBooking);
+    }
+    
+    @Override
+    @Transactional
+    public BookingResponse checkOutBooking(String bookingId, String checkedOutBy) {
+        log.info("Checking out booking: {}", bookingId);
+        
+        Booking booking = bookingRepository.findById(bookingId)
+                .orElseThrow(() -> new AppException(ErrorCode.BOOKING_NOT_FOUND));
+        
+        // Validate status
+        if (booking.getStatus() != Booking.BookingStatus.CHECKED_IN) {
+            throw new AppException(ErrorCode.BOOKING_NOT_EXISTED); // Custom error needed
+        }
+        
+        // Update status
+        booking.setStatus(Booking.BookingStatus.CHECKED_OUT);
+        booking.setActualCheckoutTime(LocalDateTime.now());
+        booking.setCheckedOutBy(checkedOutBy);
+        
+        Booking checkedOutBooking = bookingRepository.save(booking);
+        
+        // Auto-complete after checkout
+        checkedOutBooking.setStatus(Booking.BookingStatus.COMPLETED);
+        bookingRepository.save(checkedOutBooking);
+        
+        log.info("Booking checked out and completed: {}", checkedOutBooking.getBookingCode());
+        
+        return bookingMapper.toBookingResponse(checkedOutBooking);
+    }
+    
+    @Override
+    @Transactional
+    public BookingResponse markNoShow(String bookingId, String reason) {
+        log.info("Marking booking as no-show: {}", bookingId);
+        
+        Booking booking = bookingRepository.findById(bookingId)
+                .orElseThrow(() -> new AppException(ErrorCode.BOOKING_NOT_FOUND));
+        
+        // Update status
+        booking.setStatus(Booking.BookingStatus.NO_SHOW);
+        booking.setCancellationReason(reason);
+        booking.setPaymentStatus(Booking.PaymentStatus.REFUNDED); // No refund for no-show
+        
+        Booking noShowBooking = bookingRepository.save(booking);
+        log.info("Booking marked as no-show: {}", noShowBooking.getBookingCode());
+        
+        return bookingMapper.toBookingResponse(noShowBooking);
+    }
+    
+    @Override
+    @Transactional
+    public void autoConfirmAfterPayment(String bookingId) {
+        log.info("Auto-confirming booking after payment: {}", bookingId);
+        
+        Booking booking = bookingRepository.findById(bookingId)
+                .orElseThrow(() -> new AppException(ErrorCode.BOOKING_NOT_FOUND));
+        
+        // Auto-confirm only if PENDING and payment is PAID
+        if (booking.getStatus() == Booking.BookingStatus.PENDING &&
+            booking.getPaymentStatus() == Booking.PaymentStatus.PAID) {
+            
+            booking.setStatus(Booking.BookingStatus.CONFIRMED);
+            booking.setEmailSent(true); // TODO: Send confirmation email
+            
+            bookingRepository.save(booking);
+            log.info("Booking auto-confirmed: {}", booking.getBookingCode());
+        }
     }
 }

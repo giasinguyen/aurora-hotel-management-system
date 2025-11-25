@@ -11,6 +11,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -33,4 +34,31 @@ public interface BookingRepository extends JpaRepository<Booking, String> {
                                @Param("customer") User customer,
                                @Param("status") String status,
                                Pageable pageable);
+    
+    @Query("SELECT b.id FROM Booking b JOIN b.rooms br WHERE " +
+           "br.room.id = :roomId AND " +
+           "b.status IN :statuses AND " +
+           "b.checkin < :checkoutDate AND " +
+           "b.checkout > :checkinDate")
+    List<String> findConflictingBookings(
+            @Param("roomId") String roomId,
+            @Param("checkinDate") LocalDate checkinDate,
+            @Param("checkoutDate") LocalDate checkoutDate,
+            @Param("statuses") List<Booking.BookingStatus> statuses
+    );
+    
+   
+    @Query("SELECT b.id FROM Booking b JOIN b.rooms br WHERE " +
+           "br.room.id = :roomId AND " +
+           "b.id != :excludeId AND " +
+           "b.status IN :statuses AND " +
+           "b.checkin < :checkoutDate AND " +
+           "b.checkout > :checkinDate")
+    List<String> findConflictingBookingsExcluding(
+            @Param("roomId") String roomId,
+            @Param("checkinDate") LocalDate checkinDate,
+            @Param("checkoutDate") LocalDate checkoutDate,
+            @Param("statuses") List<Booking.BookingStatus> statuses,
+            @Param("excludeId") String excludeBookingId
+    );
 }

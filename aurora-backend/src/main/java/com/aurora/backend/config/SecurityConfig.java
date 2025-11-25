@@ -33,8 +33,20 @@ public class SecurityConfig {
             "/api/v1/auth/logout",
             "/api/v1/auth/refresh-token",
             "/api/v1/auth/refresh",
+            
+            // Password reset endpoints - PUBLIC for forgot/reset password
+            "/api/v1/auth/forgot-password",
+            "/api/v1/auth/reset-password",
+            
+            // Email verification endpoints - PUBLIC
+            "/api/v1/auth/verify-email",
+            "/api/v1/auth/resend-verification-email",
+            
             "/api/v1/rag/**",
             "/api/v1/documents/**",
+
+            // Room availability - PUBLIC for availability check
+            "/api/v1/room-availability/check-multiple",
 
             // VNPay IPN callback - MUST be public for VNPay server-to-server callback
             "/api/v1/payments/vnpay/ipn",
@@ -55,8 +67,13 @@ public class SecurityConfig {
             "/api/v1/amenities/**",
             "/api/v1/rag/**",
             "/api/v1/documents/**",
-            // VNPay return URL - Public for customer redirect after payment
-            "/api/v1/payments/vnpay/return"
+            "/api/v1/payments/vnpay/return",
+            
+            // Room availability - PUBLIC for checking availability
+            "/api/v1/room-availability/check/**",
+            "/api/v1/room-availability/find-available/**",
+            "/api/v1/room-availability/calendar/**",
+            "/api/v1/room-availability/count-available/**"
     };
     private final CustomJwtDecoder customJwtDecoder;
 

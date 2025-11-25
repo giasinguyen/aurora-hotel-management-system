@@ -32,6 +32,10 @@ public final class PermissionConstants {
         public static final String BOOKING_CREATE_MANUAL = "BOOKING_CREATE_MANUAL";
         public static final String BOOKING_UPDATE_ALL = "BOOKING_UPDATE_ALL";
         public static final String BOOKING_CANCEL_ALL = "BOOKING_CANCEL_ALL";
+        public static final String BOOKING_CONFIRM = "BOOKING_CONFIRM";
+        public static final String BOOKING_CHECKIN = "BOOKING_CHECKIN";
+        public static final String BOOKING_CHECKOUT = "BOOKING_CHECKOUT";
+        public static final String BOOKING_MANAGE = "BOOKING_MANAGE"; // No-show, etc
         public static final String ROOM_STATUS_UPDATE = "ROOM_STATUS_UPDATE";
         public static final String CHECKIN_PROCESS = "CHECKIN_PROCESS";
         public static final String CHECKOUT_PROCESS = "CHECKOUT_PROCESS";

@@ -1,8 +1,6 @@
 package com.aurora.backend.controller;
 
-import com.aurora.backend.dto.request.LoginRequest;
-import com.aurora.backend.dto.request.RegisterRequest;
-import com.aurora.backend.dto.request.SessionMetaRequest;
+import com.aurora.backend.dto.request.*;
 import com.aurora.backend.dto.response.ApiResponse;
 import com.aurora.backend.dto.response.AuthResult;
 import com.aurora.backend.dto.response.AuthTokenResponse;
@@ -164,5 +162,106 @@ public class AuthenticationController {
                 .build();
         
         return ResponseEntity.ok(response);
+    }
+    
+    /**
+     * Forgot password - send reset email
+     * PUBLIC endpoint
+     */
+    @PostMapping("/forgot-password")
+    public ResponseEntity<ApiResponse<Void>> forgotPassword(
+            @Valid @RequestBody ForgotPasswordRequest request
+    ) {
+        log.info("Forgot password request for email: {}", request.getEmail());
+        authenticationService.forgotPassword(request);
+        
+        return ResponseEntity.ok(ApiResponse.<Void>builder()
+                .message("Password reset instructions have been sent to your email")
+                .result(null)
+                .build());
+    }
+    
+    /**
+     * Reset password with token
+     * PUBLIC endpoint
+     */
+    @PostMapping("/reset-password")
+    public ResponseEntity<ApiResponse<Void>> resetPassword(
+            @Valid @RequestBody ResetPasswordRequest request
+    ) {
+        log.info("Reset password request with token");
+        authenticationService.resetPassword(request);
+        
+        return ResponseEntity.ok(ApiResponse.<Void>builder()
+                .message("Password has been reset successfully")
+                .result(null)
+                .build());
+    }
+    
+    /**
+     * Change password for authenticated user
+     * PROTECTED endpoint - requires authentication
+     */
+    @PostMapping("/change-password")
+    public ResponseEntity<ApiResponse<Void>> changePassword(
+            @Valid @RequestBody ChangePasswordRequest request
+    ) {
+        log.info("Change password request for authenticated user");
+        authenticationService.changePassword(request);
+        
+        return ResponseEntity.ok(ApiResponse.<Void>builder()
+                .message("Password has been changed successfully")
+                .result(null)
+                .build());
+    }
+    
+    /**
+     * Send verification email to current authenticated user
+     * PROTECTED endpoint - requires authentication
+     */
+    @PostMapping("/send-verification-email")
+    public ResponseEntity<ApiResponse<Void>> sendVerificationEmail() {
+        UserSessionResponse currentUser = authenticationService.getCurrentUser();
+        log.info("Send verification email request for user: {}", currentUser.getId());
+        authenticationService.sendVerificationEmail(currentUser.getId());
+        
+        return ResponseEntity.ok(ApiResponse.<Void>builder()
+                .message("Verification email has been sent")
+                .result(null)
+                .build());
+    }
+    
+    /**
+     * Verify email with token
+     * PUBLIC endpoint
+     */
+    @PostMapping("/verify-email")
+    public ResponseEntity<ApiResponse<Void>> verifyEmail(
+            @Valid @RequestBody VerifyEmailRequest request
+    ) {
+        log.info("Verify email request with token");
+        authenticationService.verifyEmail(request);
+        
+        return ResponseEntity.ok(ApiResponse.<Void>builder()
+                .message("Email has been verified successfully")
+                .result(null)
+                .build());
+    }
+    
+    /**
+     * Resend verification email
+     * PUBLIC endpoint
+     */
+    @PostMapping("/resend-verification-email")
+    public ResponseEntity<ApiResponse<Void>> resendVerificationEmail(
+            @RequestParam String email
+    ) {
+        log.info("Resend verification email request for: {}", email);
+        authenticationService.resendVerificationEmail(email);
+        
+        return ResponseEntity.ok(ApiResponse.<Void>builder()
+                .message("Verification email has been resent")
+                .result(null)
+                .build());
     }
 }
