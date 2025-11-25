@@ -1,0 +1,599 @@
+{
+	"info": {
+		"_postman_id": "cloudinary-test-collection",
+		"name": "Cloudinary API Test Collection",
+		"description": "Collection để test các endpoint Cloudinary trong Aurora Hotel System",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "1. Test Connection",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Response has correct structure\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.have.property('code');",
+							"    pm.expect(jsonData).to.have.property('message');",
+							"    pm.expect(jsonData).to.have.property('data');",
+							"});",
+							"",
+							"pm.test(\"Cloudinary connection successful\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.data.connected).to.eql(true);",
+							"    pm.expect(jsonData.data.cloudName).to.eql('dqmlxcbxt');",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/api/v1/cloudinary/test",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"cloudinary",
+						"test"
+					]
+				},
+				"description": "Kiểm tra kết nối với Cloudinary"
+			},
+			"response": []
+		},
+		{
+			"name": "2. Upload Single File",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"File uploaded successfully\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.code).to.eql(200);",
+							"    pm.expect(jsonData.data).to.have.property('publicId');",
+							"    pm.expect(jsonData.data).to.have.property('url');",
+							"    pm.expect(jsonData.data).to.have.property('secureUrl');",
+							"    ",
+							"    // Lưu publicId để dùng cho các test sau",
+							"    pm.environment.set('lastUploadedPublicId', jsonData.data.publicId);",
+							"    pm.environment.set('lastUploadedUrl', jsonData.data.secureUrl);",
+							"});",
+							"",
+							"pm.test(\"Response contains file metadata\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.data).to.have.property('format');",
+							"    pm.expect(jsonData.data).to.have.property('bytes');",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "file",
+							"type": "file",
+							"src": [],
+							"description": "Chọn file ảnh để upload (jpg, png, webp...)"
+						},
+						{
+							"key": "folder",
+							"value": "test",
+							"type": "text",
+							"description": "Tên folder trên Cloudinary (mặc định: uploads)"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/v1/cloudinary/upload?folder=test",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"cloudinary",
+						"upload"
+					],
+					"query": [
+						{
+							"key": "folder",
+							"value": "test"
+						}
+					]
+				},
+				"description": "Upload 1 file lên Cloudinary. Sau khi chạy, publicId sẽ được lưu vào environment variable để dùng cho các request sau."
+			},
+			"response": []
+		},
+		{
+			"name": "2.1. Upload Room Image",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Room image uploaded successfully\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.code).to.eql(200);",
+							"    pm.expect(jsonData.data.publicId).to.include('room-images/');",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "file",
+							"type": "file",
+							"src": [],
+							"description": "Chọn ảnh phòng"
+						},
+						{
+							"key": "folder",
+							"value": "room-images",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/v1/cloudinary/upload?folder=room-images",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"cloudinary",
+						"upload"
+					],
+					"query": [
+						{
+							"key": "folder",
+							"value": "room-images"
+						}
+					]
+				},
+				"description": "Upload ảnh phòng vào folder room-images"
+			},
+			"response": []
+		},
+		{
+			"name": "2.2. Upload Hotel Photo",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "file",
+							"type": "file",
+							"src": []
+						},
+						{
+							"key": "folder",
+							"value": "hotel-photos",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/v1/cloudinary/upload?folder=hotel-photos",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"cloudinary",
+						"upload"
+					],
+					"query": [
+						{
+							"key": "folder",
+							"value": "hotel-photos"
+						}
+					]
+				},
+				"description": "Upload ảnh khách sạn vào folder hotel-photos"
+			},
+			"response": []
+		},
+		{
+			"name": "2.3. Upload RAG Document",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "file",
+							"type": "file",
+							"src": [],
+							"description": "Chọn file PDF hoặc document"
+						},
+						{
+							"key": "folder",
+							"value": "rag-documents",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/v1/cloudinary/upload?folder=rag-documents",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"cloudinary",
+						"upload"
+					],
+					"query": [
+						{
+							"key": "folder",
+							"value": "rag-documents"
+						}
+					]
+				},
+				"description": "Upload tài liệu cho RAG system vào folder rag-documents"
+			},
+			"response": []
+		},
+		{
+			"name": "3. Upload Multiple Files",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Multiple files uploaded\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.data).to.have.property('totalFiles');",
+							"    pm.expect(jsonData.data).to.have.property('successfulUploads');",
+							"    pm.expect(jsonData.data).to.have.property('results');",
+							"    pm.expect(jsonData.data.results).to.be.an('array');",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "files",
+							"type": "file",
+							"src": [],
+							"description": "Chọn nhiều file để upload"
+						},
+						{
+							"key": "files",
+							"type": "file",
+							"src": []
+						},
+						{
+							"key": "files",
+							"type": "file",
+							"src": []
+						},
+						{
+							"key": "folder",
+							"value": "batch-upload",
+							"type": "text"
+						}
+					]
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/v1/cloudinary/upload-multiple?folder=batch-upload",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"cloudinary",
+						"upload-multiple"
+					],
+					"query": [
+						{
+							"key": "folder",
+							"value": "batch-upload"
+						}
+					]
+				},
+				"description": "Upload nhiều file cùng lúc"
+			},
+			"response": []
+		},
+		{
+			"name": "4. Get Optimized Image URL",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"Optimized URL generated\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.data).to.have.property('optimizedUrl');",
+							"    pm.expect(jsonData.data.optimizedUrl).to.include('w_800');",
+							"    pm.expect(jsonData.data.optimizedUrl).to.include('h_600');",
+							"    pm.expect(jsonData.data.optimizedUrl).to.include('q_80');",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"// Lấy publicId từ environment variable và encode",
+							"var publicId = pm.environment.get('lastUploadedPublicId');",
+							"if (publicId) {",
+							"    var encodedPublicId = encodeURIComponent(publicId);",
+							"    pm.variables.set('encodedPublicId', encodedPublicId);",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/api/v1/cloudinary/optimize/{{encodedPublicId}}?width=800&height=600&quality=80",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"cloudinary",
+						"optimize",
+						"{{encodedPublicId}}"
+					],
+					"query": [
+						{
+							"key": "width",
+							"value": "800",
+							"description": "Chiều rộng mong muốn (pixels)"
+						},
+						{
+							"key": "height",
+							"value": "600",
+							"description": "Chiều cao mong muốn (pixels)"
+						},
+						{
+							"key": "quality",
+							"value": "80",
+							"description": "Chất lượng ảnh (1-100)"
+						}
+					]
+				},
+				"description": "Lấy URL ảnh đã được tối ưu hóa với kích thước và chất lượng tùy chỉnh. Sử dụng publicId từ file đã upload trước đó."
+			},
+			"response": []
+		},
+		{
+			"name": "4.1. Get Thumbnail (200x200)",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/api/v1/cloudinary/optimize/{{encodedPublicId}}?width=200&height=200&quality=70",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"cloudinary",
+						"optimize",
+						"{{encodedPublicId}}"
+					],
+					"query": [
+						{
+							"key": "width",
+							"value": "200"
+						},
+						{
+							"key": "height",
+							"value": "200"
+						},
+						{
+							"key": "quality",
+							"value": "70"
+						}
+					]
+				},
+				"description": "Lấy URL thumbnail kích thước nhỏ 200x200"
+			},
+			"response": []
+		},
+		{
+			"name": "4.2. Get HD Image (1920x1080)",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/api/v1/cloudinary/optimize/{{encodedPublicId}}?width=1920&height=1080&quality=90",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"cloudinary",
+						"optimize",
+						"{{encodedPublicId}}"
+					],
+					"query": [
+						{
+							"key": "width",
+							"value": "1920"
+						},
+						{
+							"key": "height",
+							"value": "1080"
+						},
+						{
+							"key": "quality",
+							"value": "90"
+						}
+					]
+				},
+				"description": "Lấy URL ảnh HD chất lượng cao"
+			},
+			"response": []
+		},
+		{
+			"name": "5. Delete File",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"",
+							"pm.test(\"File deleted successfully\", function () {",
+							"    var jsonData = pm.response.json();",
+							"    pm.expect(jsonData.code).to.eql(200);",
+							"    pm.expect(jsonData.data.result).to.eql('ok');",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"// Lấy publicId từ environment variable và encode",
+							"var publicId = pm.environment.get('lastUploadedPublicId');",
+							"if (publicId) {",
+							"    var encodedPublicId = encodeURIComponent(publicId);",
+							"    pm.variables.set('encodedPublicId', encodedPublicId);",
+							"}"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/api/v1/cloudinary/delete/{{encodedPublicId}}",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"cloudinary",
+						"delete",
+						"{{encodedPublicId}}"
+					]
+				},
+				"description": "Xóa file từ Cloudinary. Sử dụng publicId từ file đã upload trước đó.\n\n⚠️ Chú ý: Chạy request này sẽ xóa file thật trên Cloudinary!"
+			},
+			"response": []
+		},
+		{
+			"name": "6. Delete Specific File (Manual)",
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"url": {
+					"raw": "{{baseUrl}}/api/v1/cloudinary/delete/test%2Ffile-name-here",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"v1",
+						"cloudinary",
+						"delete",
+						"test%2Ffile-name-here"
+					]
+				},
+				"description": "Xóa file cụ thể bằng cách nhập publicId thủ công.\n\nVí dụ publicId: `test/abc123`\nĐã encode: `test%2Fabc123`\n\nThay thế `test%2Ffile-name-here` bằng publicId thực tế."
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:8080",
+			"type": "string"
+		}
+	]
+}

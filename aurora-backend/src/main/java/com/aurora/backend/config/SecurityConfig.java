@@ -50,6 +50,10 @@ public class SecurityConfig {
 
             // VNPay IPN callback - MUST be public for VNPay server-to-server callback
             "/api/v1/payments/vnpay/ipn",
+            
+            // Cloudinary upload endpoints
+            "/api/v1/cloudinary/upload",
+            "/api/v1/cloudinary/upload-multiple",
 
             // Test endpoints - For testing purposes only (remove in production)
             "/api/v1/test/**"
@@ -68,6 +72,9 @@ public class SecurityConfig {
             "/api/v1/rag/**",
             "/api/v1/documents/**",
             "/api/v1/payments/vnpay/return",
+            
+            // Cloudinary test endpoint
+            "/api/v1/cloudinary/test",
             
             // Room availability - PUBLIC for checking availability
             "/api/v1/room-availability/check/**",
@@ -90,6 +97,8 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.PUT, "/api/v1/document/**").permitAll() // TODO: Delete this in production
                 .requestMatchers(HttpMethod.DELETE, "/api/v1/document/**").permitAll() // TODO: Delete this in production
                 .requestMatchers(HttpMethod.DELETE, "/api/v1/test/**").permitAll() // Test cleanup endpoint
+                .requestMatchers(HttpMethod.DELETE, "/api/v1/cloudinary/delete/**").permitAll() // Cloudinary delete endpoint
+                .requestMatchers(HttpMethod.GET, "/api/v1/cloudinary/optimize/**").permitAll() // Cloudinary optimize endpoint
                 .anyRequest().authenticated());
 
         http.oauth2ResourceServer(oauth2 -> oauth2.jwt(jwtConfigurer -> jwtConfigurer

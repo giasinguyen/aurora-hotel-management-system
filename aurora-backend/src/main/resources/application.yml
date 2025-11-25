@@ -92,3 +92,10 @@ vnpay:
   return-url: ${VNPAY_RETURN_URL:http://localhost:5173/payment/return}
   ipn-url: ${VNPAY_IPN_URL:http://localhost:8080/api/v1/payments/vnpay/ipn}
   timezone: Asia/Ho_Chi_Minh
+
+# Cloudinary Configuration
+cloudinary:
+  cloud-name: ${CLOUDINARY_CLOUD_NAME}
+  api-key: ${CLOUDINARY_API_KEY}
+  api-secret: ${CLOUDINARY_API_SECRET}
+  secure: ${CLOUDINARY_SECURE:true}
