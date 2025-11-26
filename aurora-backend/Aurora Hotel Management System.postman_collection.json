@@ -1,10 +1,11 @@
 {
 	"info": {
-		"_postman_id": "a746e4af-4d13-46e1-873d-6741fcdfe74c",
+		"_postman_id": "142be643-84e0-4f8f-94a3-7ee28c831ec7",
 		"name": "Aurora Hotel Management System",
-		"description": "Comprehensive API Testing Collection for Aurora Hotel System\n\n## Test Flow\n1. **Authentication** - Login and get tokens\n2. **User Management** - Register and manage users\n3. **Branch Management** - Create and manage hotel branches\n4. **Amenity Management** - Manage hotel amenities (WiFi, TV, etc.)\n5. **Facility Management** - Manage branch facilities (Pool, Gym, Spa)\n6. **Room Type Management** - Configure room types\n7. **Room Management** - Manage individual rooms\n8. **Service Management** - Hotel services (Laundry, Room service, etc.)\n9. **Promotion Management** - Discounts and promotions\n10. **Booking Management** - Room bookings\n11. **Booking Room** - Booking-Room relationship\n12. **Service Booking** - Service bookings for guests\n13. **Payment Management** - Process payments\n14. **Role & Permission** - Manage access control\n15. **Review & Rating** - Customer reviews and ratings\n16. **RAG (AI Chat)** - AI-powered chat using hotel knowledge base\n17. **Document Management** - Upload, manage, and download documents\n\n## Authentication\nAll endpoints (except register and login) require Bearer token authentication.\n\n## Default Users\n- **Admin**: username=`admin`, password=`Admin@123`\n- **Manager**: username=`manager`, password=`Manager@123`\n- **Staff**: username=`staff`, password=`Staff@123`\n- **Customer**: username=`customer`, password=`Customer@123`\n\n## New Features\n- **RAG AI Chat**: Intelligent responses using retrieval augmented generation\n- **Document Management**: Full CRUD operations for document handling",
+		"description": "Comprehensive API Testing Collection for Aurora Hotel System\n\n## Test Flow\n\n1. **Authentication** - Login and get tokens\n    \n2. **User Management** - Register and manage users\n    \n3. **Branch Management** - Create and manage hotel branches\n    \n4. **Amenity Management** - Manage hotel amenities (WiFi, TV, etc.)\n    \n5. **Facility Management** - Manage branch facilities (Pool, Gym, Spa)\n    \n6. **Room Type Management** - Configure room types\n    \n7. **Room Management** - Manage individual rooms\n    \n8. **Service Management** - Hotel services (Laundry, Room service, etc.)\n    \n9. **Promotion Management** - Discounts and promotions\n    \n10. **Booking Management** - Room bookings\n    \n11. **Booking Room** - Booking-Room relationship\n    \n12. **Service Booking** - Service bookings for guests\n    \n13. **Payment Management** - Process payments\n    \n14. **Role & Permission** - Manage access control\n    \n15. **Review & Rating** - Customer reviews and ratings\n    \n16. **RAG (AI Chat)** - AI-powered chat using hotel knowledge base\n    \n17. **Document Management** - Upload, manage, and download documents\n    \n\n## Authentication\n\nAll endpoints (except register and login) require Bearer token authentication.\n\n## Default Users\n\n- **Admin**: username=`admin`, password=`Admin@123`\n    \n- **Manager**: username=`manager`, password=`Manager@123`\n    \n- **Staff**: username=`staff`, password=`Staff@123`\n    \n- **Customer**: username=`customer`, password=`Customer@123`\n    \n\n## New Features\n\n- **RAG AI Chat**: Intelligent responses using retrieval augmented generation\n    \n- **Document Management**: Full CRUD operations for document handling",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
-		"_exporter_id": "40740215"
+		"_exporter_id": "48417652",
+		"_collection_link": "https://nguyenduykhai2-8509419.postman.co/workspace/NguyenDuyKhai's-Workspace~81749740-16ed-49e1-8f0c-0313169dea68/collection/48417652-142be643-84e0-4f8f-94a3-7ee28c831ec7?action=share&source=collection_link&creator=48417652"
 	},
 	"item": [
 		{
@@ -3652,8 +3653,6 @@
 			"item": [
 				{
 					"name": "Chat Sync",
-					"event": [
-					],
 					"request": {
 						"method": "GET",
 						"header": [],
@@ -3687,8 +3686,6 @@
 				},
 				{
 					"name": "Chat Stream",
-					"event": [
-					],
 					"request": {
 						"method": "GET",
 						"header": [
@@ -3727,8 +3724,6 @@
 				},
 				{
 					"name": "Test Content Retriever",
-					"event": [
-					],
 					"request": {
 						"method": "GET",
 						"header": [],
@@ -3763,8 +3758,6 @@
 			"item": [
 				{
 					"name": "Upload Document",
-					"event": [
-					],
 					"request": {
 						"method": "POST",
 						"header": [],
@@ -3773,9 +3766,9 @@
 							"formdata": [
 								{
 									"key": "file",
+									"description": "The document file to upload",
 									"type": "file",
-									"src": [],
-									"description": "The document file to upload"
+									"src": []
 								}
 							]
 						},
@@ -3797,8 +3790,6 @@
 				},
 				{
 					"name": "List All Documents",
-					"event": [
-					],
 					"request": {
 						"method": "GET",
 						"header": [],
@@ -3819,8 +3810,6 @@
 				},
 				{
 					"name": "Download Document",
-					"event": [
-					],
 					"request": {
 						"method": "GET",
 						"header": [],
@@ -3843,8 +3832,6 @@
 				},
 				{
 					"name": "Update Document",
-					"event": [
-					],
 					"request": {
 						"method": "PUT",
 						"header": [],
@@ -3853,9 +3840,9 @@
 							"formdata": [
 								{
 									"key": "file",
+									"description": "The new document file to replace the existing one",
 									"type": "file",
-									"src": [],
-									"description": "The new document file to replace the existing one"
+									"src": []
 								}
 							]
 						},
@@ -3877,8 +3864,6 @@
 				},
 				{
 					"name": "Delete Document",
-					"event": [
-					],
 					"request": {
 						"method": "DELETE",
 						"header": [],
@@ -3900,6 +3885,842 @@
 				}
 			],
 			"description": "Document Management System - Upload, download, update, and delete documents for the hotel system"
+		},
+		{
+			"name": "11. Dashboard & Statistics",
+			"item": [
+				{
+					"name": "Get Admin Dashboard Overview",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status 200\", function() {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response structure is correct\", function() {\r",
+									"    const response = pm.response.json();\r",
+									"    \r",
+									"    pm.expect(response).to.have.property('code');\r",
+									"    pm.expect(response).to.have.property('result');\r",
+									"    pm.expect(response.code).to.equal(1000);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Dashboard data exists\", function() {\r",
+									"    const data = pm.response.json().result;\r",
+									"    \r",
+									"    // Check all required properties\r",
+									"    pm.expect(data).to.have.property('totalRevenue');\r",
+									"    pm.expect(data).to.have.property('totalBookings');\r",
+									"    pm.expect(data).to.have.property('occupancyRate');\r",
+									"    pm.expect(data).to.have.property('avgBookingValue');\r",
+									"    pm.expect(data).to.have.property('newCustomers');\r",
+									"    pm.expect(data).to.have.property('returningCustomers');\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Data types are correct\", function() {\r",
+									"    const data = pm.response.json().result;\r",
+									"    \r",
+									"    pm.expect(data.totalRevenue).to.be.a('number');\r",
+									"    pm.expect(data.totalBookings).to.be.a('number');\r",
+									"    pm.expect(data.occupancyRate).to.be.a('number');\r",
+									"    pm.expect(data.avgBookingValue).to.be.a('number');\r",
+									"    pm.expect(data.newCustomers).to.be.a('number');\r",
+									"    pm.expect(data.returningCustomers).to.be.a('number');\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Occupancy rate is valid percentage\", function() {\r",
+									"    const data = pm.response.json().result;\r",
+									"    pm.expect(data.occupancyRate).to.be.within(0, 100);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Numbers are non-negative\", function() {\r",
+									"    const data = pm.response.json().result;\r",
+									"    \r",
+									"    pm.expect(data.totalRevenue).to.be.at.least(0);\r",
+									"    pm.expect(data.totalBookings).to.be.at.least(0);\r",
+									"    pm.expect(data.newCustomers).to.be.at.least(0);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/dashboard/admin/overview?dateFrom=2025-01-01&dateTo=2025-12-31",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"dashboard",
+								"admin",
+								"overview"
+							],
+							"query": [
+								{
+									"key": "dateFrom",
+									"value": "2025-01-01"
+								},
+								{
+									"key": "dateTo",
+									"value": "2025-12-31"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Manager Branch Overview",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status 200\", function() {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Branch overview data exists\", function() {\r",
+									"    const data = pm.response.json().result;\r",
+									"    \r",
+									"    pm.expect(data).to.have.property('totalRevenue');\r",
+									"    pm.expect(data).to.have.property('totalBookings');\r",
+									"    pm.expect(data).to.have.property('occupancyRate');\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response is for correct branch\", function() {\r",
+									"    const data = pm.response.json().result;\r",
+									"    const requestedBranchId = pm.collectionVariables.get(\"branchId\");\r",
+									"    \r",
+									"    // If branchId is returned in response\r",
+									"    if (data.branchId) {\r",
+									"        pm.expect(data.branchId).to.equal(requestedBranchId);\r",
+									"    }\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Manager sees limited data\", function() {\r",
+									"    const data = pm.response.json().result;\r",
+									"    \r",
+									"    // Manager should see branch-specific data\r",
+									"    pm.expect(data.totalRevenue).to.be.a('number');\r",
+									"    pm.expect(data.totalBookings).to.be.a('number');\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/dashboard/manager/branch/{{branchId}}?dateFrom=2025-01-01&dateTo=2025-12-31",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"dashboard",
+								"manager",
+								"branch",
+								"{{branchId}}"
+							],
+							"query": [
+								{
+									"key": "dateFrom",
+									"value": "2025-01-01"
+								},
+								{
+									"key": "dateTo",
+									"value": "2025-12-31"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Staff Dashboard",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status 200\", function() {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Staff dashboard data exists\", function() {\r",
+									"    const data = pm.response.json().result;\r",
+									"    \r",
+									"    pm.expect(data).to.be.an('object');\r",
+									"    pm.expect(data).to.have.property('totalBookings');\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Staff has limited data access\", function() {\r",
+									"    const data = pm.response.json().result;\r",
+									"    \r",
+									"    // Staff should see their assigned bookings\r",
+									"    pm.expect(data.totalBookings).to.be.a('number');\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Response time is acceptable\", function() {\r",
+									"    pm.expect(pm.response.responseTime).to.be.below(2000);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/dashboard/staff?dateFrom=2025-01-01&dateTo=2025-12-31",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"dashboard",
+								"staff"
+							],
+							"query": [
+								{
+									"key": "dateFrom",
+									"value": "2025-01-01"
+								},
+								{
+									"key": "dateTo",
+									"value": "2025-12-31"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Revenue Statistics",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status 200\", function() {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Revenue statistics is an array\", function() {\r",
+									"    const data = pm.response.json().result;\r",
+									"    pm.expect(data).to.be.an('array');\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Revenue data structure is correct\", function() {\r",
+									"    const data = pm.response.json().result;\r",
+									"    \r",
+									"    if (data.length > 0) {\r",
+									"        const firstItem = data[0];\r",
+									"        \r",
+									"        pm.expect(firstItem).to.have.property('period');\r",
+									"        pm.expect(firstItem).to.have.property('revenue');\r",
+									"        pm.expect(firstItem).to.have.property('bookingCount');\r",
+									"        pm.expect(firstItem).to.have.property('avgValue');\r",
+									"    }\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Revenue values are valid\", function() {\r",
+									"    const data = pm.response.json().result;\r",
+									"    \r",
+									"    data.forEach(function(item) {\r",
+									"        pm.expect(item.revenue).to.be.at.least(0);\r",
+									"        pm.expect(item.bookingCount).to.be.at.least(0);\r",
+									"        pm.expect(item.avgValue).to.be.at.least(0);\r",
+									"    });\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Period format is correct\", function() {\r",
+									"    const data = pm.response.json().result;\r",
+									"    const groupBy = pm.request.url.query.get('groupBy') || 'DAY';\r",
+									"    \r",
+									"    if (data.length > 0) {\r",
+									"        pm.expect(data[0].period).to.be.a('string');\r",
+									"        console.log(\"Sample period:\", data[0].period);\r",
+									"    }\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Data is sorted by period\", function() {\r",
+									"    const data = pm.response.json().result;\r",
+									"    \r",
+									"    if (data.length > 1) {\r",
+									"        // Periods should be in order\r",
+									"        pm.expect(data[0].period).to.exist;\r",
+									"    }\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/dashboard/revenue?dateFrom=2025-01-01&dateTo=2025-12-31&groupBy={{groupBy}}&branchId={{branchId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"dashboard",
+								"revenue"
+							],
+							"query": [
+								{
+									"key": "dateFrom",
+									"value": "2025-01-01"
+								},
+								{
+									"key": "dateTo",
+									"value": "2025-12-31"
+								},
+								{
+									"key": "groupBy",
+									"value": "{{groupBy}}"
+								},
+								{
+									"key": "branchId",
+									"value": "{{branchId}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Revenue by Payment Method",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status 200\", function() {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Payment methods breakdown exists\", function() {\r",
+									"    const data = pm.response.json().result;\r",
+									"    pm.expect(data).to.be.an('object');\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Common payment methods exist\", function() {\r",
+									"    const data = pm.response.json().result;\r",
+									"    \r",
+									"    // Check if at least one payment method exists\r",
+									"    const hasPaymentMethod = Object.keys(data).length > 0;\r",
+									"    pm.expect(hasPaymentMethod).to.be.true;\r",
+									"    \r",
+									"    console.log(\"Payment methods:\", Object.keys(data));\r",
+									"});\r",
+									"\r",
+									"pm.test(\"All revenue values are numbers\", function() {\r",
+									"    const data = pm.response.json().result;\r",
+									"    \r",
+									"    Object.values(data).forEach(function(amount) {\r",
+									"        pm.expect(amount).to.be.a('number');\r",
+									"        pm.expect(amount).to.be.at.least(0);\r",
+									"    });\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Total revenue calculation\", function() {\r",
+									"    const data = pm.response.json().result;\r",
+									"    \r",
+									"    let total = Object.values(data).reduce((sum, val) => sum + val, 0);\r",
+									"    pm.expect(total).to.be.at.least(0);\r",
+									"    \r",
+									"    console.log(\"Total revenue from all methods:\", total);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/dashboard/revenue/payment-methods?dateFrom=2025-01-01&dateTo=2025-12-31&branchId={{branchId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"dashboard",
+								"revenue",
+								"payment-methods"
+							],
+							"query": [
+								{
+									"key": "dateFrom",
+									"value": "2025-01-01"
+								},
+								{
+									"key": "dateTo",
+									"value": "2025-12-31"
+								},
+								{
+									"key": "branchId",
+									"value": "{{branchId}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Occupancy Statistics",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status 200\", function() {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Occupancy data structure is correct\", function() {\r",
+									"    const data = pm.response.json().result;\r",
+									"    \r",
+									"    pm.expect(data).to.have.property('date');\r",
+									"    pm.expect(data).to.have.property('totalRooms');\r",
+									"    pm.expect(data).to.have.property('occupiedRooms');\r",
+									"    pm.expect(data).to.have.property('availableRooms');\r",
+									"    pm.expect(data).to.have.property('occupancyRate');\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Room counts are valid\", function() {\r",
+									"    const data = pm.response.json().result;\r",
+									"    \r",
+									"    pm.expect(data.totalRooms).to.be.at.least(0);\r",
+									"    pm.expect(data.occupiedRooms).to.be.at.least(0);\r",
+									"    pm.expect(data.availableRooms).to.be.at.least(0);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Occupancy calculation is correct\", function() {\r",
+									"    const data = pm.response.json().result;\r",
+									"    \r",
+									"    // occupied + available should equal total\r",
+									"    const sum = data.occupiedRooms + data.availableRooms;\r",
+									"    pm.expect(sum).to.equal(data.totalRooms);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Occupancy rate is valid percentage\", function() {\r",
+									"    const data = pm.response.json().result;\r",
+									"    pm.expect(data.occupancyRate).to.be.within(0, 100);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Occupancy rate calculation matches\", function() {\r",
+									"    const data = pm.response.json().result;\r",
+									"    \r",
+									"    if (data.totalRooms > 0) {\r",
+									"        const expectedRate = (data.occupiedRooms / data.totalRooms) * 100;\r",
+									"        pm.expect(data.occupancyRate).to.be.closeTo(expectedRate, 0.1);\r",
+									"    }\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Date format is correct\", function() {\r",
+									"    const data = pm.response.json().result;\r",
+									"    pm.expect(data.date).to.match(/^\\d{4}-\\d{2}-\\d{2}$/);\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/dashboard/occupancy?date=2025-12-01&branchId={{branchId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"dashboard",
+								"occupancy"
+							],
+							"query": [
+								{
+									"key": "date",
+									"value": "2025-12-01"
+								},
+								{
+									"key": "branchId",
+									"value": "{{branchId}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Top Selling Room Types",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status 200\", function() {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Top rooms is an array\", function() {\r",
+									"    const data = pm.response.json().result;\r",
+									"    pm.expect(data).to.be.an('array');\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Returns correct number of room types\", function() {\r",
+									"    const data = pm.response.json().result;\r",
+									"    const limit = parseInt(pm.request.url.query.get('limit') || '5');\r",
+									"    \r",
+									"    pm.expect(data.length).to.be.at.most(limit);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Room type data structure is correct\", function() {\r",
+									"    const data = pm.response.json().result;\r",
+									"    \r",
+									"    if (data.length > 0) {\r",
+									"        const firstRoom = data[0];\r",
+									"        \r",
+									"        pm.expect(firstRoom).to.have.property('roomTypeId');\r",
+									"        pm.expect(firstRoom).to.have.property('roomTypeName');\r",
+									"        pm.expect(firstRoom).to.have.property('bookingCount');\r",
+									"        pm.expect(firstRoom).to.have.property('revenue');\r",
+									"    }\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Room types are sorted by revenue\", function() {\r",
+									"    const data = pm.response.json().result;\r",
+									"    \r",
+									"    for (let i = 0; i < data.length - 1; i++) {\r",
+									"        pm.expect(data[i].revenue).to.be.at.least(data[i + 1].revenue);\r",
+									"    }\r",
+									"});\r",
+									"\r",
+									"pm.test(\"All values are valid\", function() {\r",
+									"    const data = pm.response.json().result;\r",
+									"    \r",
+									"    data.forEach(function(room) {\r",
+									"        pm.expect(room.bookingCount).to.be.at.least(0);\r",
+									"        pm.expect(room.revenue).to.be.at.least(0);\r",
+									"        pm.expect(room.roomTypeName).to.be.a('string');\r",
+									"    });\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/dashboard/top-rooms?limit=5&branchId={{branchId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"dashboard",
+								"top-rooms"
+							],
+							"query": [
+								{
+									"key": "limit",
+									"value": "5"
+								},
+								{
+									"key": "branchId",
+									"value": "{{branchId}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Customer Growth",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status 200\", function() {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Customer growth is an array\", function() {\r",
+									"    const data = pm.response.json().result;\r",
+									"    pm.expect(data).to.be.an('array');\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Growth data structure is correct\", function() {\r",
+									"    const data = pm.response.json().result;\r",
+									"    \r",
+									"    if (data.length > 0) {\r",
+									"        const firstItem = data[0];\r",
+									"        \r",
+									"        pm.expect(firstItem).to.have.property('period');\r",
+									"        pm.expect(firstItem).to.have.property('newCustomers');\r",
+									"        pm.expect(firstItem).to.have.property('returningCustomers');\r",
+									"        pm.expect(firstItem).to.have.property('totalCustomers');\r",
+									"    }\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Customer counts are valid\", function() {\r",
+									"    const data = pm.response.json().result;\r",
+									"    \r",
+									"    data.forEach(function(item) {\r",
+									"        pm.expect(item.newCustomers).to.be.at.least(0);\r",
+									"        pm.expect(item.returningCustomers).to.be.at.least(0);\r",
+									"        pm.expect(item.totalCustomers).to.be.at.least(0);\r",
+									"    });\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Total customers equals new + returning\", function() {\r",
+									"    const data = pm.response.json().result;\r",
+									"    \r",
+									"    data.forEach(function(item) {\r",
+									"        const sum = item.newCustomers + item.returningCustomers;\r",
+									"        pm.expect(item.totalCustomers).to.equal(sum);\r",
+									"    });\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Growth trend exists\", function() {\r",
+									"    const data = pm.response.json().result;\r",
+									"    \r",
+									"    if (data.length > 1) {\r",
+									"        console.log(\"Customer growth over\", data.length, \"periods\");\r",
+									"        console.log(\"Latest:\", data[data.length - 1]);\r",
+									"    }\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"auth": {
+							"type": "bearer",
+							"bearer": [
+								{
+									"key": "token",
+									"value": "{{accessToken}}",
+									"type": "string"
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/dashboard/customer-growth?period={{period}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"dashboard",
+								"customer-growth"
+							],
+							"query": [
+								{
+									"key": "period",
+									"value": "{{period}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Get Bookings by Source",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status 200\", function() {\r",
+									"    pm.response.to.have.status(200);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Booking sources is an object\", function() {\r",
+									"    const data = pm.response.json().result;\r",
+									"    pm.expect(data).to.be.an('object');\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Common booking sources exist\", function() {\r",
+									"    const data = pm.response.json().result;\r",
+									"    \r",
+									"    // Expected sources\r",
+									"    const expectedSources = ['WEBSITE', 'MOBILE_APP', 'WALK_IN', 'PHONE'];\r",
+									"    \r",
+									"    const hasAtLeastOneSource = Object.keys(data).length > 0;\r",
+									"    pm.expect(hasAtLeastOneSource).to.be.true;\r",
+									"    \r",
+									"    console.log(\"Booking sources:\", Object.keys(data));\r",
+									"});\r",
+									"\r",
+									"pm.test(\"All counts are valid numbers\", function() {\r",
+									"    const data = pm.response.json().result;\r",
+									"    \r",
+									"    Object.entries(data).forEach(function([source, count]) {\r",
+									"        pm.expect(count).to.be.a('number');\r",
+									"        pm.expect(count).to.be.at.least(0);\r",
+									"    });\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Total bookings calculation\", function() {\r",
+									"    const data = pm.response.json().result;\r",
+									"    \r",
+									"    const total = Object.values(data).reduce((sum, count) => sum + count, 0);\r",
+									"    pm.expect(total).to.be.at.least(0);\r",
+									"    \r",
+									"    console.log(\"Total bookings from all sources:\", total);\r",
+									"});\r",
+									"\r",
+									"pm.test(\"Source distribution\", function() {\r",
+									"    const data = pm.response.json().result;\r",
+									"    \r",
+									"    if (Object.keys(data).length > 0) {\r",
+									"        const entries = Object.entries(data);\r",
+									"        const sorted = entries.sort((a, b) => b[1] - a[1]);\r",
+									"        \r",
+									"        console.log(\"Most popular source:\", sorted[0][0], \"with\", sorted[0][1], \"bookings\");\r",
+									"    }\r",
+									"});"
+								],
+								"type": "text/javascript",
+								"packages": {},
+								"requests": {}
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/dashboard/bookings/source?dateFrom=2025-01-01&dateTo=2025-12-31&branchId={{branchId}}",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"dashboard",
+								"bookings",
+								"source"
+							],
+							"query": [
+								{
+									"key": "dateFrom",
+									"value": "2025-01-01"
+								},
+								{
+									"key": "dateTo",
+									"value": "2025-12-31"
+								},
+								{
+									"key": "branchId",
+									"value": "{{branchId}}"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
 		}
 	],
 	"auth": {
