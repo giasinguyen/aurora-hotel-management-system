@@ -2,6 +2,7 @@ package com.aurora.backend.repository;
 
 import com.aurora.backend.entity.Booking;
 import com.aurora.backend.entity.Payment;
+import com.aurora.backend.repository.projection.PaymentMethodRevenueProjection;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -10,6 +11,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -62,4 +64,25 @@ public interface PaymentRepository extends JpaRepository<Payment, String> {
        Optional<Payment> findByVnpayTxnRef(String vnpayTxnRef);
 
        List<Payment> findByBookingAndStatus(Booking booking, Payment.PaymentStatus status);
+
+       @Query("SELECT COALESCE(SUM(p.amount), 0) FROM Payment p " +
+               "WHERE p.status = :status " +
+               "AND p.booking.checkin >= :start " +
+               "AND p.booking.checkout <= :end " +
+               "AND (:branchId IS NULL OR p.booking.branch.id = :branchId)")
+       BigDecimal sumPaymentsByStatusAndRange(@Param("status") Payment.PaymentStatus status,
+                                              @Param("start") LocalDate start,
+                                              @Param("end") LocalDate end,
+                                              @Param("branchId") String branchId);
+
+       @Query("SELECT p.method AS method, COALESCE(SUM(p.amount), 0) AS totalAmount FROM Payment p " +
+               "WHERE p.status = :status " +
+               "AND p.booking.checkin >= :start " +
+               "AND p.booking.checkout <= :end " +
+               "AND (:branchId IS NULL OR p.booking.branch.id = :branchId) " +
+               "GROUP BY p.method")
+       List<PaymentMethodRevenueProjection> sumPaymentsByMethod(@Param("status") Payment.PaymentStatus status,
+                                                                @Param("start") LocalDate start,
+                                                                @Param("end") LocalDate end,
+                                                                @Param("branchId") String branchId);
 }

@@ -1,11 +1,26 @@
 package com.aurora.backend.controller;
 
+import com.aurora.backend.config.annotation.RequirePermission;
+import com.aurora.backend.config.annotation.RequirePermission.LogicType;
+import com.aurora.backend.constant.PermissionConstants;
+import com.aurora.backend.dto.response.ApiResponse;
+import com.aurora.backend.dto.response.CustomerGrowthPoint;
+import com.aurora.backend.dto.response.DashboardOverviewResponse;
+import com.aurora.backend.dto.response.OccupancyStatistics;
+import com.aurora.backend.dto.response.RevenueStatistics;
+import com.aurora.backend.dto.response.TopRoomTypeResponse;
+import com.aurora.backend.enums.DashboardGroupBy;
 import com.aurora.backend.service.DashboardService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
@@ -17,38 +32,135 @@ public class DashboardController {
 
     private final DashboardService dashboardService;
 
+    @GetMapping("/admin/overview")
+    @RequirePermission(PermissionConstants.Admin.DASHBOARD_VIEW_ADMIN)
+    public ApiResponse<DashboardOverviewResponse> getAdminOverview(
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateFrom,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateTo
+    ) {
+        DashboardOverviewResponse result = dashboardService.getAdminOverview(dateFrom, dateTo);
+        return ApiResponse.<DashboardOverviewResponse>builder()
+                .result(result)
+                .build();
+    }
+
+    @GetMapping("/manager/branch/{branchId}")
+    @RequirePermission(PermissionConstants.Manager.DASHBOARD_VIEW_MANAGER)
+    public ApiResponse<DashboardOverviewResponse> getManagerBranchOverview(
+            @PathVariable String branchId,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateFrom,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateTo
+    ) {
+        DashboardOverviewResponse result = dashboardService.getBranchOverview(branchId, dateFrom, dateTo);
+        return ApiResponse.<DashboardOverviewResponse>builder()
+                .result(result)
+                .build();
+    }
+
+    @GetMapping("/staff")
+    @RequirePermission(PermissionConstants.Staff.DASHBOARD_VIEW_STAFF)
+    public ApiResponse<DashboardOverviewResponse> getStaffDashboard(
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateFrom,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateTo
+    ) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String username = authentication.getName();
+        DashboardOverviewResponse result = dashboardService.getStaffOverview(username, dateFrom, dateTo);
+        return ApiResponse.<DashboardOverviewResponse>builder()
+                .result(result)
+                .build();
+    }
+
     @GetMapping("/revenue")
-    public BigDecimal getTotalRevenue(
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateFrom,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateTo,
-            @RequestParam(required = false) Long branchId
+    @RequirePermission(value = {
+            PermissionConstants.Admin.DASHBOARD_VIEW_ADMIN,
+            PermissionConstants.Manager.DASHBOARD_VIEW_MANAGER
+    }, logic = LogicType.OR)
+    public ApiResponse<List<RevenueStatistics>> getRevenueStatistics(
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateFrom,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateTo,
+            @RequestParam(defaultValue = "DAY") String groupBy,
+            @RequestParam(required = false) String branchId
     ) {
-        return dashboardService.getTotalRevenue(dateFrom, dateTo, branchId);
+        DashboardGroupBy bucket = DashboardGroupBy.from(groupBy);
+        List<RevenueStatistics> result = dashboardService.getRevenueStatistics(dateFrom, dateTo, bucket, branchId);
+        return ApiResponse.<List<RevenueStatistics>>builder()
+                .result(result)
+                .build();
     }
 
-    @GetMapping("/bookings")
-    public long getTotalBookings(
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateFrom,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateTo,
-            @RequestParam(required = false) String status,
-            @RequestParam(required = false) Long branchId
+    @GetMapping("/occupancy")
+    @RequirePermission(value = {
+            PermissionConstants.Manager.DASHBOARD_VIEW_MANAGER,
+            PermissionConstants.Staff.DASHBOARD_VIEW_STAFF
+    }, logic = LogicType.OR)
+    public ApiResponse<OccupancyStatistics> getOccupancy(
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date,
+            @RequestParam(required = false) String branchId
     ) {
-        return dashboardService.getTotalBookings(dateFrom, dateTo, status, branchId);
+        OccupancyStatistics result = dashboardService.getOccupancyStatistics(date, branchId);
+        return ApiResponse.<OccupancyStatistics>builder()
+                .result(result)
+                .build();
     }
 
-    @GetMapping("/revenue-by-method")
-    public Map<String, BigDecimal> getRevenueByPaymentMethod(
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateFrom,
-            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateTo
-    ) {
-        return dashboardService.getRevenueByPaymentMethod(dateFrom, dateTo);
-    }
-
-    @GetMapping("/top-room-types")
-    public List<Map<String, Object>> getTopSellingRoomTypes(
+    @GetMapping("/top-rooms")
+    @RequirePermission(value = {
+            PermissionConstants.Admin.DASHBOARD_VIEW_ADMIN,
+            PermissionConstants.Manager.DASHBOARD_VIEW_MANAGER
+    }, logic = LogicType.OR)
+    public ApiResponse<List<TopRoomTypeResponse>> getTopRooms(
             @RequestParam(defaultValue = "5") int limit,
-            @RequestParam(required = false) Long branchId
+            @RequestParam(required = false) String branchId
     ) {
-        return dashboardService.getTopSellingRoomTypes(limit, branchId);
+        List<TopRoomTypeResponse> result = dashboardService.getTopSellingRoomTypes(limit, branchId);
+        return ApiResponse.<List<TopRoomTypeResponse>>builder()
+                .result(result)
+                .build();
+    }
+
+    @GetMapping("/revenue/payment-methods")
+    @RequirePermission(value = {
+            PermissionConstants.Admin.DASHBOARD_VIEW_ADMIN,
+            PermissionConstants.Manager.DASHBOARD_VIEW_MANAGER
+    }, logic = LogicType.OR)
+    public ApiResponse<Map<String, java.math.BigDecimal>> getRevenueByMethod(
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateFrom,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateTo,
+            @RequestParam(required = false) String branchId
+    ) {
+        Map<String, java.math.BigDecimal> result =
+                dashboardService.getRevenueByPaymentMethod(dateFrom, dateTo, branchId);
+        return ApiResponse.<Map<String, java.math.BigDecimal>>builder()
+                .result(result)
+                .build();
+    }
+
+    @GetMapping("/bookings/source")
+    @RequirePermission(value = {
+            PermissionConstants.Admin.DASHBOARD_VIEW_ADMIN,
+            PermissionConstants.Manager.DASHBOARD_VIEW_MANAGER
+    }, logic = LogicType.OR)
+    public ApiResponse<Map<String, Long>> getBookingsBySource(
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateFrom,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateTo,
+            @RequestParam(required = false) String branchId
+    ) {
+        Map<String, Long> result = dashboardService.getBookingsBySource(dateFrom, dateTo, branchId);
+        return ApiResponse.<Map<String, Long>>builder()
+                .result(result)
+                .build();
+    }
+
+    @GetMapping("/customer-growth")
+    @RequirePermission(PermissionConstants.Admin.DASHBOARD_VIEW_ADMIN)
+    public ApiResponse<List<CustomerGrowthPoint>> getCustomerGrowth(
+            @RequestParam(defaultValue = "MONTH") String period
+    ) {
+        DashboardGroupBy bucket = DashboardGroupBy.from(period);
+        List<CustomerGrowthPoint> result = dashboardService.getCustomerGrowth(bucket);
+        return ApiResponse.<List<CustomerGrowthPoint>>builder()
+                .result(result)
+                .build();
     }
 }

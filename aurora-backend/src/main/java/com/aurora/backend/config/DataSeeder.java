@@ -110,6 +110,7 @@ public class DataSeeder {
                 // 13. Seed Reviews
                 log.info("⭐ [13/13] Seeding reviews...");
                 helper.seedReviews(bookings, customer);
+
                 long endTime = System.currentTimeMillis();
                 long duration = (endTime - startTime) / 1000;
                 

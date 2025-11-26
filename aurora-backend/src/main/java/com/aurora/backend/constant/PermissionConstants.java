@@ -39,6 +39,7 @@ public final class PermissionConstants {
         public static final String PAYMENT_VIEW_ALL = "PAYMENT_VIEW_ALL";
         public static final String SERVICE_MANAGE = "SERVICE_MANAGE";
         public static final String REVIEW_VIEW_ALL = "REVIEW_VIEW_ALL";
+        public static final String DASHBOARD_VIEW_STAFF = "DASHBOARD_VIEW_STAFF";
     }
 
     public static final class Manager {
@@ -57,6 +58,7 @@ public final class PermissionConstants {
         public static final String STAFF_VIEW = "STAFF_VIEW";
         public static final String REVIEW_VIEW_ALL = "REVIEW_VIEW_ALL";
         public static final String REVIEW_MODERATE = "REVIEW_MODERATE";
+        public static final String DASHBOARD_VIEW_MANAGER = "DASHBOARD_VIEW_MANAGER";
     }
 
     public static final class Admin {
@@ -81,5 +83,6 @@ public final class PermissionConstants {
         public static final String REVIEW_VIEW_ALL = "REVIEW_VIEW_ALL";
         public static final String REVIEW_MODERATE = "REVIEW_MODERATE";
         public static final String REVIEW_UPDATE_ALL = "REVIEW_UPDATE_ALL";
+        public static final String DASHBOARD_VIEW_ADMIN = "DASHBOARD_VIEW_ADMIN";
     }
 }

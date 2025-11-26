@@ -171,6 +171,10 @@ public enum ErrorCode {
     VNPAY_PAYMENT_FAILED(2604, "VNPay payment failed", HttpStatus.PAYMENT_REQUIRED),
     PAYMENT_EXPIRED(2605, "Payment session has expired", HttpStatus.BAD_REQUEST),
     VNPAY_TXN_REF_NOT_FOUND(2606, "VNPay transaction reference not found", HttpStatus.NOT_FOUND),
+    
+    // Dashboard errors
+    DASHBOARD_DATE_RANGE_INVALID(2700, "Date range cannot exceed 365 days", HttpStatus.BAD_REQUEST),
+    DASHBOARD_BRANCH_REQUIRED(2701, "Assigned branch is required for this dashboard", HttpStatus.BAD_REQUEST),
     ;
 
     ErrorCode(int code, String message, HttpStatusCode statusCode) {
