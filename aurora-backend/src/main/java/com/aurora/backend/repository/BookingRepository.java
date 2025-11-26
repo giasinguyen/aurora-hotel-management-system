@@ -35,6 +35,9 @@ public interface BookingRepository extends JpaRepository<Booking, String> {
                                @Param("customer") User customer,
                                @Param("status") String status,
                                Pageable pageable);
+    // =================================================================
+    // (STATISTICS & DASHBOARD)
+    // =================================================================
 
     @Query("SELECT b FROM Booking b WHERE b.checkin >= :start AND b.checkout <= :end " +
             "AND (:branchId IS NULL OR b.branch.id = :branchId)")
@@ -77,4 +80,33 @@ public interface BookingRepository extends JpaRepository<Booking, String> {
     List<Object[]> countBookingsBySource(@Param("start") LocalDate start,
                                          @Param("end") LocalDate end,
                                          @Param("branchId") String branchId);
+//------
+    
+    @Query("SELECT b.id FROM Booking b JOIN b.rooms br WHERE " +
+           "br.room.id = :roomId AND " +
+           "b.status IN :statuses AND " +
+           "b.checkin < :checkoutDate AND " +
+           "b.checkout > :checkinDate")
+    List<String> findConflictingBookings(
+            @Param("roomId") String roomId,
+            @Param("checkinDate") LocalDate checkinDate,
+            @Param("checkoutDate") LocalDate checkoutDate,
+            @Param("statuses") List<Booking.BookingStatus> statuses
+    );
+    
+   
+    @Query("SELECT b.id FROM Booking b JOIN b.rooms br WHERE " +
+           "br.room.id = :roomId AND " +
+           "b.id != :excludeId AND " +
+           "b.status IN :statuses AND " +
+           "b.checkin < :checkoutDate AND " +
+           "b.checkout > :checkinDate")
+    List<String> findConflictingBookingsExcluding(
+            @Param("roomId") String roomId,
+            @Param("checkinDate") LocalDate checkinDate,
+            @Param("checkoutDate") LocalDate checkoutDate,
+            @Param("statuses") List<Booking.BookingStatus> statuses,
+            @Param("excludeId") String excludeBookingId
+    );
+
 }

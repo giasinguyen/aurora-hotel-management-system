@@ -27,6 +27,12 @@ public enum ErrorCode {
     ACCOUNT_LOCKED(1015, "Account is locked due to too many failed login attempts", HttpStatus.UNAUTHORIZED),
     WEAK_PASSWORD(1016, "Password must be at least 8 characters with uppercase, lowercase, digit and special character", HttpStatus.BAD_REQUEST),
     SESSION_NOT_FOUND(1017, "Session not found or already expired", HttpStatus.NOT_FOUND),
+    PASSWORD_NOT_MATCH(1018, "Passwords do not match", HttpStatus.BAD_REQUEST),
+    INVALID_TOKEN(1019, "Invalid or expired token", HttpStatus.BAD_REQUEST),
+    TOKEN_EXPIRED(1020, "Token has expired", HttpStatus.BAD_REQUEST),
+    WRONG_PASSWORD(1021, "Current password is incorrect", HttpStatus.BAD_REQUEST),
+    EMAIL_ALREADY_VERIFIED(1022, "Email has already been verified", HttpStatus.BAD_REQUEST),
+    EMAIL_NOT_VERIFIED(1023, "Email has not been verified", HttpStatus.FORBIDDEN),
     
     // Amenity errors
     AMENITY_EXISTED(1100, "Amenity already exists", HttpStatus.BAD_REQUEST),
@@ -121,6 +127,7 @@ public enum ErrorCode {
     ROOM_TYPE_HOTEL_MISMATCH(2105, "Room type does not belong to the specified hotel", HttpStatus.BAD_REQUEST),
     HOTEL_NOT_FOUND(2106, "Hotel not found", HttpStatus.NOT_FOUND),
     ROOM_TYPE_NOT_FOUND(2107, "Room type not found", HttpStatus.NOT_FOUND),
+    ROOM_NOT_AVAILABLE(2108, "Room is not available for the selected dates", HttpStatus.BAD_REQUEST),
     
     // Service errors
     SERVICE_NOT_FOUND(2200, "Service not found", HttpStatus.NOT_FOUND),

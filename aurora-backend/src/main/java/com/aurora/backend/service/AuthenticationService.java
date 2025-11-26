@@ -1,8 +1,6 @@
 package com.aurora.backend.service;
 
-import com.aurora.backend.dto.request.LoginRequest;
-import com.aurora.backend.dto.request.RegisterRequest;
-import com.aurora.backend.dto.request.SessionMetaRequest;
+import com.aurora.backend.dto.request.*;
 import com.aurora.backend.dto.response.AuthResult;
 import com.aurora.backend.dto.response.SessionMetaResponse;
 import com.aurora.backend.dto.response.UserDetailsResponse;
@@ -30,4 +28,17 @@ public interface AuthenticationService {
     List<SessionMetaResponse> getAllSelfSessionMetas(String refreshToken) throws ParseException, JOSEException;
     
     UserSessionResponse getCurrentUser();
+    
+    void forgotPassword(ForgotPasswordRequest request);
+    
+    void resetPassword(ResetPasswordRequest request);
+    
+    void changePassword(ChangePasswordRequest request);
+    
+    void sendVerificationEmail(String userId);
+    
+    void verifyEmail(VerifyEmailRequest request);
+    
+    void resendVerificationEmail(String email);
 }
+

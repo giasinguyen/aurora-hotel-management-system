@@ -2,6 +2,8 @@ server:
   port: 8080
 
 spring:
+  main:
+    allow-bean-definition-overriding: true
   profiles:
     active: ${SPRING_PROFILES_ACTIVE}
   datasource:
@@ -15,14 +17,15 @@ spring:
       connection-timeout: 30000
       idle-timeout: 600000
       max-lifetime: 1800000
-
-  # Spring Vector Store Init Configuration
+  # Database Initial Configuration
   sql:
     init:
       mode: always
       encoding: UTF-8
-      schema-locations: classpath:db/init-vector-store.sql
-
+      schema-locations:
+        - classpath:db/fix-email-verified.sql
+        - classpath:db/init-vector-store.sql
+        - classpath:db/init-roles-permissions.sql
   jpa:
     hibernate:
       ddl-auto: update
@@ -36,6 +39,7 @@ spring:
           batch_size: 20
         order_inserts: true
         order_updates: true
+    defer-datasource-initialization: true
   
   # Redis Configuration
   data:
@@ -89,3 +93,10 @@ vnpay:
   return-url: ${VNPAY_RETURN_URL:http://localhost:5173/payment/return}
   ipn-url: ${VNPAY_IPN_URL:http://localhost:8080/api/v1/payments/vnpay/ipn}
   timezone: Asia/Ho_Chi_Minh
+
+# Cloudinary Configuration
+cloudinary:
+  cloud-name: ${CLOUDINARY_CLOUD_NAME}
+  api-key: ${CLOUDINARY_API_KEY}
+  api-secret: ${CLOUDINARY_API_SECRET}
+  secure: ${CLOUDINARY_SECURE:true}

@@ -1,330 +1,217 @@
 import { createBrowserRouter } from "react-router-dom";
-import ErrorPage from "@/pages/commons/ErrorPage";
 
-// ==================== CLIENT LAYOUT ====================
-import ClientPage from "@/pages/client/index";
+// Layouts
+import AdminPage from "@/layouts/admin";
+import ClientPage from "@/layouts/client";
+import ManagerPage from "@/layouts/manager";
+import StaffPage from "@/layouts/staff";
 
-// ==================== GUEST PAGES (client/guest - không cần đăng nhập) ====================
-import HomePage from "@/pages/client/guest/Home";
-import AboutPage from "@/pages/client/guest/About";
-import AccommodationPage from "@/pages/client/guest/Accommodation";
-import ServicePage from "@/pages/client/guest/Service";
-import GalleryPage from "@/pages/client/guest/Gallery";
-import NewsPage from "@/pages/client/guest/News";
-import ContactPage from "@/pages/client/guest/Contact";
+// Auth
+import AuthPage from "@/pages/auth";
 
-// Guest - Branch & Room pages
-import BranchListPage from "@/pages/client/guest/BranchList";
-import GuestRoomListPage from "@/pages/client/guest/RoomList";
-import GuestRoomDetailPage from "@/pages/client/guest/RoomDetail";
+// Bookings
+import BookingDetailPage from "@/pages/bookings/BookingDetail";
+import BookingListPage from "@/pages/bookings/BookingList";
+import BookingUpsertPage from "@/pages/bookings/BookingUpsert";
 
-// Guest - Quick Booking pages
-import QuickBookingPage from "@/pages/client/guest/booking/QuickBooking";
-import QuickBookingConfirmPage from "@/pages/client/guest/booking/QuickBookingConfirm";
+// Branches
+import AssignBranchPage from "@/pages/branches/AssignBranch";
+import BranchListPage from "@/pages/branches/BranchList";
+import BranchUpsertPage from "@/pages/branches/BranchUpsert";
 
-// Authentication pages
-import AuthPage from "@/pages/client/guest/auth";
-import RegisterPage from "@/pages/client/guest/auth/Register";
-import LoginPage from "@/pages/client/guest/auth/Login";
-import ForgotPasswordPage from "@/pages/client/guest/auth/ForgotPassword";
-import ResetPasswordPage from "@/pages/client/guest/auth/ResetPassword";
+// Common
+import ContactPage from "@/pages/common/Contact";
+import ErrorPage from "@/pages/common/ErrorPage";
+import GalleryPage from "@/pages/common/Gallery";
+import HomePage from "@/pages/common/Home";
+import NewsPage from "@/pages/common/News";
+import ServicePage from "@/pages/common/Service";
+import UserProfilePage from "@/pages/common/UserProfile";
+import GuestBranchListPage from "@/pages/common/BranchList";
+import GuestRoomDetailPage from "@/pages/common/RoomDetail";
+import GuestRoomListPage from "@/pages/common/RoomList";
+import PaymentReturnPage from "@/pages/common/PaymentReturn";
+import AboutPage from "@/pages/common/About";
+import AccommodationPage from "@/pages/common/Accommodation";
+// Common - Customer Area
+import ProfilePage from "@/pages/common/customer/account/Profile";
+import ProfileUpsertPage from "@/pages/common/customer/account/ProfileUpsert";
+import CreateBookingPage from "@/pages/common/customer/booking/CreateBooking";
+import ConfirmBookingPage from "@/pages/common/customer/booking/ConfirmBooking";
+import CustomerBookingListPage from "@/pages/common/customer/bookings/BookingList";
+import CustomerBookingDetailPage from "@/pages/common/customer/bookings/BookingDetail";
+import FavoriteListPage from "@/pages/common/customer/favorites/FavoriteList";
+import PaymentPage from "@/pages/common/customer/payment/PaymentPage";
+import LateCheckoutRequestListPage from "@/pages/common/customer/requests/LateCheckoutRequestList";
+import LateCheckoutRequestUpsertPage from "@/pages/common/customer/requests/LateCheckoutRequestUpsert";
+import EarlyCheckinRequestListPage from "@/pages/common/customer/requests/EarlyCheckinRequestList";
+import EarlyCheckinRequestUpsertPage from "@/pages/common/customer/requests/EarlyCheckinRequestUpsert";
+import IssueReportListPage from "@/pages/common/customer/requests/IssueReportList";
+import IssueReportUpsertPage from "@/pages/common/customer/requests/IssueReportUpsert";
+import ReviewListPage from "@/pages/common/customer/reviews/ReviewList";
+import ReviewUpsertPage from "@/pages/common/customer/reviews/ReviewUpsert";
 
-// Payment pages
-import PaymentReturn from "@/pages/client/PaymentReturn";
+// Dashboard
+import AdminDashboardPage from "@/pages/dashboard/AdminDashboard";
+import ManagerDashboardPage from "@/pages/dashboard/ManagerDashboard";
+import StaffDashboardPage from "@/pages/dashboard/StaffDashboard";
 
-// ==================== CUSTOMER PAGES (client/customer - cần đăng nhập) ====================
-// Customer account & profile
-import CustomerProfilePage from "@/pages/client/customer/account/Profile";
-import ProfileUpsertPage from "@/pages/client/customer/account/ProfileUpsert";
+// Document
+import DocumentListPage from "@/pages/document/DocumentList";
+import DocumentUpsertPage from "@/pages/document/DocumentUpsert";
 
-// Customer booking
-import CreateBookingPage from "@/pages/client/customer/booking/CreateBooking";
-import ConfirmBookingPage from "@/pages/client/customer/booking/ConfirmBooking";
+// News
+import NewsListPage from "@/pages/news/NewsList";
+import NewsUpsertPage from "@/pages/news/NewsUpsert";
 
+// Promotion
+import PromotionListPage from "@/pages/promotion/PromotionList";
+import PromotionUpsertPage from "@/pages/promotion/PromotionUpsert";
 
-// Customer bookings
-import CustomerBookingListPage from "@/pages/client/customer/bookings/BookingList";
-import CustomerBookingDetailPage from "@/pages/client/customer/bookings/BookingDetail";
+// Reports
+import BranchComparisonReportPage from "@/pages/reports/BranchComparisonReport";
+import AdminOccupancyReportPage from "@/pages/reports/AdminOccupancyReport";
+import AdminRevenueReportPage from "@/pages/reports/AdminRevenueReport";
+import OccupancyReportPage from "@/pages/reports/OccupancyReport";
+import OverviewReportPage from "@/pages/reports/OverviewReport";
+import RevenueReportPage from "@/pages/reports/RevenueReport";
+import ShiftReportPage from "@/pages/reports/ShiftReport";
 
-// Customer favorites
-import FavoriteListPage from "@/pages/client/customer/favorites/FavoriteList";
+// Role
+import RoleManagementPage from "@/pages/role/RoleManagement";
 
+// Rooms
+import RoomListPage from "@/pages/rooms/RoomList";
+import RoomTypeListPage from "@/pages/rooms/RoomTypeList";
+import RoomTypeUpsertPage from "@/pages/rooms/RoomTypeUpsert";
+import RoomUpsertPage from "@/pages/rooms/RoomUpsert";
 
-// Customer reviews
-import ReviewListPage from "@/pages/client/customer/reviews/ReviewList";
-import ReviewUpsertPage from "@/pages/client/customer/reviews/ReviewUpsert";
+// Services
+import ServiceListPage from "@/pages/services/ServiceList";
+import ServiceUpsertPage from "@/pages/services/ServiceUpsert";
 
-// ==================== STAFF PAGES ====================
-import StaffPage from "@/pages/staff/index";
-import StaffDashboardPage from "@/pages/staff/dashboard/StaffDashboard";
-import StaffBookingListPage from "@/pages/staff/bookings/BookingList";
-import StaffBookingUpsertPage from "@/pages/staff/bookings/BookingUpsert";
-import StaffBookingDetailPage from "@/pages/staff/bookings/BookingDetail";
-import StaffCustomerUpsertPage from "@/pages/staff/customers/CustomerUpsert";
-import ShiftReportPage from "@/pages/staff/reports/ShiftReport";
-
-// ==================== MANAGER PAGES ====================
-import ManagerPage from "@/pages/manager/index";
-import ManagerDashboardPage from "@/pages/manager/dashboard/ManagerDashboard";
-import ManagerRoomListPage from "@/pages/manager/rooms/RoomList";
-import ManagerRoomUpsertPage from "@/pages/manager/rooms/RoomUpsert";
-import RoomTypeListPage from "@/pages/manager/rooms/RoomTypeList";
-import RoomTypeUpsertPage from "@/pages/manager/rooms/RoomTypeUpsert";
-import ManagerServiceListPage from "@/pages/manager/services/ServiceList";
-import ManagerServiceUpsertPage from "@/pages/manager/services/ServiceUpsert";
-import ManagerCustomerListPage from "@/pages/manager/customers/CustomerList";
-import ManagerCustomerUpsertPage from "@/pages/manager/customers/CustomerUpsert";
-import ManagerCustomerDetailPage from "@/pages/manager/customers/CustomerDetail";
-import ManagerStaffListPage from "@/pages/manager/staff/StaffList";
-import ManagerStaffUpsertPage from "@/pages/manager/staff/StaffUpsert";
-import AssignBranchPage from "@/pages/manager/staff/AssignBranch";
-import ManagerPromotionListPage from "@/pages/manager/promotions/PromotionList";
-import ManagerPromotionUpsertPage from "@/pages/manager/promotions/PromotionUpsert";
-import ManagerNewsListPage from "@/pages/manager/news/NewsList";
-import ManagerNewsUpsertPage from "@/pages/manager/news/NewsUpsert";
-import ManagerRevenueReportPage from "@/pages/manager/reports/RevenueReport";
-import ManagerOccupancyReportPage from "@/pages/manager/reports/OccupancyReport";
-
-// ==================== ADMIN PAGES ====================
-import AdminPage from "@/pages/admin/index";
-import AdminDashboardPage from "@/pages/admin/dashboard/AdminDashboard";
-import AdminBranchListPage from "@/pages/admin/branches/BranchList";
-import AdminBranchUpsertPage from "@/pages/admin/branches/BranchUpsert";
-import AdminUserListPage from "@/pages/admin/users/UserList";
-import AdminUserUpsertPage from "@/pages/admin/users/UserUpsert";
-import AdminRoleManagementPage from "@/pages/admin/users/RoleManagement";
-import AdminDocumentListPage from "@/pages/admin/documents/DocumentList";
-import AdminDocumentUpsertPage from "@/pages/admin/documents/DocumentUpsert";
-import AdminOverviewReportPage from "@/pages/admin/reports/OverviewReport";
-import AdminRevenueReportPage from "@/pages/admin/reports/RevenueReport";
-import AdminOccupancyReportPage from "@/pages/admin/reports/OccupancyReport";
-import AdminBranchComparisonReportPage from "@/pages/admin/reports/BranchComparisonReport";
-
-// ==================== COMMON PAGES ====================
-import UserProfilePage from "@/pages/commons/UserProfile";
-import PaymentPage from "@/pages/client/customer/payment/PaymentPage";
-import LateCheckoutRequestListPage from "@/pages/client/customer/requests/LateCheckoutRequestList";
-import LateCheckoutRequestUpsertPage from "@/pages/client/customer/requests/LateCheckoutRequestUpsert";
-import EarlyCheckinRequestListPage from "@/pages/client/customer/requests/EarlyCheckinRequestList";
-import EarlyCheckinRequestUpsertPage from "@/pages/client/customer/requests/EarlyCheckinRequestUpsert";
-import IssueReportListPage from "@/pages/client/customer/requests/IssueReportList";
-import IssueReportUpsertPage from "@/pages/client/customer/requests/IssueReportUpsert";
+// User (shared)
+import UserDetailPage from "@/pages/user/UserDetail";
+import UserListPage from "@/pages/user/UserList";
+import UserUpsertPage from "@/pages/user/UserUpsert";
 
 const router = createBrowserRouter([
-  // ==================== GUEST & CUSTOMER ROUTES (Using ClientPage Layout) ====================
   {
     path: "/",
     element: <ClientPage />,
     errorElement: <ErrorPage />,
     children: [
-      // ==================== GUEST ROUTES (không cần đăng nhập) ====================
+      // Guest
       { index: true, element: <HomePage /> },
       { path: "about", element: <AboutPage /> },
       { path: "accommodation", element: <AccommodationPage /> },
       { path: "service", element: <ServicePage /> },
-      { path: "branches", element: <BranchListPage /> },
+      { path: "branches", element: <GuestBranchListPage /> },
       { path: "rooms", element: <GuestRoomListPage /> },
       { path: "rooms/:id", element: <GuestRoomDetailPage /> },
       { path: "gallery", element: <GalleryPage /> },
       { path: "news", element: <NewsPage /> },
       { path: "contact", element: <ContactPage /> },
       { path: "auth", element: <AuthPage /> },
-
-      // Guest - Quick Booking
-      { path: "booking/new", element: <QuickBookingPage /> },
-      { path: "booking/confirm", element: <QuickBookingConfirmPage /> },
-
-      // Guest - Authentication
-      { path: "register", element: <RegisterPage /> },
-      { path: "login", element: <LoginPage /> },
-      { path: "forgot-password", element: <ForgotPasswordPage /> },
-      { path: "reset-password", element: <ResetPasswordPage /> },
-
-      // Guest - Payment Return (public for VNPay redirect)
-      { path: "payment/return", element: <PaymentReturn /> },
-
-      // ==================== CUSTOMER ROUTES (cần đăng nhập) ====================
-      { path: "customer/profile", element: <CustomerProfilePage /> },
-      { path: "customer/profile/upsert", element: <ProfileUpsertPage /> },
-      { path: "customer/booking", element: <CustomerBookingListPage /> },
-      { path: "customer/booking/CreateBooking", element: <CreateBookingPage /> },
-      { path: "customer/booking/ConfirmBooking", element: <ConfirmBookingPage /> },
-      { path: "customer/booking/:id", element: <CustomerBookingDetailPage /> },
-      { path: "customer/favorites", element: <FavoriteListPage /> },
-      {
-        path: "customer/late-checkout-requests",
-        element: <LateCheckoutRequestListPage />,
-      },
-      {
-        path: "customer/late-checkout-requests/upsert",
-        element: <LateCheckoutRequestUpsertPage />,
-      },
-      {
-        path: "customer/early-checkin-requests",
-        element: <EarlyCheckinRequestListPage />,
-      },
-      {
-        path: "customer/early-checkin-requests/upsert",
-        element: <EarlyCheckinRequestUpsertPage />,
-      },
-      { path: "customer/issue-reports", element: <IssueReportListPage /> },
-      {
-        path: "customer/issue-reports/upsert",
-        element: <IssueReportUpsertPage />,
-      },
-      { path: "customer/reviews", element: <ReviewListPage /> },
-      { path: "customer/reviews/upsert", element: <ReviewUpsertPage /> },
-      { path: "customer/payment", element: <PaymentPage /> },
-
+      { path: "payment/return", element: <PaymentReturnPage /> },
+      // Customer
+      { path: "profile", element: <ProfilePage /> },
+      { path: "profile/upsert", element: <ProfileUpsertPage /> },
+      { path: "booking", element: <CustomerBookingListPage /> },
+      { path: "booking/create", element: <CreateBookingPage /> },
+      { path: "booking/confirm", element: <ConfirmBookingPage /> },
+      { path: "booking/:id", element: <CustomerBookingDetailPage /> },
+      { path: "favorites", element: <FavoriteListPage /> },
+      { path: "late-checkout-requests", element: <LateCheckoutRequestListPage /> },
+      { path: "late-checkout-requests/upsert", element: <LateCheckoutRequestUpsertPage /> },
+      { path: "early-checkin-requests", element: <EarlyCheckinRequestListPage /> },
+      { path: "early-checkin-requests/upsert", element: <EarlyCheckinRequestUpsertPage /> },
+      { path: "issue-reports", element: <IssueReportListPage /> },
+      { path: "issue-reports/upsert", element: <IssueReportUpsertPage /> },
+      { path: "reviews", element: <ReviewListPage /> },
+      { path: "reviews/upsert", element: <ReviewUpsertPage /> },
+      { path: "payment", element: <PaymentPage /> },
     ],
   },
-
-  // ==================== STAFF ROUTES ====================
   {
     path: "/staff",
     element: <StaffPage />,
     errorElement: <ErrorPage />,
     children: [
       { index: true, element: <StaffDashboardPage /> },
-
-      // Quản lý đơn đặt phòng
-      { path: "booking", element: <StaffBookingListPage /> },
-      { path: "booking/upsert", element: <StaffBookingUpsertPage /> },
-      { path: "booking/:id", element: <StaffBookingDetailPage /> },
-
-      // Quản lý khách hàng (chỉ tạo/upsert)
-      { path: "customers/upsert", element: <StaffCustomerUpsertPage /> },
-
-      // Báo cáo ca làm việc
+      { path: "booking", element: <BookingListPage /> },
+      { path: "booking/upsert", element: <BookingUpsertPage /> },
+      { path: "booking/:id", element: <BookingDetailPage /> },
+      { path: "users/upsert", element: <UserUpsertPage /> },
       { path: "reports/shift", element: <ShiftReportPage /> },
-
-      // Profile
       { path: "profile", element: <UserProfilePage /> },
     ],
   },
-
-  // ==================== MANAGER ROUTES ====================
-  // Manager kế thừa tất cả chức năng của Staff + thêm chức năng riêng
   {
     path: "/manager",
     element: <ManagerPage />,
     errorElement: <ErrorPage />,
     children: [
       { index: true, element: <ManagerDashboardPage /> },
-
-      // ===== Kế thừa từ Staff =====
-      // Quản lý đơn đặt phòng (từ Staff)
-      { path: "booking", element: <StaffBookingListPage /> },
-      { path: "booking/upsert", element: <StaffBookingUpsertPage /> },
-      { path: "booking/:id", element: <StaffBookingDetailPage /> },
-
-      // Báo cáo ca làm việc (từ Staff)
+      { path: "booking", element: <BookingListPage /> },
+      { path: "booking/upsert", element: <BookingUpsertPage /> },
+      { path: "booking/:id", element: <BookingDetailPage /> },
       { path: "reports/shift", element: <ShiftReportPage /> },
-
-      // ===== Chức năng riêng của Manager =====
-      // Quản lý phòng
-      { path: "rooms", element: <ManagerRoomListPage /> },
-      { path: "rooms/upsert", element: <ManagerRoomUpsertPage /> },
+      { path: "rooms", element: <RoomListPage /> },
+      { path: "rooms/upsert", element: <RoomUpsertPage /> },
       { path: "room-types", element: <RoomTypeListPage /> },
       { path: "room-types/upsert", element: <RoomTypeUpsertPage /> },
-
-      // Quản lý dịch vụ
-      { path: "services", element: <ManagerServiceListPage /> },
-      { path: "services/upsert", element: <ManagerServiceUpsertPage /> },
-
-      // Quản lý khách hàng (đầy đủ: xem, tạo, sửa)
-      { path: "customers", element: <ManagerCustomerListPage /> },
-      { path: "customers/upsert", element: <ManagerCustomerUpsertPage /> },
-      { path: "customers/:id", element: <ManagerCustomerDetailPage /> },
-
-      // Quản lý nhân viên
-      { path: "staff", element: <ManagerStaffListPage /> },
-      { path: "staff/upsert", element: <ManagerStaffUpsertPage /> },
-      { path: "staff/:id/assign-branch", element: <AssignBranchPage /> },
-
-      // Quản lý khuyến mãi
-      { path: "promotions", element: <ManagerPromotionListPage /> },
-      { path: "promotions/upsert", element: <ManagerPromotionUpsertPage /> },
-
-      // Quản lý tin tức
-      { path: "news", element: <ManagerNewsListPage /> },
-      { path: "news/upsert", element: <ManagerNewsUpsertPage /> },
-
-      // Báo cáo doanh thu và công suất
-      { path: "reports/revenue", element: <ManagerRevenueReportPage /> },
-      { path: "reports/occupancy", element: <ManagerOccupancyReportPage /> },
-
-      // Profile
+      { path: "services", element: <ServiceListPage /> },
+      { path: "services/upsert", element: <ServiceUpsertPage /> },
+      { path: "users", element: <UserListPage /> },
+      { path: "users/upsert", element: <UserUpsertPage /> },
+      { path: "users/:id", element: <UserDetailPage /> },
+      { path: "users/:id/assign-branch", element: <AssignBranchPage /> },
+      { path: "promotions", element: <PromotionListPage /> },
+      { path: "promotions/upsert", element: <PromotionUpsertPage /> },
+      { path: "news", element: <NewsListPage /> },
+      { path: "news/upsert", element: <NewsUpsertPage /> },
+      { path: "reports/revenue", element: <RevenueReportPage /> },
+      { path: "reports/occupancy", element: <OccupancyReportPage /> },
       { path: "profile", element: <UserProfilePage /> },
     ],
   },
-
-  // ==================== ADMIN ROUTES ====================
-  // Admin kế thừa tất cả chức năng của Manager (và Staff) + thêm chức năng riêng
   {
     path: "/admin",
     element: <AdminPage />,
     errorElement: <ErrorPage />,
     children: [
       { index: true, element: <AdminDashboardPage /> },
-
-      // ===== Kế thừa từ Staff =====
-      // Quản lý đơn đặt phòng (từ Staff)
-      { path: "booking", element: <StaffBookingListPage /> },
-      { path: "booking/upsert", element: <StaffBookingUpsertPage /> },
-      { path: "booking/:id", element: <StaffBookingDetailPage /> },
-
-      // Báo cáo ca làm việc (từ Staff)
+      { path: "booking", element: <BookingListPage /> },
+      { path: "booking/upsert", element: <BookingUpsertPage /> },
+      { path: "booking/:id", element: <BookingDetailPage /> },
       { path: "reports/shift", element: <ShiftReportPage /> },
-
-      // ===== Kế thừa từ Manager =====
-      // Quản lý phòng (từ Manager)
-      { path: "rooms", element: <ManagerRoomListPage /> },
-      { path: "rooms/upsert", element: <ManagerRoomUpsertPage /> },
+      { path: "rooms", element: <RoomListPage /> },
+      { path: "rooms/upsert", element: <RoomUpsertPage /> },
       { path: "room-types", element: <RoomTypeListPage /> },
       { path: "room-types/upsert", element: <RoomTypeUpsertPage /> },
-
-      // Quản lý dịch vụ (từ Manager)
-      { path: "services", element: <ManagerServiceListPage /> },
-      { path: "services/upsert", element: <ManagerServiceUpsertPage /> },
-
-      // Quản lý khuyến mãi (từ Manager)
-      { path: "promotions", element: <ManagerPromotionListPage /> },
-      { path: "promotions/upsert", element: <ManagerPromotionUpsertPage /> },
-
-      // Quản lý tin tức (từ Manager)
-      { path: "news", element: <ManagerNewsListPage /> },
-      { path: "news/upsert", element: <ManagerNewsUpsertPage /> },
-
-      // ===== Chức năng riêng của Admin =====
-      // Quản lý chi nhánh
-      { path: "branches", element: <AdminBranchListPage /> },
-      { path: "branches/upsert", element: <AdminBranchUpsertPage /> },
-
-      // Quản lý User System (bao gồm tất cả: Staff, Manager, Customer)
-      { path: "users", element: <AdminUserListPage /> },
-      { path: "users/upsert", element: <AdminUserUpsertPage /> },
-      { path: "roles", element: <AdminRoleManagementPage /> },
-
-      // Quản lý tài liệu
-      { path: "documents", element: <AdminDocumentListPage /> },
-      { path: "documents/upsert", element: <AdminDocumentUpsertPage /> },
-
-      // Báo cáo tổng quát (gồm tất cả các role)
-      { path: "reports/overview", element: <AdminOverviewReportPage /> },
+      { path: "services", element: <ServiceListPage /> },
+      { path: "services/upsert", element: <ServiceUpsertPage /> },
+      { path: "promotions", element: <PromotionListPage /> },
+      { path: "promotions/upsert", element: <PromotionUpsertPage /> },
+      { path: "news", element: <NewsListPage /> },
+      { path: "news/upsert", element: <NewsUpsertPage /> },
+      { path: "branches", element: <BranchListPage /> },
+      { path: "branches/upsert", element: <BranchUpsertPage /> },
+      { path: "users", element: <UserListPage /> },
+      { path: "users/upsert", element: <UserUpsertPage /> },
+      { path: "users/:id", element: <UserDetailPage /> },
+      { path: "users/:id/assign-branch", element: <AssignBranchPage /> },
+      { path: "roles", element: <RoleManagementPage /> },
+      { path: "documents", element: <DocumentListPage /> },
+      { path: "documents/upsert", element: <DocumentUpsertPage /> },
+      { path: "reports/overview", element: <OverviewReportPage /> },
       { path: "reports/revenue", element: <AdminRevenueReportPage /> },
       { path: "reports/occupancy", element: <AdminOccupancyReportPage /> },
-      {
-        path: "reports/branch-comparison",
-        element: <AdminBranchComparisonReportPage />,
-      },
-
-      // Profile
+      { path: "reports/branch-comparison", element: <BranchComparisonReportPage /> },
       { path: "profile", element: <UserProfilePage /> },
     ],
   },
-
-  // ==================== 404 PAGE ====================
   {
     path: "*",
     element: <ErrorPage />,

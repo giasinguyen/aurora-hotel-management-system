@@ -13,10 +13,9 @@ import java.util.Optional;
 public interface UserRepository extends JpaRepository<User, String> {
 
     boolean existsByUsername(String username);
-
     Optional<User> findByUsername(String username);
 
-    // ✅ Method mới: Eager fetch roles và permissions trong 1 query duy nhất
+    // Method mới: Eager fetch roles và permissions trong 1 query duy nhất
     // Dùng cho JWT Authentication để tránh LazyInitializationException
     @Query("""
         SELECT DISTINCT u FROM User u
@@ -25,6 +24,7 @@ public interface UserRepository extends JpaRepository<User, String> {
         WHERE u.username = :username
     """)
     Optional<User> findByUsernameWithPermissions(@Param("username") String username);
+    Optional<User> findByEmail(String email);
 
     Page<User> findByUsernameContainingIgnoreCase(String username, Pageable pageable);
 
