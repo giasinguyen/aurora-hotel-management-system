@@ -1,25 +1,38 @@
 package com.aurora.backend.service;
 
-import java.math.BigDecimal;
+import com.aurora.backend.dto.response.CustomerGrowthPoint;
+import com.aurora.backend.dto.response.DashboardOverviewResponse;
+import com.aurora.backend.dto.response.OccupancyStatistics;
+import com.aurora.backend.dto.response.RevenueStatistics;
+import com.aurora.backend.dto.response.TopRoomTypeResponse;
+import com.aurora.backend.enums.DashboardGroupBy;
+
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 
 public interface DashboardService {
 
-    BigDecimal getTotalRevenue(LocalDate dateFrom, LocalDate dateTo, Long branchId);
+    DashboardOverviewResponse getAdminOverview(LocalDate dateFrom, LocalDate dateTo);
 
-    long getTotalBookings(LocalDate dateFrom, LocalDate dateTo, String status, Long branchId);
+    DashboardOverviewResponse getBranchOverview(String branchId, LocalDate dateFrom, LocalDate dateTo);
 
-    double getOccupancyRate(LocalDate date, Long branchId);
+    DashboardOverviewResponse getStaffOverview(String username, LocalDate dateFrom, LocalDate dateTo);
 
-    BigDecimal getAverageBookingValue(LocalDate dateFrom, LocalDate dateTo);
+    List<RevenueStatistics> getRevenueStatistics(LocalDate dateFrom,
+                                                 LocalDate dateTo,
+                                                 DashboardGroupBy groupBy,
+                                                 String branchId);
 
-    List<Map<String, Object>> getTopSellingRoomTypes(int limit, Long branchId);
+    OccupancyStatistics getOccupancyStatistics(LocalDate date, String branchId);
 
-    Map<String, Long> getCustomerGrowth(String period);
+    List<TopRoomTypeResponse> getTopSellingRoomTypes(int limit, String branchId);
 
-    Map<String, BigDecimal> getRevenueByPaymentMethod(LocalDate dateFrom, LocalDate dateTo);
+    Map<String, java.math.BigDecimal> getRevenueByPaymentMethod(LocalDate dateFrom,
+                                                                LocalDate dateTo,
+                                                                String branchId);
 
-    Map<String, Long> getBookingsBySource(LocalDate dateFrom, LocalDate dateTo);
+    Map<String, Long> getBookingsBySource(LocalDate dateFrom, LocalDate dateTo, String branchId);
+
+    List<CustomerGrowthPoint> getCustomerGrowth(DashboardGroupBy period);
 }
