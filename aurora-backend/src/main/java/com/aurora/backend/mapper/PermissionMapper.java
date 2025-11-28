@@ -13,9 +13,9 @@ public interface PermissionMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "roles", ignore = true)
     Permission toPermission(PermissionCreationRequest request);
-
+    
     PermissionResponse toPermissionResponse(Permission permission);
-
+    
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "name", ignore = true)
     @Mapping(target = "roles", ignore = true)

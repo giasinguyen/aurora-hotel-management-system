@@ -1,5 +1,3 @@
-import VideoHero from "@/components/custom/VideoHero";
-
 export default function GalleryPage() {
   const galleries = [
     { category: 'Phòng nghỉ', images: ['🛏️', '🏨', '🛋️', '🚿', '🪟', '📺'] },
@@ -11,10 +9,12 @@ export default function GalleryPage() {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <VideoHero 
-        title="Thư viện ảnh"
-        subtitle="Khám phá vẻ đẹp của Aurora Hotel"
-      />
+      <section className="relative h-96 bg-gradient-to-r from-blue-600 to-purple-700 flex items-center justify-center">
+        <div className="text-center text-white px-4">
+          <h1 className="text-4xl md:text-5xl font-bold mb-4">Thư viện ảnh</h1>
+          <p className="text-xl opacity-90">Khám phá vẻ đẹp của Aurora Hotel</p>
+        </div>
+      </section>
 
       {/* Gallery Grid */}
       <section className="py-16">

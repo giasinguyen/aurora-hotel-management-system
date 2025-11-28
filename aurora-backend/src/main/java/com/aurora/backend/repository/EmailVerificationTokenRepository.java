@@ -12,7 +12,7 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Repository
-public interface EmailVerificationTokenRepository extends JpaRepository<EmailVerificationToken, String> {
+public interface EmailVerificationTokenRepository extends JpaRepository<EmailVerificationToken, Long> {
     
     Optional<EmailVerificationToken> findByToken(String token);
     

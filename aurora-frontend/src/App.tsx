@@ -4,7 +4,6 @@ import { persistor, store } from '@/features/store';
 import { setupAxiosInterceptors } from '@/config/axiosClient';
 import { Toaster } from '@/components/ui/sonner';
 import { PersistGate } from 'redux-persist/integration/react';
-import LoadingScreen from '@/components/custom/LoadingScreen';
 import router from './router';
 
 // Setup axios interceptors
@@ -13,8 +12,7 @@ setupAxiosInterceptors(store.dispatch);
 function App() {
   return (
     <Provider store={store}>
-      <PersistGate persistor={persistor} loading={<LoadingScreen />}>
-        <LoadingScreen />
+      <PersistGate persistor={persistor}>
         <RouterProvider router={router} />
         <Toaster />
       </PersistGate>

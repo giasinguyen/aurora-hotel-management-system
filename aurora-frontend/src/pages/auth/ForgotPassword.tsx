@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import VideoBanner from "@/components/custom/VideoBanner";
+import PageWithCarousel from "@/components/custom/PageWithCarousel";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -42,7 +42,7 @@ const ForgotPasswordPage = () => {
 
   if (success) {
     return (
-      <VideoBanner>
+      <PageWithCarousel>
         <Card className="w-full max-w-md shadow-2xl backdrop-blur-sm bg-white/95">
           <CardContent className="pt-6">
             <div className="text-center space-y-4">
@@ -66,12 +66,12 @@ const ForgotPasswordPage = () => {
             </div>
           </CardContent>
         </Card>
-      </VideoBanner>
+      </PageWithCarousel>
     );
   }
 
   return (
-    <VideoBanner>
+    <PageWithCarousel>
       <Card className="w-full max-w-md shadow-2xl backdrop-blur-sm bg-white/95">
         <CardHeader className="space-y-1">
           <div className="flex justify-center mb-4">
@@ -157,7 +157,7 @@ const ForgotPasswordPage = () => {
           </div>
         </CardFooter>
       </Card>
-    </VideoBanner>
+    </PageWithCarousel>
   );
 };
 

@@ -12,10 +12,10 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 
 @Repository
-public interface PasswordResetTokenRepository extends JpaRepository<PasswordResetToken, String> {
-
+public interface PasswordResetTokenRepository extends JpaRepository<PasswordResetToken, Long> {
+    
     Optional<PasswordResetToken> findByToken(String token);
-
+    
     Optional<PasswordResetToken> findByUserAndUsedFalseAndExpiryDateAfter(User user, LocalDateTime now);
     
     @Modifying

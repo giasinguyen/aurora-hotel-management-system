@@ -11,7 +11,7 @@ import org.mapstruct.NullValuePropertyMappingStrategy;
 
 @Mapper(componentModel = "spring", nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
 public interface ReviewMapper {
-
+    
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "booking", ignore = true)
     @Mapping(target = "customer", ignore = true)
@@ -33,7 +33,7 @@ public interface ReviewMapper {
     @Mapping(target = "version", ignore = true)
     @Mapping(target = "deleted", ignore = true)
     Review toReview(ReviewCreationRequest request);
-
+    
     @Mapping(target = "bookingId", source = "booking.id")
     @Mapping(target = "bookingCode", source = "booking.bookingCode")
     @Mapping(target = "customerId", source = "customer.id")
@@ -45,7 +45,7 @@ public interface ReviewMapper {
     @Mapping(target = "roomNumber", source = "room.roomNumber")
     @Mapping(target = "status", expression = "java(review.getStatus().name())")
     ReviewResponse toReviewResponse(Review review);
-
+    
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "booking", ignore = true)
     @Mapping(target = "customer", ignore = true)
@@ -67,14 +67,14 @@ public interface ReviewMapper {
     @Mapping(target = "version", ignore = true)
     @Mapping(target = "deleted", ignore = true)
     void updateReview(@MappingTarget Review review, ReviewUpdateRequest request);
-
+    
     default String getCustomerFullName(Review review) {
         if (review.getCustomer() == null) {
             return null;
         }
         String firstName = review.getCustomer().getFirstName();
         String lastName = review.getCustomer().getLastName();
-
+        
         if (firstName != null && lastName != null) {
             return firstName + " " + lastName;
         } else if (firstName != null) {
@@ -85,3 +85,4 @@ public interface ReviewMapper {
         return review.getCustomer().getUsername();
     }
 }
+

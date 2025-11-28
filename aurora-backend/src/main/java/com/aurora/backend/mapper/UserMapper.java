@@ -28,7 +28,7 @@ public interface UserMapper {
     @Mapping(target = "password", ignore = true)
     @Mapping(target = "roles", ignore = true)
     void updateUserFromRequest(UserUpdateRequest request, @MappingTarget User user);
-
+    
     @Named("rolesToRoleResponses")
     default Set<RoleResponse> rolesToRoleResponses(Set<Role> roles) {
         if (roles == null) {
@@ -43,7 +43,7 @@ public interface UserMapper {
                         .build())
                 .collect(Collectors.toSet());
     }
-
+    
     default Set<PermissionResponse> permissionsToPermissionResponses(Set<Permission> permissions) {
         if (permissions == null) {
             return null;

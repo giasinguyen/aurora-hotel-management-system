@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import VideoBanner from "@/components/custom/VideoBanner";
+import PageWithCarousel from "@/components/custom/PageWithCarousel";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -112,7 +112,7 @@ const LoginPage = () => {
   };
 
   return (
-    <VideoBanner>
+    <PageWithCarousel>
       <Card className="w-full max-w-md shadow-2xl backdrop-blur-sm bg-white/95">
         <CardHeader className="space-y-1">
           <CardTitle className="text-3xl font-bold text-center text-gray-900">
@@ -264,7 +264,7 @@ const LoginPage = () => {
           </p>
         </CardFooter>
       </Card>
-    </VideoBanner>
+    </PageWithCarousel>
   );
 };
 
