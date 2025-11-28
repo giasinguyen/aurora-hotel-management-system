@@ -93,6 +93,11 @@ public interface RoomRepository extends JpaRepository<Room, String> {
             @Param("checkout") LocalDate checkout
     );
 
+
+    @Query("SELECT COUNT(r) FROM Room r WHERE r.deleted = false " +
+            "AND (:branchId IS NULL OR r.branch.id = :branchId)")
+    long countActiveRooms(@Param("branchId") String branchId);
+
     @Query("SELECT r FROM Room r WHERE r.roomType.id = :roomTypeId AND r.branch.id = :branchId")
     List<Room> findByRoomTypeIdAndBranchId(
             @Param("roomTypeId") String roomTypeId,
