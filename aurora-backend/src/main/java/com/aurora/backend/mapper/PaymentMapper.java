@@ -14,11 +14,11 @@ public interface PaymentMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "paidAt", ignore = true)
     Payment toPayment(PaymentCreationRequest request);
-    
+
     @Mapping(target = "bookingId", source = "booking.id")
     @Mapping(target = "bookingCode", source = "booking.bookingCode")
     PaymentResponse toPaymentResponse(Payment payment);
-    
+
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "booking", ignore = true)
     @Mapping(target = "method", ignore = true)

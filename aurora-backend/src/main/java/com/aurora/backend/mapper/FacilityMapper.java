@@ -13,11 +13,11 @@ public interface FacilityMapper {
     @Mapping(target = "branch.id", source = "branchId")
     @Mapping(target = "id", ignore = true)
     Facility toFacility(FacilityCreationRequest request);
-    
+
     @Mapping(target = "branchId", source = "branch.id")
     @Mapping(target = "branchName", source = "branch.name")
     FacilityResponse toFacilityResponse(Facility facility);
-    
+
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "branch", ignore = true)
     void updateFacilityFromRequest(FacilityUpdateRequest request, @MappingTarget Facility facility);

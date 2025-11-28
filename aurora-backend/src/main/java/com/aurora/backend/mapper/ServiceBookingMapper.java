@@ -15,7 +15,7 @@ public interface ServiceBookingMapper {
     @Mapping(target = "customer.id", source = "customerId")
     @Mapping(target = "id", ignore = true)
     ServiceBooking toServiceBooking(ServiceBookingCreationRequest request);
-    
+
     @Mapping(target = "bookingId", source = "booking.id")
     @Mapping(target = "bookingCode", source = "booking.bookingCode")
     @Mapping(target = "serviceId", source = "service.id")
@@ -24,7 +24,7 @@ public interface ServiceBookingMapper {
     @Mapping(target = "customerId", source = "customer.id")
     @Mapping(target = "customerName", expression = "java(serviceBooking.getCustomer().getFirstName() + \" \" + serviceBooking.getCustomer().getLastName())")
     ServiceBookingResponse toServiceBookingResponse(ServiceBooking serviceBooking);
-    
+
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "booking", ignore = true)
     @Mapping(target = "service", ignore = true)

@@ -14,7 +14,7 @@ public interface RoomMapper {
     @Mapping(target = "roomType.id", source = "roomTypeId")
     @Mapping(target = "id", ignore = true)
     Room toRoom(RoomCreationRequest request);
-    
+
     @Mapping(target = "branchId", source = "branch.id")
     @Mapping(target = "branchName", source = "branch.name")
     @Mapping(target = "roomTypeId", source = "roomType.id")
@@ -23,7 +23,7 @@ public interface RoomMapper {
     @Mapping(target = "capacityChildren", source = "roomType.capacityChildren")
     @Mapping(target = "sizeM2", source = "roomType.sizeM2")
     RoomResponse toRoomResponse(Room room);
-    
+
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "branch", ignore = true)
     @Mapping(target = "roomType", ignore = true)

@@ -13,9 +13,9 @@ public interface RoleMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "permissions", ignore = true)
     Role toRole(RoleCreationRequest request);
-    
+
     RoleResponse toRoleResponse(Role role);
-    
+
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "permissions", ignore = true)
     void updateRole(@MappingTarget Role role, RoleUpdateRequest request);

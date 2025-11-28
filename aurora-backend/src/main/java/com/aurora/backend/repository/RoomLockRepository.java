@@ -13,11 +13,11 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface RoomLockRepository extends JpaRepository<RoomLock, Long> {
-
+public interface RoomLockRepository extends JpaRepository<RoomLock, String> {
 
     @Query("SELECT rl FROM RoomLock rl WHERE rl.lockToken = :token AND rl.released = false")
     Optional<RoomLock> findByLockToken(@Param("token") String token);
+
 
     @Query("SELECT rl FROM RoomLock rl WHERE rl.room.id = :roomId " +
             "AND rl.released = false " +

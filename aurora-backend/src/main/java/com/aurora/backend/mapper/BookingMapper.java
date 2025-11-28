@@ -15,13 +15,13 @@ public interface BookingMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "bookingCode", ignore = true)
     Booking toBooking(BookingCreationRequest request);
-    
+
     @Mapping(target = "branchId", source = "branch.id")
     @Mapping(target = "branchName", source = "branch.name")
     @Mapping(target = "customerId", source = "customer.id")
     @Mapping(target = "customerName", expression = "java(booking.getCustomer().getFirstName() + \" \" + booking.getCustomer().getLastName())")
     BookingResponse toBookingResponse(Booking booking);
-    
+
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "bookingCode", ignore = true)
     @Mapping(target = "branch", ignore = true)
