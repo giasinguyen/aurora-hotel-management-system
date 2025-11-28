@@ -52,8 +52,10 @@ INSERT INTO permissions (id, name, description, created_at, updated_at, version,
 (gen_random_uuid(), 'CUSTOMER_VIEW', 'Xem thông tin khách hàng', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, false),
 (gen_random_uuid(), 'PAYMENT_VIEW_ALL', 'Xem tất cả thanh toán', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, false),
 (gen_random_uuid(), 'SERVICE_MANAGE', 'Quản lý dịch vụ bổ sung', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, false),
-(gen_random_uuid(), 'REVIEW_VIEW_ALL', 'Xem tất cả đánh giá', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, false)
+(gen_random_uuid(), 'REVIEW_VIEW_ALL', 'Xem tất cả đánh giá', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, false),
+(gen_random_uuid(), 'DASHBOARD_VIEW_STAFF', 'Truy cập dashboard cho nhân viên', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, false)
 ON CONFLICT (name) DO NOTHING;
+
 
 -- Manager Permissions (Quản lý)
 INSERT INTO permissions (id, name, description, created_at, updated_at, version, deleted) VALUES 
@@ -65,12 +67,14 @@ INSERT INTO permissions (id, name, description, created_at, updated_at, version,
 (gen_random_uuid(), 'PROMOTION_CREATE', 'Tạo khuyến mãi', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, false),
 (gen_random_uuid(), 'PROMOTION_UPDATE', 'Cập nhật khuyến mãi', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, false),
 (gen_random_uuid(), 'PROMOTION_DELETE', 'Xóa khuyến mãi', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, false),
-(gen_random_uuid(),     'BRANCH_VIEW_STATS', 'Xem thống kê chi nhánh', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, false),
+(gen_random_uuid(), 'BRANCH_VIEW_STATS', 'Xem thống kê chi nhánh', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, false),
 (gen_random_uuid(), 'REPORT_VIEW', 'Xem báo cáo thống kê', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, false),
 (gen_random_uuid(), 'REPORT_EXPORT', 'Xuất báo cáo', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, false),
 (gen_random_uuid(), 'STAFF_VIEW', 'Xem danh sách nhân viên', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, false),
-(gen_random_uuid(), 'REVIEW_MODERATE', 'Phê duyệt/Từ chối đánh giá', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, false)
+(gen_random_uuid(), 'REVIEW_MODERATE', 'Phê duyệt/Từ chối đánh giá', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, false),
+(gen_random_uuid(), 'DASHBOARD_VIEW_MANAGER', 'Truy cập dashboard quản lý branch', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, false)
 ON CONFLICT (name) DO NOTHING;
+
 
 -- Admin Permissions (Quản trị viên hệ thống)
 INSERT INTO permissions (id, name, description, created_at, updated_at, version, deleted) VALUES 
@@ -92,8 +96,10 @@ INSERT INTO permissions (id, name, description, created_at, updated_at, version,
 (gen_random_uuid(), 'BRANCH_DELETE', 'Xóa chi nhánh', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, false),
 (gen_random_uuid(), 'BRANCH_ASSIGN_MANAGER', 'Gán quản lý cho chi nhánh', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, false),
 (gen_random_uuid(), 'BRANCH_REMOVE_MANAGER', 'Gỡ quản lý khỏi chi nhánh', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, false),
-(gen_random_uuid(), 'REVIEW_UPDATE_ALL', 'Cập nhật mọi đánh giá (chỉ Admin)', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, false)
+(gen_random_uuid(), 'REVIEW_UPDATE_ALL', 'Cập nhật mọi đánh giá (chỉ Admin)', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, false),
+(gen_random_uuid(), 'DASHBOARD_VIEW_ADMIN', 'Truy cập dashboard tổng quan hệ thống', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, false)
 ON CONFLICT (name) DO NOTHING;
+
 
 -- =====================================================
 -- BƯỚC 2: TẠO CÁC ROLES
@@ -182,9 +188,11 @@ AND p.name IN (
     'PAYMENT_VIEW_ALL',
     'SERVICE_MANAGE',
     -- Review permissions
-    'REVIEW_VIEW_ALL'
+    'REVIEW_VIEW_ALL',
+    'DASHBOARD_VIEW_STAFF'
 )
 ON CONFLICT DO NOTHING;
+
 
 -- MANAGER Role: Kế thừa STAFF + Quản lý chi nhánh và báo cáo
 INSERT INTO role_permissions (role_id, permission_id)
@@ -227,9 +235,11 @@ AND p.name IN (
     'STAFF_VIEW',
     -- Review permissions
     'REVIEW_VIEW_ALL',
-    'REVIEW_MODERATE'
+    'REVIEW_MODERATE',
+    'DASHBOARD_VIEW_MANAGER'
 )
 ON CONFLICT DO NOTHING;
+
 
 -- ADMIN Role: Toàn quyền hệ thống
 INSERT INTO role_permissions (role_id, permission_id)

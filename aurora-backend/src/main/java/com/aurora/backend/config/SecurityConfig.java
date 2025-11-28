@@ -26,6 +26,10 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SecurityConfig {
 
+
+    private final CustomJwtDecoder customJwtDecoder;
+    private final CustomJwtAuthenticationConverter customJwtAuthenticationConverter;
+
     private static final String[] PUBLIC_POST_ENDPOINTS = {
             // Auth endpoints - Session management with Redis
             "/api/v1/auth/register",
@@ -82,7 +86,6 @@ public class SecurityConfig {
             "/api/v1/room-availability/calendar/**",
             "/api/v1/room-availability/count-available/**"
     };
-    private final CustomJwtDecoder customJwtDecoder;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -103,7 +106,7 @@ public class SecurityConfig {
 
         http.oauth2ResourceServer(oauth2 -> oauth2.jwt(jwtConfigurer -> jwtConfigurer
                         .decoder(customJwtDecoder)
-                        .jwtAuthenticationConverter(jwtAuthenticationConverter()))
+                        .jwtAuthenticationConverter(customJwtAuthenticationConverter))
                 .authenticationEntryPoint(new JwtAuthenticationEntryPoint())
                 .accessDeniedHandler(new JwtAccessDeniedHandler()));
 
@@ -144,14 +147,16 @@ public class SecurityConfig {
         return source;
     }
 
-    @Bean
-    JwtAuthenticationConverter jwtAuthenticationConverter() {
-        JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
-        jwtGrantedAuthoritiesConverter.setAuthorityPrefix("");
 
-        JwtAuthenticationConverter authenticationConverter = new JwtAuthenticationConverter();
-        authenticationConverter.setJwtGrantedAuthoritiesConverter(jwtGrantedAuthoritiesConverter);
+//    @Bean
+//    JwtAuthenticationConverter jwtAuthenticationConverter() {
+//        JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
+//        jwtGrantedAuthoritiesConverter.setAuthorityPrefix("");
+//
+//        JwtAuthenticationConverter authenticationConverter = new JwtAuthenticationConverter();
+//        authenticationConverter.setJwtGrantedAuthoritiesConverter(jwtGrantedAuthoritiesConverter);
+//
+//        return authenticationConverter;
+//    }
 
-        return authenticationConverter;
-    }
 }
