@@ -70,8 +70,7 @@ export default function Header() {
   ];
 
   const handleSearchClick = () => {
-    console.log("Search clicked");
-    // TODO: Implement search functionality
+    alert("In development mode");
   };
 
   const handleLanguageChange = (value: string) => {

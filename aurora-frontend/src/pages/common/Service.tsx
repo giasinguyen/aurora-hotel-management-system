@@ -1,3 +1,5 @@
+import VideoHero from "@/components/custom/VideoHero";
+
 export default function ServicePage() {
   const services = [
     {
@@ -59,12 +61,10 @@ export default function ServicePage() {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="relative h-96 bg-gradient-to-r from-blue-600 to-purple-700 flex items-center justify-center">
-        <div className="text-center text-white px-4">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">Dịch vụ</h1>
-          <p className="text-xl opacity-90">Trải nghiệm những dịch vụ đẳng cấp thế giới</p>
-        </div>
-      </section>
+      <VideoHero 
+        title="Dịch vụ"
+        subtitle="Trải nghiệm những dịch vụ đẳng cấp thế giới"
+      />
 
       {/* Services Grid */}
       <section className="py-16">

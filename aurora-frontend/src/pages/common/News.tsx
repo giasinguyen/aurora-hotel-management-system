@@ -1,3 +1,5 @@
+import VideoHero from "@/components/custom/VideoHero";
+
 export default function NewsPage() {
   const news = [
     {
@@ -33,12 +35,10 @@ export default function NewsPage() {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="relative h-96 bg-gradient-to-r from-blue-600 to-purple-700 flex items-center justify-center">
-        <div className="text-center text-white px-4">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">Tin tức</h1>
-          <p className="text-xl opacity-90">Cập nhật những thông tin mới nhất từ Aurora Hotel</p>
-        </div>
-      </section>
+      <VideoHero 
+        title="Tin tức"
+        subtitle="Cập nhật những thông tin mới nhất từ Aurora Hotel"
+      />
 
       {/* News List */}
       <section className="py-16">

@@ -1,13 +1,13 @@
+import VideoHero from "@/components/custom/VideoHero";
+
 export default function AboutPage() {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="relative h-96 bg-gradient-to-r from-blue-600 to-purple-700 flex items-center justify-center">
-        <div className="text-center text-white px-4">
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">Về Aurora Hotel</h1>
-          <p className="text-xl opacity-90">Câu chuyện về sự sang trọng và phong cách phục vụ tận tâm</p>
-        </div>
-      </section>
+      <VideoHero 
+        title="Về Aurora Hotel"
+        subtitle="Câu chuyện về sự sang trọng và phong cách phục vụ tận tâm"
+      />
 
       {/* Story Section */}
       <section className="py-16">
