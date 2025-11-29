@@ -1,21 +1,27 @@
 import { useState, useEffect, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { toast } from 'sonner';
 import { 
   Eye, 
   MoreHorizontal, 
-  Trash2, 
   Edit, 
   User as UserIcon,
   Shield,
   Calendar,
   Mail,
+  CheckCircle2,
+  XCircle,
+  UserX,
+  UserCheck,
+  Plus,
+  Phone,
 } from 'lucide-react';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Switch } from '@/components/ui/switch';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -24,6 +30,12 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 import { 
   PageHeader, 
@@ -34,12 +46,13 @@ import {
   type Column 
 } from '@/components/custom';
 
-import { getUsersPaginated, deleteUser, searchUsers } from '@/services/userApi';
+import { getUsersPaginated, toggleUserStatus, searchUsers } from '@/services/userApi';
 import type { User } from '@/types/user.types';
 import { ROLE_CONFIG } from '@/types/user.types';
 
 export default function UserList() {
   const navigate = useNavigate();
+  const location = useLocation();
   
   // State
   const [users, setUsers] = useState<User[]>([]);
@@ -54,14 +67,16 @@ export default function UserList() {
   // Filters
   const [searchKeyword, setSearchKeyword] = useState('');
   const [selectedRole, setSelectedRole] = useState('');
+  const [selectedStatus, setSelectedStatus] = useState('');
   
   // Sorting
   const [sortColumn, setSortColumn] = useState('username');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
   
   // Dialogs
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
+  const [statusDialogOpen, setStatusDialogOpen] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+  const [statusAction, setStatusAction] = useState<'activate' | 'deactivate'>('deactivate');
 
   // Fetch users
   const fetchUsers = useCallback(async () => {
@@ -93,6 +108,13 @@ export default function UserList() {
             u.roles?.some(r => r.name === selectedRole)
           );
         }
+
+        // Client-side filter by status
+        if (selectedStatus === 'active') {
+          filteredUsers = filteredUsers.filter(u => u.active === true);
+        } else if (selectedStatus === 'inactive') {
+          filteredUsers = filteredUsers.filter(u => u.active === false);
+        }
         
         setUsers(filteredUsers);
         setTotalElements(response.result.totalElements);
@@ -104,26 +126,52 @@ export default function UserList() {
     } finally {
       setIsLoading(false);
     }
-  }, [currentPage, pageSize, searchKeyword, selectedRole, sortColumn, sortDirection]);
+  }, [currentPage, pageSize, searchKeyword, selectedRole, selectedStatus, sortColumn, sortDirection]);
 
   useEffect(() => {
     fetchUsers();
   }, [fetchUsers]);
 
-  // Handle delete user
-  const handleDeleteUser = async () => {
-    if (!selectedUserId) return;
+  // Refresh when navigating back from create/edit
+  useEffect(() => {
+    if (location.state?.refresh) {
+      // Clear filters to see newly created/updated user
+      setSearchKeyword('');
+      setSelectedRole('');
+      setSelectedStatus('');
+      setCurrentPage(0);
+      
+      // Clear the state to prevent unnecessary refreshes
+      window.history.replaceState({}, document.title);
+    }
+  }, [location.state]);
+
+  // Handle toggle user status
+  const handleToggleStatus = async () => {
+    if (!selectedUser) return;
     
     try {
-      await deleteUser(selectedUserId);
-      toast.success('Xóa người dùng thành công');
-      setDeleteDialogOpen(false);
-      setSelectedUserId(null);
+      const newStatus = statusAction === 'activate';
+      await toggleUserStatus(selectedUser.id, newStatus);
+      toast.success(
+        newStatus 
+          ? 'Đã kích hoạt tài khoản' 
+          : 'Đã vô hiệu hóa tài khoản'
+      );
+      setStatusDialogOpen(false);
+      setSelectedUser(null);
       fetchUsers();
     } catch (error) {
-      console.error('Failed to delete user:', error);
-      toast.error('Không thể xóa người dùng');
+      console.error('Failed to toggle user status:', error);
+      toast.error('Không thể thay đổi trạng thái tài khoản');
     }
+  };
+
+  // Open status dialog
+  const openStatusDialog = (user: User, action: 'activate' | 'deactivate') => {
+    setSelectedUser(user);
+    setStatusAction(action);
+    setStatusDialogOpen(true);
   };
 
   // Handle sort
@@ -140,6 +188,7 @@ export default function UserList() {
   const handleClearFilters = () => {
     setSearchKeyword('');
     setSelectedRole('');
+    setSelectedStatus('');
     setCurrentPage(0);
   };
 
@@ -163,14 +212,27 @@ export default function UserList() {
       header: 'Người dùng',
       cell: (item) => (
         <div className="flex items-center gap-3">
-          <Avatar className="h-10 w-10">
-            <AvatarImage src={item.avatarUrl} alt={item.username} />
-            <AvatarFallback className="bg-primary/10 text-primary">
-              {getInitials(item.firstName, item.lastName)}
-            </AvatarFallback>
-          </Avatar>
+          <div className="relative">
+            <Avatar className="h-10 w-10">
+              <AvatarImage src={item.avatarUrl} alt={item.username} />
+              <AvatarFallback className="bg-primary/10 text-primary">
+                {getInitials(item.firstName, item.lastName)}
+              </AvatarFallback>
+            </Avatar>
+            {/* Status indicator dot */}
+            <div className={`absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-white ${
+              item.active ? 'bg-emerald-500' : 'bg-gray-400'
+            }`} />
+          </div>
           <div>
-            <div className="font-medium">{item.firstName} {item.lastName}</div>
+            <div className="font-medium flex items-center gap-2">
+              {item.firstName} {item.lastName}
+              {!item.active && (
+                <Badge variant="outline" className="text-xs bg-red-50 text-red-600 border-red-200">
+                  Đã vô hiệu hóa
+                </Badge>
+              )}
+            </div>
             <div className="text-sm text-muted-foreground flex items-center gap-1">
               <UserIcon className="h-3 w-3" />
               {item.username}
@@ -180,12 +242,22 @@ export default function UserList() {
       ),
     },
     {
-      key: 'email',
-      header: 'Email',
+      key: 'contact',
+      header: 'Liên hệ',
       cell: (item) => (
-        <div className="flex items-center gap-2 text-sm">
-          <Mail className="h-4 w-4 text-muted-foreground" />
-          {item.email || '-'}
+        <div className="space-y-1">
+          <div className="flex items-center gap-2 text-sm">
+            <Mail className="h-4 w-4 text-muted-foreground" />
+            <span className="truncate max-w-[180px]" title={item.email || undefined}>
+              {item.email || '-'}
+            </span>
+          </div>
+          {item.phone && (
+            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <Phone className="h-4 w-4" />
+              {item.phone}
+            </div>
+          )}
         </div>
       ),
     },
@@ -222,6 +294,33 @@ export default function UserList() {
       ),
     },
     {
+      key: 'status',
+      header: 'Trạng thái',
+      cell: (item) => (
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <div className="flex items-center gap-2">
+                <Switch
+                  checked={item.active}
+                  onCheckedChange={(checked) => {
+                    openStatusDialog(item, checked ? 'activate' : 'deactivate');
+                  }}
+                  className={item.active ? 'data-[state=checked]:bg-emerald-500' : ''}
+                />
+                <span className={`text-sm font-medium ${item.active ? 'text-emerald-600' : 'text-gray-500'}`}>
+                  {item.active ? 'Hoạt động' : 'Đã tắt'}
+                </span>
+              </div>
+            </TooltipTrigger>
+            <TooltipContent>
+              <p>{item.active ? 'Bấm để vô hiệu hóa tài khoản' : 'Bấm để kích hoạt tài khoản'}</p>
+            </TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
+      ),
+    },
+    {
       key: 'actions',
       header: '',
       cell: (item) => (
@@ -234,25 +333,32 @@ export default function UserList() {
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Thao tác</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => navigate(`/admin/users/${item.id}`)}>
+            <DropdownMenuItem onClick={() => navigate(`/admin/users/upsert?id=${item.id}&view=true`)}>
               <Eye className="h-4 w-4 mr-2" />
               Xem chi tiết
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => navigate(`/admin/users/${item.id}/edit`)}>
+            <DropdownMenuItem onClick={() => navigate(`/admin/users/upsert?id=${item.id}`)}>
               <Edit className="h-4 w-4 mr-2" />
               Chỉnh sửa
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem
-              className="text-destructive"
-              onClick={() => {
-                setSelectedUserId(item.id);
-                setDeleteDialogOpen(true);
-              }}
-            >
-              <Trash2 className="h-4 w-4 mr-2" />
-              Xóa người dùng
-            </DropdownMenuItem>
+            {item.active ? (
+              <DropdownMenuItem
+                className="text-amber-600"
+                onClick={() => openStatusDialog(item, 'deactivate')}
+              >
+                <UserX className="h-4 w-4 mr-2" />
+                Vô hiệu hóa
+              </DropdownMenuItem>
+            ) : (
+              <DropdownMenuItem
+                className="text-emerald-600"
+                onClick={() => openStatusDialog(item, 'activate')}
+              >
+                <UserCheck className="h-4 w-4 mr-2" />
+                Kích hoạt lại
+              </DropdownMenuItem>
+            )}
           </DropdownMenuContent>
         </DropdownMenu>
       ),
@@ -266,12 +372,17 @@ export default function UserList() {
     label: config.label,
   }));
 
+  const statusOptions = [
+    { value: 'active', label: 'Đang hoạt động' },
+    { value: 'inactive', label: 'Đã vô hiệu hóa' },
+  ];
+
   return (
     <div className="space-y-6">
       <PageHeader
         title="Quản lý người dùng"
         description="Xem và quản lý tất cả người dùng trong hệ thống"
-        onAdd={() => navigate('/admin/users/create')}
+        onAdd={() => navigate('/admin/users/upsert')}
         addButtonText="Thêm người dùng"
         onRefresh={fetchUsers}
         isLoading={isLoading}
@@ -294,6 +405,16 @@ export default function UserList() {
                 options: roleOptions,
                 onChange: (value) => {
                   setSelectedRole(value === 'all' ? '' : value);
+                  setCurrentPage(0);
+                },
+              },
+              {
+                key: 'status',
+                label: 'Trạng thái',
+                value: selectedStatus,
+                options: statusOptions,
+                onChange: (value) => {
+                  setSelectedStatus(value === 'all' ? '' : value);
                   setCurrentPage(0);
                 },
               },
@@ -330,16 +451,20 @@ export default function UserList() {
         </CardContent>
       </Card>
 
-      {/* Delete Confirmation Dialog */}
+      {/* Status Toggle Confirmation Dialog */}
       <ConfirmDialog
-        open={deleteDialogOpen}
-        onOpenChange={setDeleteDialogOpen}
-        title="Xác nhận xóa người dùng"
-        description="Bạn có chắc chắn muốn xóa người dùng này? Hành động này không thể hoàn tác."
-        confirmText="Xóa"
+        open={statusDialogOpen}
+        onOpenChange={setStatusDialogOpen}
+        title={statusAction === 'activate' ? 'Kích hoạt tài khoản' : 'Vô hiệu hóa tài khoản'}
+        description={
+          statusAction === 'activate'
+            ? `Bạn có chắc muốn kích hoạt lại tài khoản "${selectedUser?.firstName} ${selectedUser?.lastName}"? Người dùng sẽ có thể đăng nhập và sử dụng hệ thống.`
+            : `Bạn có chắc muốn vô hiệu hóa tài khoản "${selectedUser?.firstName} ${selectedUser?.lastName}"? Người dùng sẽ không thể đăng nhập cho đến khi được kích hoạt lại.`
+        }
+        confirmText={statusAction === 'activate' ? 'Kích hoạt' : 'Vô hiệu hóa'}
         cancelText="Hủy"
-        onConfirm={handleDeleteUser}
-        variant="destructive"
+        onConfirm={handleToggleStatus}
+        variant={statusAction === 'activate' ? 'default' : 'destructive'}
       />
     </div>
   );

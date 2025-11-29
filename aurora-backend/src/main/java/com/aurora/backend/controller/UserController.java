@@ -103,17 +103,11 @@ public class UserController {
     }
 
     @GetMapping("/{userId}")
-    @RequirePermission(PermissionConstants.Customer.PROFILE_VIEW)
+    @RequirePermission({PermissionConstants.Admin.USER_VIEW, PermissionConstants.Manager.STAFF_VIEW, PermissionConstants.Customer.PROFILE_VIEW})
     ApiResponse<UserResponse> getUser(@PathVariable("userId") String userId) {
         log.info("Fetching user with ID: {}", userId);
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String currentUsername = authentication.getName();
         
         UserResponse user = userService.getUser(userId);
-        if (!user.getUsername().equals(currentUsername)) {
-            throw new com.aurora.backend.exception.AppException(
-                com.aurora.backend.enums.ErrorCode.UNAUTHORIZED);
-        }
         
         return ApiResponse.<UserResponse>builder()
                 .message("User retrieved successfully")
@@ -132,19 +126,11 @@ public class UserController {
     }
 
     @PutMapping("/{userId}")
-    @RequirePermission(PermissionConstants.Customer.PROFILE_UPDATE)
+    @RequirePermission({PermissionConstants.Admin.USER_UPDATE, PermissionConstants.Customer.PROFILE_UPDATE})
     ApiResponse<UserResponse> updateUser(
             @PathVariable("userId") String userId,
             @RequestBody @Valid UserUpdateRequest userUpdateRequest) {
         log.info("Updating user with ID: {}", userId);
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String currentUsername = authentication.getName();
-        
-        UserResponse user = userService.getUser(userId);
-        if (!user.getUsername().equals(currentUsername)) {
-            throw new com.aurora.backend.exception.AppException(
-                com.aurora.backend.enums.ErrorCode.UNAUTHORIZED);
-        }
         
         return ApiResponse.<UserResponse>builder()
                 .message("User updated successfully")
@@ -163,6 +149,28 @@ public class UserController {
                 .build();
     }
 
+    @PatchMapping("/{userId}/status")
+    @RequirePermission(PermissionConstants.Admin.USER_UPDATE)
+    ApiResponse<UserResponse> toggleUserStatus(
+            @PathVariable("userId") String userId,
+            @RequestBody java.util.Map<String, Boolean> statusRequest) {
+        log.info("Toggling user status for ID: {}", userId);
+        Boolean active = statusRequest.get("active");
+        if (active == null) {
+            throw new com.aurora.backend.exception.AppException(
+                com.aurora.backend.enums.ErrorCode.INVALID_KEY);
+        }
+        
+        // Get current user and update status
+        UserUpdateRequest updateRequest = new UserUpdateRequest();
+        updateRequest.setActive(active);
+        
+        return ApiResponse.<UserResponse>builder()
+                .message(active ? "User activated successfully" : "User deactivated successfully")
+                .result(userService.updateUser(userId, updateRequest))
+                .build();
+    }
+
     @GetMapping("/search")
     @RequirePermission({PermissionConstants.Admin.USER_CREATE, PermissionConstants.Staff.CUSTOMER_VIEW})
     ApiResponse<Page<UserResponse>> searchUsers(
@@ -176,6 +184,68 @@ public class UserController {
         return ApiResponse.<Page<UserResponse>>builder()
                 .message("Users searched successfully")
                 .result(userService.searchUsersByUsername(username, pageable))
+                .build();
+    }
+
+    // ========== Role Management Endpoints ==========
+    
+    @PostMapping("/{userId}/roles/{roleId}")
+    @RequirePermission(PermissionConstants.Admin.ROLE_ASSIGN)
+    ApiResponse<UserResponse> assignRoleToUser(
+            @PathVariable("userId") String userId,
+            @PathVariable("roleId") String roleId) {
+        log.info("Assigning role {} to user {}", roleId, userId);
+        UserResponse user = userService.assignRoleToUser(userId, roleId);
+        return ApiResponse.<UserResponse>builder()
+                .message("Role assigned successfully")
+                .result(user)
+                .build();
+    }
+
+    @DeleteMapping("/{userId}/roles/{roleId}")
+    @RequirePermission(PermissionConstants.Admin.ROLE_ASSIGN)
+    ApiResponse<UserResponse> removeRoleFromUser(
+            @PathVariable("userId") String userId,
+            @PathVariable("roleId") String roleId) {
+        log.info("Removing role {} from user {}", roleId, userId);
+        UserResponse user = userService.removeRoleFromUser(userId, roleId);
+        return ApiResponse.<UserResponse>builder()
+                .message("Role removed successfully")
+                .result(user)
+                .build();
+    }
+
+    // ========== Permission Management Endpoints ==========
+    
+    @GetMapping("/{userId}/permissions")
+    @RequirePermission({PermissionConstants.Admin.PERMISSION_MANAGE, PermissionConstants.Admin.USER_VIEW})
+    ApiResponse<List<String>> getUserPermissions(@PathVariable("userId") String userId) {
+        log.info("Fetching disabled permissions for user {}", userId);
+        List<String> disabledPermissions = userService.getUserDisabledPermissions(userId);
+        return ApiResponse.<List<String>>builder()
+                .message("User permissions retrieved successfully")
+                .result(disabledPermissions)
+                .build();
+    }
+
+    @PutMapping("/{userId}/permissions")
+    @RequirePermission(PermissionConstants.Admin.PERMISSION_MANAGE)
+    ApiResponse<UserResponse> updateUserPermissions(
+            @PathVariable("userId") String userId,
+            @RequestBody java.util.Map<String, Object> permissionRequest) {
+        log.info("Updating permissions for user {}", userId);
+        
+        @SuppressWarnings("unchecked")
+        List<String> disabledPermissions = (List<String>) permissionRequest.get("disabledPermissions");
+        
+        if (disabledPermissions == null) {
+            disabledPermissions = new java.util.ArrayList<>();
+        }
+        
+        UserResponse user = userService.updateUserPermissions(userId, disabledPermissions);
+        return ApiResponse.<UserResponse>builder()
+                .message("User permissions updated successfully")
+                .result(user)
                 .build();
     }
 }

@@ -16,7 +16,7 @@ import lombok.extern.slf4j.Slf4j;
 public class GlobalException {
 
     @ExceptionHandler(value = Exception.class)
-    ResponseEntity<ApiResponse<Void>> handlingRuntimeException(RuntimeException exception) {
+    ResponseEntity<ApiResponse<Void>> handlingRuntimeException(Exception exception) {
         log.error("Exception: ", exception);
         ErrorCode errorCode = ErrorCode.UNCATEGORIZED_EXCEPTION;
 

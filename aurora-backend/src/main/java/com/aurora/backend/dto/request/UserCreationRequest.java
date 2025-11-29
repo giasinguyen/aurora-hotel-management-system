@@ -7,6 +7,7 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.time.LocalDate;
+import java.util.Set;
 
 
 @Data
@@ -31,4 +32,9 @@ public class UserCreationRequest {
     
     @Past(message = "DOB_INVALID")
     LocalDate dob;
+    
+    String phone;
+    String email;
+    String address;
+    Set<String> roles; // Role names to assign to user
 }
