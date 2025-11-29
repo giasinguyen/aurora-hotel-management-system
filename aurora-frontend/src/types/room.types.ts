@@ -66,8 +66,11 @@ export interface RoomType {
   branchName: string;
   name: string;
   code: string;
+  basePrice: number;
+  weekendPrice?: number;
   capacityAdults: number;
   capacityChildren: number;
+  maxOccupancy: number;
   sizeM2: number;
   refundable: boolean;
   totalRooms: number;
@@ -79,8 +82,11 @@ export interface RoomTypeCreationRequest {
   branchId: string;
   name: string;
   code: string;
+  basePrice: number;
+  weekendPrice?: number;
   capacityAdults: number;
   capacityChildren: number;
+  maxOccupancy: number;
   sizeM2: number;
   refundable?: boolean;
   amenityIds?: string[];
@@ -89,8 +95,11 @@ export interface RoomTypeCreationRequest {
 export interface RoomTypeUpdateRequest {
   name?: string;
   code?: string;
+  basePrice?: number;
+  weekendPrice?: number;
   capacityAdults?: number;
   capacityChildren?: number;
+  maxOccupancy?: number;
   sizeM2?: number;
   refundable?: boolean;
   amenityIds?: string[];

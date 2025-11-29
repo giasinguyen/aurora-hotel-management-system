@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
-import { Eye, MoreHorizontal, Trash2, Edit, Users, Maximize, BedDouble, Check } from 'lucide-react';
+import { Eye, MoreHorizontal, Trash2, Edit, Users, Maximize, BedDouble, Check, DollarSign } from 'lucide-react';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -158,6 +158,19 @@ export default function RoomTypeList() {
       cell: (roomType) => roomType.branchName,
     },
     {
+      key: 'basePrice',
+      header: 'Giá phòng',
+      cell: (roomType) => (
+        <div className="flex items-center gap-1.5">
+          <DollarSign className="h-4 w-4 text-green-600" />
+          <span className="font-medium text-green-700">
+            {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(roomType.basePrice)}
+          </span>
+        </div>
+      ),
+      sortable: true,
+    },
+    {
       key: 'capacity',
       header: 'Sức chứa',
       cell: (roomType) => (
@@ -240,11 +253,11 @@ export default function RoomTypeList() {
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Thao tác</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => navigate(`/admin/room-types/${roomType.id}`)}>
+            <DropdownMenuItem onClick={() => navigate(`/admin/room-types/upsert?id=${roomType.id}&view=true`)}>
               <Eye className="h-4 w-4 mr-2" />
               Xem chi tiết
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => navigate(`/admin/room-types/${roomType.id}/edit`)}>
+            <DropdownMenuItem onClick={() => navigate(`/admin/room-types/upsert?id=${roomType.id}`)}>
               <Edit className="h-4 w-4 mr-2" />
               Chỉnh sửa
             </DropdownMenuItem>
@@ -277,7 +290,10 @@ export default function RoomTypeList() {
       <PageHeader
         title="Quản lý loại phòng"
         description="Xem và quản lý tất cả loại phòng trong hệ thống"
-        onAdd={() => navigate('/admin/room-types/create')}
+        onAdd={() => {
+          console.log('Add button clicked, navigating to /admin/room-types/upsert');
+          navigate('/admin/room-types/upsert');
+        }}
         addButtonText="Thêm loại phòng"
         onRefresh={fetchRoomTypes}
         isLoading={isLoading}

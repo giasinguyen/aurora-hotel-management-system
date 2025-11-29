@@ -137,19 +137,20 @@ export default function RoomList() {
     fetchRooms();
   }, [fetchRooms]);
 
-  // Handle delete room
+  // Handle delete room (soft delete - change status to OUT_OF_ORDER)
   const handleDeleteRoom = async () => {
     if (!selectedRoomId) return;
     
     try {
-      await roomApi.delete(selectedRoomId);
-      toast.success('Xóa phòng thành công');
+      // Soft delete: Update status to OUT_OF_ORDER instead of deleting
+      await roomApi.update(selectedRoomId, { status: 'OUT_OF_ORDER' });
+      toast.success('Đã tạm ngưng phòng thành công');
       setDeleteDialogOpen(false);
       setSelectedRoomId(null);
       fetchRooms();
     } catch (error) {
-      console.error('Failed to delete room:', error);
-      toast.error('Không thể xóa phòng');
+      console.error('Failed to suspend room:', error);
+      toast.error('Không thể tạm ngưng phòng');
     }
   };
 
@@ -247,11 +248,11 @@ export default function RoomList() {
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Thao tác</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => navigate(`/admin/rooms/${room.id}`)}>
+            <DropdownMenuItem onClick={() => navigate(`/admin/rooms/upsert?id=${room.id}&view=true`)}>
               <Eye className="h-4 w-4 mr-2" />
               Xem chi tiết
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => navigate(`/admin/rooms/${room.id}/edit`)}>
+            <DropdownMenuItem onClick={() => navigate(`/admin/rooms/upsert?id=${room.id}`)}>
               <Edit className="h-4 w-4 mr-2" />
               Chỉnh sửa
             </DropdownMenuItem>
@@ -264,7 +265,7 @@ export default function RoomList() {
               }}
             >
               <Trash2 className="h-4 w-4 mr-2" />
-              Xóa phòng
+              Tạm ngưng phòng
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -294,7 +295,7 @@ export default function RoomList() {
       <PageHeader
         title="Quản lý phòng"
         description="Xem và quản lý tất cả phòng trong hệ thống"
-        onAdd={() => navigate('/admin/rooms/create')}
+        onAdd={() => navigate('/admin/rooms/upsert')}
         addButtonText="Thêm phòng"
         onRefresh={fetchRooms}
         isLoading={isLoading}
@@ -373,13 +374,13 @@ export default function RoomList() {
         </CardContent>
       </Card>
 
-      {/* Delete Confirmation Dialog */}
+      {/* Suspend Room Confirmation Dialog */}
       <ConfirmDialog
         open={deleteDialogOpen}
         onOpenChange={setDeleteDialogOpen}
-        title="Xác nhận xóa phòng"
-        description="Bạn có chắc chắn muốn xóa phòng này? Hành động này không thể hoàn tác."
-        confirmText="Xóa"
+        title="Xác nhận tạm ngưng phòng"
+        description="Bạn có chắc chắn muốn tạm ngưng phòng này? Phòng sẽ chuyển sang trạng thái 'Tạm ngưng' và không thể đặt được."
+        confirmText="Tạm ngưng"
         cancelText="Hủy"
         onConfirm={handleDeleteRoom}
         variant="destructive"

@@ -132,7 +132,8 @@ export const roomTypeApi = {
   // Get room type by ID
   getById: async (id: string) => {
     const response = await axiosClient.get<ApiResponse<RoomType>>(
-      `${ROOM_TYPE_BASE_URL}/${id}`
+      `${ROOM_TYPE_BASE_URL}/${id}`,
+      { params: { _t: Date.now() } } // Cache busting
     );
     return response.data;
   },

@@ -266,15 +266,15 @@ export default function BranchList() {
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Thao tác</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => navigate(`/admin/branches/${branch.id}`)}>
+            <DropdownMenuItem onClick={() => navigate(`/admin/branches/upsert?id=${branch.id}&view=true`)}>
               <Eye className="h-4 w-4 mr-2" />
               Xem chi tiết
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => navigate(`/admin/branches/${branch.id}/edit`)}>
+            <DropdownMenuItem onClick={() => navigate(`/admin/branches/upsert?id=${branch.id}`)}>
               <Edit className="h-4 w-4 mr-2" />
               Chỉnh sửa
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => navigate(`/admin/branches/${branch.id}/assign-manager`)}>
+            <DropdownMenuItem onClick={() => navigate(`/admin/users/${branch.managerId}/assign-branch`)}>
               <UserCog className="h-4 w-4 mr-2" />
               Phân công quản lý
             </DropdownMenuItem>
@@ -312,7 +312,7 @@ export default function BranchList() {
       <PageHeader
         title="Quản lý chi nhánh"
         description="Xem và quản lý tất cả chi nhánh khách sạn"
-        onAdd={() => navigate('/admin/branches/create')}
+        onAdd={() => navigate('/admin/branches/upsert')}
         addButtonText="Thêm chi nhánh"
         onRefresh={fetchBranches}
         isLoading={isLoading}

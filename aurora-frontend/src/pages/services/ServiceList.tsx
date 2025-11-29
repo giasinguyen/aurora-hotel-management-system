@@ -211,11 +211,11 @@ export default function ServiceList() {
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Thao tác</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => navigate(`/admin/services/${service.id}`)}>
+            <DropdownMenuItem onClick={() => navigate(`/admin/services/upsert?id=${service.id}&view=true`)}>
               <Eye className="h-4 w-4 mr-2" />
               Xem chi tiết
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => navigate(`/admin/services/${service.id}/edit`)}>
+            <DropdownMenuItem onClick={() => navigate(`/admin/services/upsert?id=${service.id}`)}>
               <Edit className="h-4 w-4 mr-2" />
               Chỉnh sửa
             </DropdownMenuItem>
@@ -253,7 +253,7 @@ export default function ServiceList() {
       <PageHeader
         title="Quản lý dịch vụ"
         description="Xem và quản lý tất cả dịch vụ trong hệ thống"
-        onAdd={() => navigate('/admin/services/create')}
+        onAdd={() => navigate('/admin/services/upsert')}
         addButtonText="Thêm dịch vụ"
         onRefresh={fetchServices}
         isLoading={isLoading}
