@@ -2259,30 +2259,6 @@
 			],
 			"description": "Facility management for branch amenities (Pool, Gym, Spa, Restaurant, etc.)"
 		},
-		{
-			"name": "06. Review & Rating Management",
-			"item": [
-				{
-					"name": "Create Review (Customer)",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"if (pm.response.code === 201) {",
-									"    var jsonData = pm.response.json();",
-									"    pm.collectionVariables.set('reviewId', jsonData.result.id);",
-									"    pm.test('✅ Review created successfully', function() {",
-									"        pm.expect(jsonData.result.rating).to.be.a('number');",
-									"        pm.expect(jsonData.result.status).to.eql('PENDING');",
-									"    });",
-									"    console.log('Review ID:', jsonData.result.id);",
-									"}"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
 					"request": {
 						"method": "POST",
 						"header": [],

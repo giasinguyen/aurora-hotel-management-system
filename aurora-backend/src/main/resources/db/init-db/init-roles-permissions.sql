@@ -34,10 +34,7 @@ INSERT INTO permissions (id, name, description, created_at, updated_at, version,
 (gen_random_uuid(), 'PAYMENT_VIEW_OWN', 'Xem lịch sử thanh toán của mình', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, false),
 (gen_random_uuid(), 'PROFILE_VIEW', 'Xem thông tin cá nhân', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, false),
 (gen_random_uuid(), 'PROFILE_UPDATE', 'Cập nhật thông tin cá nhân', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, false),
-(gen_random_uuid(), 'SERVICE_REGISTER', 'Đăng ký dịch vụ bổ sung', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, false),
-(gen_random_uuid(), 'REVIEW_CREATE', 'Tạo đánh giá cho booking đã hoàn thành', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, false),
-(gen_random_uuid(), 'REVIEW_UPDATE_OWN', 'Cập nhật đánh giá của mình (trong 24h)', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, false),
-(gen_random_uuid(), 'REVIEW_DELETE_OWN', 'Xóa đánh giá của mình', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, false)
+(gen_random_uuid(), 'SERVICE_REGISTER', 'Đăng ký dịch vụ bổ sung', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, false)
 ON CONFLICT (name) DO NOTHING;
 
 -- Staff Permissions (Nhân viên lễ tân)
@@ -52,7 +49,6 @@ INSERT INTO permissions (id, name, description, created_at, updated_at, version,
 (gen_random_uuid(), 'CUSTOMER_VIEW', 'Xem thông tin khách hàng', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, false),
 (gen_random_uuid(), 'PAYMENT_VIEW_ALL', 'Xem tất cả thanh toán', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, false),
 (gen_random_uuid(), 'SERVICE_MANAGE', 'Quản lý dịch vụ bổ sung', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, false),
-(gen_random_uuid(), 'REVIEW_VIEW_ALL', 'Xem tất cả đánh giá', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, false),
 (gen_random_uuid(), 'DASHBOARD_VIEW_STAFF', 'Truy cập dashboard cho nhân viên', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, false)
 ON CONFLICT (name) DO NOTHING;
 
@@ -71,7 +67,6 @@ INSERT INTO permissions (id, name, description, created_at, updated_at, version,
 (gen_random_uuid(), 'REPORT_VIEW', 'Xem báo cáo thống kê', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, false),
 (gen_random_uuid(), 'REPORT_EXPORT', 'Xuất báo cáo', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, false),
 (gen_random_uuid(), 'STAFF_VIEW', 'Xem danh sách nhân viên', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, false),
-(gen_random_uuid(), 'REVIEW_MODERATE', 'Phê duyệt/Từ chối đánh giá', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, false),
 (gen_random_uuid(), 'DASHBOARD_VIEW_MANAGER', 'Truy cập dashboard quản lý branch', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, false)
 ON CONFLICT (name) DO NOTHING;
 
@@ -96,7 +91,6 @@ INSERT INTO permissions (id, name, description, created_at, updated_at, version,
 (gen_random_uuid(), 'BRANCH_DELETE', 'Xóa chi nhánh', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, false),
 (gen_random_uuid(), 'BRANCH_ASSIGN_MANAGER', 'Gán quản lý cho chi nhánh', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, false),
 (gen_random_uuid(), 'BRANCH_REMOVE_MANAGER', 'Gỡ quản lý khỏi chi nhánh', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, false),
-(gen_random_uuid(), 'REVIEW_UPDATE_ALL', 'Cập nhật mọi đánh giá (chỉ Admin)', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, false),
 (gen_random_uuid(), 'DASHBOARD_VIEW_ADMIN', 'Truy cập dashboard tổng quan hệ thống', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, false)
 ON CONFLICT (name) DO NOTHING;
 
@@ -152,11 +146,7 @@ AND p.name IN (
     'PAYMENT_VIEW_OWN',
     'PROFILE_VIEW',
     'PROFILE_UPDATE',
-    'SERVICE_REGISTER',
-    -- Review permissions
-    'REVIEW_CREATE',
-    'REVIEW_UPDATE_OWN',
-    'REVIEW_DELETE_OWN'
+    'SERVICE_REGISTER'
 )
 ON CONFLICT DO NOTHING;
 
@@ -187,8 +177,6 @@ AND p.name IN (
     'CUSTOMER_VIEW',
     'PAYMENT_VIEW_ALL',
     'SERVICE_MANAGE',
-    -- Review permissions
-    'REVIEW_VIEW_ALL',
     'DASHBOARD_VIEW_STAFF'
 )
 ON CONFLICT DO NOTHING;
@@ -233,9 +221,6 @@ AND p.name IN (
     'REPORT_VIEW',
     'REPORT_EXPORT',
     'STAFF_VIEW',
-    -- Review permissions
-    'REVIEW_VIEW_ALL',
-    'REVIEW_MODERATE',
     'DASHBOARD_VIEW_MANAGER'
 )
 ON CONFLICT DO NOTHING;

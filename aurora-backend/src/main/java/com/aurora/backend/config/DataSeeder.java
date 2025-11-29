@@ -46,7 +46,6 @@ public class DataSeeder {
     private final BookingRoomRepository bookingRoomRepository;
     private final ServiceBookingRepository serviceBookingRepository;
     private final PaymentRepository paymentRepository;
-    private final ReviewRepository reviewRepository;
     private final PasswordEncoder passwordEncoder;
     private final DataSeederHelper helper;
 
@@ -111,12 +110,8 @@ public class DataSeeder {
                 helper.seedServiceBookings(bookings, services, customer);
 
                 // 12. Seed Payments
-                log.info("💳 [12/13] Seeding payments...");
+                log.info("💳 [12/12] Seeding payments...");
                 helper.seedPayments(bookings);
-
-                // 13. Seed Reviews
-                log.info("⭐ [13/13] Seeding reviews...");
-                helper.seedReviews(bookings, customer);
 
                 long endTime = System.currentTimeMillis();
                 long duration = (endTime - startTime) / 1000;
@@ -135,8 +130,7 @@ public class DataSeeder {
                 log.info("║  ├─ Bookings:         {:>4}                                 ║", bookingRepository.count());
                 log.info("║  ├─ Booking Rooms:    {:>4}                                 ║", bookingRoomRepository.count());
                 log.info("║  ├─ Service Bookings: {:>4}                                 ║", serviceBookingRepository.count());
-                log.info("║  ├─ Payments:         {:>4}                                 ║", paymentRepository.count());
-                log.info("║  └─ Reviews:          {:>4}                                 ║", reviewRepository.count());
+                log.info("║  └─ Payments:         {:>4}                                 ║", paymentRepository.count());
                 log.info("║                                                            ║");
                 log.info("║  ⏱️  Completed in {} seconds                                ║", duration);
                 log.info("╚════════════════════════════════════════════════════════════╝");
@@ -179,7 +173,6 @@ public class DataSeeder {
                 .email("hanoi@aurorahotel.com")
                 .website("https://aurorahotel.com/hanoi")
                 .description("Khách sạn 5 sao sang trọng tại trung tâm Hà Nội, view Hồ Hoàn Kiếm")
-                .rating(5.0)
                 .totalRooms(150)
                 .status(Branch.BranchStatus.ACTIVE)
                 .checkInTime(LocalTime.of(14, 0))
@@ -201,7 +194,6 @@ public class DataSeeder {
                 .email("hcm@aurorahotel.com")
                 .website("https://aurorahotel.com/hcm")
                 .description("Khách sạn 5 sao hiện đại bên bờ sông Sài Gòn")
-                .rating(5.0)
                 .totalRooms(200)
                 .status(Branch.BranchStatus.ACTIVE)
                 .checkInTime(LocalTime.of(14, 0))
@@ -223,7 +215,6 @@ public class DataSeeder {
                 .email("danang@aurorahotel.com")
                 .website("https://aurorahotel.com/danang")
                 .description("Resort 5 sao view biển Mỹ Khê tuyệt đẹp")
-                .rating(5.0)
                 .totalRooms(180)
                 .status(Branch.BranchStatus.ACTIVE)
                 .checkInTime(LocalTime.of(14, 0))
@@ -245,7 +236,6 @@ public class DataSeeder {
                 .email("nhatrang@aurorahotel.com")
                 .website("https://aurorahotel.com/nhatrang")
                 .description("Resort sang trọng ngay bãi biển Nha Trang")
-                .rating(4.0)
                 .totalRooms(120)
                 .status(Branch.BranchStatus.MAINTENANCE)
                 .checkInTime(LocalTime.of(14, 0))

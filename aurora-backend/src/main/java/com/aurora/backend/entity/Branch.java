@@ -113,14 +113,6 @@ public class Branch extends BaseEntity {
     
     @Min(value = 0, message = "Available rooms cannot be negative")
     Integer availableRooms; // Số phòng hiện có sẵn (WARN: should be calculated from Room status)
-    
-    // Rating
-    @DecimalMin(value = "0.0", message = "Rating cannot be negative")
-    @DecimalMax(value = "5.0", message = "Rating cannot exceed 5.0")
-    Double rating; // Đánh giá trung bình (0-5)
-    
-    @Min(value = 0, message = "Total reviews cannot be negative")
-    Integer totalReviews; // Tổng số đánh giá
 
     // Mô tả
     @Size(max = 2000, message = "Description cannot exceed 2000 characters")
