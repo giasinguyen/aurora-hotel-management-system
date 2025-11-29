@@ -1,6 +1,5 @@
 package com.aurora.backend.repository;
 
-import com.aurora.backend.dto.response.CustomerGrowthPoint;
 import com.aurora.backend.entity.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
