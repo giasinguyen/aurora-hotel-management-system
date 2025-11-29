@@ -3,6 +3,7 @@ package com.aurora.backend.service.impl;
 
 import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import com.aurora.backend.dto.request.UserCreationRequest;
 import com.aurora.backend.dto.request.UserRegistrationRequest;
@@ -75,6 +76,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public UserResponse createUser(UserCreationRequest request) {
         log.info("Creating user with username: {}", request.getUsername());
 
@@ -85,6 +87,18 @@ public class UserServiceImpl implements UserService {
 
         User user = userMapper.toUser(request);
         user.setPassword(passwordEncoder.encode(request.getPassword()));
+        
+        // Set roles if provided
+        if (request.getRoles() != null && !request.getRoles().isEmpty()) {
+            Set<Role> roles = new HashSet<>();
+            for (String roleName : request.getRoles()) {
+                Role role = roleRepository.findByName(roleName)
+                        .orElseThrow(() -> new AppException(ErrorCode.ROLE_NOT_EXISTED));
+                roles.add(role);
+            }
+            user.setRoles(roles);
+            log.info("Assigned roles to user: {}", request.getRoles());
+        }
 
         User savedUser = userRepository.save(user);
         log.info("User created successfully with ID: {}", savedUser.getId());
@@ -125,13 +139,28 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @Transactional
     public UserResponse updateUser(String id, UserUpdateRequest request) {
         log.info("Updating user with ID: {}", id);
 
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
 
+        // Update basic fields
         userMapper.updateUserFromRequest(request, user);
+        
+        // Update roles if provided
+        if (request.getRoles() != null) {
+            Set<Role> roles = new HashSet<>();
+            for (String roleName : request.getRoles()) {
+                Role role = roleRepository.findByName(roleName)
+                        .orElseThrow(() -> new AppException(ErrorCode.ROLE_NOT_EXISTED));
+                roles.add(role);
+            }
+            user.setRoles(roles);
+            log.info("Updated roles for user {}: {}", id, request.getRoles());
+        }
+        
         User updatedUser = userRepository.save(user);
 
         log.info("User updated successfully with ID: {}", updatedUser.getId());
@@ -200,5 +229,91 @@ public class UserServiceImpl implements UserService {
         }
 
         log.debug("Password validation passed successfully");
+    }
+
+    @Override
+    @Transactional
+    public UserResponse assignRoleToUser(String userId, String roleId) {
+        log.info("Assigning role {} to user {}", roleId, userId);
+        
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        
+        Role role = roleRepository.findById(roleId)
+                .orElseThrow(() -> new AppException(ErrorCode.ROLE_NOT_EXISTED));
+        
+        if (user.getRoles() == null) {
+            user.setRoles(new HashSet<>());
+        }
+        
+        if (user.getRoles().contains(role)) {
+            log.warn("User {} already has role {}", userId, roleId);
+            throw new AppException(ErrorCode.ROLE_ALREADY_ASSIGNED);
+        }
+        
+        user.getRoles().add(role);
+        User savedUser = userRepository.save(user);
+        
+        log.info("Successfully assigned role {} to user {}", roleId, userId);
+        return userMapper.toUserResponse(savedUser);
+    }
+
+    @Override
+    @Transactional
+    public UserResponse removeRoleFromUser(String userId, String roleId) {
+        log.info("Removing role {} from user {}", roleId, userId);
+        
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        
+        Role role = roleRepository.findById(roleId)
+                .orElseThrow(() -> new AppException(ErrorCode.ROLE_NOT_EXISTED));
+        
+        if (user.getRoles() == null || !user.getRoles().contains(role)) {
+            log.warn("User {} does not have role {}", userId, roleId);
+            throw new AppException(ErrorCode.ROLE_NOT_ASSIGNED);
+        }
+        
+        user.getRoles().remove(role);
+        User savedUser = userRepository.save(user);
+        
+        log.info("Successfully removed role {} from user {}", roleId, userId);
+        return userMapper.toUserResponse(savedUser);
+    }
+
+    @Override
+    public List<String> getUserDisabledPermissions(String userId) {
+        log.info("Getting disabled permissions for user {}", userId);
+        
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        
+        List<String> disabledPermissions = user.getDisabledPermissions();
+        if (disabledPermissions == null) {
+            disabledPermissions = new java.util.ArrayList<>();
+        }
+        
+        log.info("User {} has {} disabled permissions", userId, disabledPermissions.size());
+        return disabledPermissions;
+    }
+
+    @Override
+    @Transactional
+    public UserResponse updateUserPermissions(String userId, List<String> disabledPermissions) {
+        log.info("Updating permissions for user {}: {} disabled permissions", userId, 
+                disabledPermissions != null ? disabledPermissions.size() : 0);
+        
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
+        
+        if (disabledPermissions == null) {
+            disabledPermissions = new java.util.ArrayList<>();
+        }
+        
+        user.setDisabledPermissions(disabledPermissions);
+        User savedUser = userRepository.save(user);
+        
+        log.info("Successfully updated permissions for user {}", userId);
+        return userMapper.toUserResponse(savedUser);
     }
 }

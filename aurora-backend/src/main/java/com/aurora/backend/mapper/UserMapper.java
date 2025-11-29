@@ -18,6 +18,10 @@ import java.util.stream.Collectors;
 
 @Mapper(componentModel = "spring")
 public interface UserMapper {
+    @Mapping(target = "roles", ignore = true)
+    @Mapping(target = "phone", source = "phone")
+    @Mapping(target = "email", source = "email")
+    @Mapping(target = "address", source = "address")
     User toUser(UserCreationRequest request);
 
     @Mapping(target = "roles", source = "roles", qualifiedByName = "rolesToRoleResponses")

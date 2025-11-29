@@ -19,4 +19,12 @@ public interface UserService {
     UserResponse updateUser(String id, UserUpdateRequest request);
     void deleteUser(String id);
     Page<UserResponse> searchUsersByUsername(String username, Pageable pageable);
+    
+    // Role management
+    UserResponse assignRoleToUser(String userId, String roleId);
+    UserResponse removeRoleFromUser(String userId, String roleId);
+    
+    // Permission management
+    List<String> getUserDisabledPermissions(String userId);
+    UserResponse updateUserPermissions(String userId, List<String> disabledPermissions);
 }

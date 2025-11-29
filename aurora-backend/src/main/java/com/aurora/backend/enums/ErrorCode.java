@@ -92,6 +92,8 @@ public enum ErrorCode {
     ROLE_NOT_EXISTED(1700, "Role not found", HttpStatus.NOT_FOUND),
     ROLE_EXISTED(1701, "Role already exists", HttpStatus.BAD_REQUEST),
     ROLE_NAME_REQUIRED(1702, "Role name is required", HttpStatus.BAD_REQUEST),
+    ROLE_ALREADY_ASSIGNED(1703, "Role is already assigned to this user", HttpStatus.BAD_REQUEST),
+    ROLE_NOT_ASSIGNED(1704, "Role is not assigned to this user", HttpStatus.BAD_REQUEST),
     
     // Permission errors
     PERMISSION_NOT_EXISTED(1800, "Permission not found", HttpStatus.NOT_FOUND),

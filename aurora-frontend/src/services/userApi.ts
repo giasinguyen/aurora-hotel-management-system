@@ -4,7 +4,8 @@ import type {
   User, 
   UserCreationRequest, 
   UserUpdateRequest, 
-  UserSearchParams 
+  UserSearchParams,
+  UpdateUserPermissionsRequest
 } from '@/types/user.types';
 
 const BASE_URL = '/api/v1/users';
@@ -102,7 +103,47 @@ export const searchUsers = async (params: UserSearchParams): Promise<ApiResponse
   return response.data;
 };
 
-export default {
+/**
+ * Toggle user active status (activate/deactivate)
+ */
+export const toggleUserStatus = async (id: string, active: boolean): Promise<ApiResponse<User>> => {
+  const response = await axiosClient.patch(`${BASE_URL}/${id}/status`, { active });
+  return response.data;
+};
+
+/**
+ * Assign role to user
+ */
+export const assignRoleToUser = async (userId: string, roleId: string): Promise<ApiResponse<User>> => {
+  const response = await axiosClient.post(`${BASE_URL}/${userId}/roles/${roleId}`);
+  return response.data;
+};
+
+/**
+ * Remove role from user
+ */
+export const removeRoleFromUser = async (userId: string, roleId: string): Promise<ApiResponse<User>> => {
+  const response = await axiosClient.delete(`${BASE_URL}/${userId}/roles/${roleId}`);
+  return response.data;
+};
+
+/**
+ * Update user permissions (disable specific permissions)
+ */
+export const updateUserPermissions = async (userId: string, data: UpdateUserPermissionsRequest): Promise<ApiResponse<User>> => {
+  const response = await axiosClient.put(`${BASE_URL}/${userId}/permissions`, data);
+  return response.data;
+};
+
+/**
+ * Get user's effective permissions (considering overrides)
+ */
+export const getUserPermissions = async (userId: string): Promise<ApiResponse<string[]>> => {
+  const response = await axiosClient.get(`${BASE_URL}/${userId}/permissions`);
+  return response.data;
+};
+
+export const userApi = {
   getUsers,
   getUsersPaginated,
   getUserById,
@@ -113,4 +154,11 @@ export default {
   updateUser,
   deleteUser,
   searchUsers,
+  toggleUserStatus,
+  assignRoleToUser,
+  removeRoleFromUser,
+  updateUserPermissions,
+  getUserPermissions,
 };
+
+export default userApi;
