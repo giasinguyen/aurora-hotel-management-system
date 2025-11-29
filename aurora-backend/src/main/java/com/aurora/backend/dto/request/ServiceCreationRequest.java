@@ -5,6 +5,8 @@ import jakarta.validation.constraints.Positive;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.util.List;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -23,4 +25,6 @@ public class ServiceCreationRequest {
     
     @Positive(message = "BASE_PRICE_POSITIVE")
     Double basePrice;
+    
+    List<String> images;
 }

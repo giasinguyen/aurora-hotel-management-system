@@ -1,5 +1,6 @@
 package com.aurora.backend.entity;
 
+import com.aurora.backend.converter.StringListConverter;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
@@ -7,6 +8,7 @@ import lombok.experimental.SuperBuilder;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -54,10 +56,11 @@ public class Room extends BaseEntity {
     
     LocalDateTime lastCleaned;
     
-    @ElementCollection
-    @CollectionTable(name = "room_images", joinColumns = @JoinColumn(name = "room_id"))
-    @Column(name = "image_url", length = 500)
-    List<String> imageUrls; // Danh sách ảnh của phòng cụ thể
+    // Images - lưu dưới dạng JSON array trong column
+    @Convert(converter = StringListConverter.class)
+    @Column(name = "images", columnDefinition = "TEXT")
+    @Builder.Default
+    List<String> images = new ArrayList<>(); // Danh sách ảnh của phòng cụ thể
 
     // Room Status Enum
     public enum RoomStatus {

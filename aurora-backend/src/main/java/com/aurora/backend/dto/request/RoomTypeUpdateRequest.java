@@ -4,6 +4,7 @@ import jakarta.validation.constraints.Positive;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.util.List;
 import java.util.Set;
 
 @Data
@@ -26,4 +27,5 @@ public class RoomTypeUpdateRequest {
     
     Boolean refundable;
     Set<String> amenityIds;
+    List<String> images;
 }

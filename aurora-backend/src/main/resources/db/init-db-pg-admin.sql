@@ -8,8 +8,8 @@
 -- 
 -- HƯỚNG DẪN SỬ DỤNG:
 -- 1. Chạy script này SAU KHI đã khởi tạo schema (JPA auto-create tables)
--- 2. Chạy SAU file init-roles-permissions.sql (để có roles/permissions/users)
--- 3. Script này có thể chạy nhiều lần (idempotent với ON CONFLICT DO NOTHING)
+-- 2. init-roles-permissions.sql, fix-email-verified.sql và init-vector-store.sql đã tự chạy khi run dự án
+-- 3. chạy init-db-pg-admin.sql để khởi tạo dữ liệu mẫu, Script này có thể chạy nhiều lần (idempotent với ON CONFLICT DO NOTHING)
 --
 -- LƯU Ý VỀ TÊN CỘT:
 -- - Hibernate/JPA sử dụng naming strategy: camelCase -> snake_case
@@ -39,7 +39,7 @@ INSERT INTO branches (
     id, name, code, address, ward, district, city,
     latitude, longitude, phone, email, website,
     description, total_rooms, status,
-    check_in_time, check_out_time, operating_hours,
+    check_in_time, check_out_time, operating_hours, images,
     created_at, updated_at, version, deleted
 ) VALUES 
 -- Hanoi Branch
@@ -62,6 +62,7 @@ INSERT INTO branches (
     '14:00:00',
     '12:00:00',
     '24/7',
+    '["https://images.unsplash.com/photo-1566073771259-6a8506099945?w=1200&h=800&fit=crop","https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?w=1200&h=800&fit=crop"]',
     NOW(), NOW(), 0, false
 ),
 -- Ho Chi Minh Branch
@@ -84,6 +85,7 @@ INSERT INTO branches (
     '14:00:00',
     '12:00:00',
     '24/7',
+    '["https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=1200&h=800&fit=crop","https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=1200&h=800&fit=crop"]',
     NOW(), NOW(), 0, false
 ),
 -- Da Nang Branch
@@ -106,6 +108,7 @@ INSERT INTO branches (
     '14:00:00',
     '12:00:00',
     '24/7',
+    '["https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=1200&h=800&fit=crop","https://images.unsplash.com/photo-1602343168117-bb8ffe3e2e9f?w=1200&h=800&fit=crop"]',
     NOW(), NOW(), 0, false
 ),
 -- Nha Trang Branch (Under Maintenance)
@@ -128,6 +131,7 @@ INSERT INTO branches (
     '14:00:00',
     '12:00:00',
     '24/7',
+    '["https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=1200&h=800&fit=crop"]',
     NOW(), NOW(), 0, false
 )
 ON CONFLICT (code) DO NOTHING;
@@ -244,7 +248,7 @@ ON CONFLICT (name) DO NOTHING;
 -- ============================================================================
 INSERT INTO facilities (
     id, branch_id, name, type, description, location,
-    opening_hours, capacity, requires_reservation, free_for_guests, active,
+    opening_hours, capacity, requires_reservation, free_for_guests, active, images,
     created_at, updated_at, version, deleted
 ) VALUES 
 -- Hanoi Facilities
@@ -260,6 +264,7 @@ INSERT INTO facilities (
     false,
     true,
     true,
+    '["https://images.unsplash.com/photo-1576610616656-d3aa5d1f4534?w=1200&h=800&fit=crop"]',
     NOW(), NOW(), 0, false
 ),
 (
@@ -274,6 +279,7 @@ INSERT INTO facilities (
     true,
     false,
     true,
+    '["https://images.unsplash.com/photo-1544161515-4ab6ce6db874?w=1200&h=800&fit=crop"]',
     NOW(), NOW(), 0, false
 ),
 -- HCM Facilities
@@ -289,6 +295,7 @@ INSERT INTO facilities (
     false,
     true,
     true,
+    '["https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=1200&h=800&fit=crop"]',
     NOW(), NOW(), 0, false
 ),
 (
@@ -303,6 +310,7 @@ INSERT INTO facilities (
     false,
     true,
     true,
+    '["https://images.unsplash.com/photo-1540497077202-7c8a3999166f?w=1200&h=800&fit=crop"]',
     NOW(), NOW(), 0, false
 ),
 -- Da Nang Facilities
@@ -318,6 +326,7 @@ INSERT INTO facilities (
     false,
     true,
     true,
+    '["https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1200&h=800&fit=crop"]',
     NOW(), NOW(), 0, false
 ),
 (
@@ -332,6 +341,7 @@ INSERT INTO facilities (
     true,
     false,
     true,
+    '["https://images.unsplash.com/photo-1600334585358-93470feb59ca?w=1200&h=800&fit=crop"]',
     NOW(), NOW(), 0, false
 )
 ON CONFLICT DO NOTHING;
@@ -345,7 +355,7 @@ INSERT INTO room_types (
     id, branch_id, name, code, base_price, weekend_price,
     capacity_adults, capacity_children, max_occupancy,
     sizem2, bed_type, number_of_beds, refundable, smoking_allowed,
-    description,
+    description, images,
     created_at, updated_at, version, deleted
 ) VALUES 
 -- Hanoi Room Types
@@ -362,6 +372,7 @@ INSERT INTO room_types (
     1,
     true, false,
     'Phòng Deluxe view thành phố 35m2',
+    '["https://images.unsplash.com/photo-1611892440504-42a792e24d32?w=1200&h=800&fit=crop","https://images.unsplash.com/photo-1590490360182-c33d57733427?w=1200&h=800&fit=crop"]',
     NOW(), NOW(), 0, false
 ),
 (
@@ -377,6 +388,7 @@ INSERT INTO room_types (
     1,
     true, false,
     'Phòng Executive view Hồ Hoàn Kiếm 45m2',
+    '["https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=1200&h=800&fit=crop","https://images.unsplash.com/photo-1578683010236-d716f9a3f461?w=1200&h=800&fit=crop"]',
     NOW(), NOW(), 0, false
 ),
 -- HCM Room Types
@@ -393,6 +405,7 @@ INSERT INTO room_types (
     1,
     true, false,
     'Phòng Superior hiện đại 30m2',
+    '["https://images.unsplash.com/photo-1566665797739-1674de7a421a?w=1200&h=800&fit=crop"]',
     NOW(), NOW(), 0, false
 ),
 (
@@ -408,6 +421,7 @@ INSERT INTO room_types (
     1,
     true, false,
     'Phòng Deluxe view sông Sài Gòn 40m2',
+    '["https://images.unsplash.com/photo-1596394516093-501ba68a0ba6?w=1200&h=800&fit=crop","https://images.unsplash.com/photo-1568605117037-4d9c780fac89?w=1200&h=800&fit=crop"]',
     NOW(), NOW(), 0, false
 ),
 -- Da Nang Room Types
@@ -424,6 +438,7 @@ INSERT INTO room_types (
     1,
     true, false,
     'Phòng view biển trực diện 35m2',
+    '["https://images.unsplash.com/photo-1618773928121-c32242e63f39?w=1200&h=800&fit=crop"]',
     NOW(), NOW(), 0, false
 ),
 (
@@ -439,6 +454,7 @@ INSERT INTO room_types (
     1,
     true, false,
     'Phòng Deluxe view biển với ban công 50m2',
+    '["https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?w=1200&h=800&fit=crop","https://images.unsplash.com/photo-1611892440504-42a792e24d32?w=1200&h=800&fit=crop"]',
     NOW(), NOW(), 0, false
 )
 ON CONFLICT DO NOTHING;
@@ -496,7 +512,7 @@ ON CONFLICT DO NOTHING;
 -- Tạo 2 rooms cho mỗi room type
 -- ============================================================================
 INSERT INTO rooms (
-    id, branch_id, room_type_id, room_number, floor, status, view_type,
+    id, branch_id, room_type_id, room_number, floor, status, view_type, images,
     created_at, updated_at, version, deleted
 ) VALUES 
 -- Hanoi Rooms - Deluxe
@@ -508,6 +524,7 @@ INSERT INTO rooms (
     10,
     'AVAILABLE',
     'CITY',
+    '["https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=1200&h=800&fit=crop"]',
     NOW(), NOW(), 0, false
 ),
 (
@@ -518,6 +535,7 @@ INSERT INTO rooms (
     10,
     'AVAILABLE',
     'CITY',
+    '["https://images.unsplash.com/photo-1590490360182-c33d57733427?w=1200&h=800&fit=crop"]',
     NOW(), NOW(), 0, false
 ),
 -- Hanoi Rooms - Executive
@@ -529,6 +547,7 @@ INSERT INTO rooms (
     15,
     'AVAILABLE',
     'CITY',
+    '["https://images.unsplash.com/photo-1578683010236-d716f9a3f461?w=1200&h=800&fit=crop"]',
     NOW(), NOW(), 0, false
 ),
 (
@@ -539,6 +558,7 @@ INSERT INTO rooms (
     15,
     'OCCUPIED',
     'CITY',
+    '["https://images.unsplash.com/photo-1611892440504-42a792e24d32?w=1200&h=800&fit=crop"]',
     NOW(), NOW(), 0, false
 ),
 -- HCM Rooms - Superior
@@ -550,6 +570,7 @@ INSERT INTO rooms (
     5,
     'AVAILABLE',
     'CITY',
+    '["https://images.unsplash.com/photo-1566665797739-1674de7a421a?w=1200&h=800&fit=crop"]',
     NOW(), NOW(), 0, false
 ),
 (
@@ -560,6 +581,7 @@ INSERT INTO rooms (
     5,
     'CLEANING',
     'CITY',
+    '["https://images.unsplash.com/photo-1596394516093-501ba68a0ba6?w=1200&h=800&fit=crop"]',
     NOW(), NOW(), 0, false
 ),
 -- HCM Rooms - Deluxe River
@@ -571,6 +593,7 @@ INSERT INTO rooms (
     8,
     'AVAILABLE',
     'CITY',
+    '["https://images.unsplash.com/photo-1568605117037-4d9c780fac89?w=1200&h=800&fit=crop"]',
     NOW(), NOW(), 0, false
 ),
 (
@@ -581,6 +604,7 @@ INSERT INTO rooms (
     8,
     'AVAILABLE',
     'CITY',
+    '["https://images.unsplash.com/photo-1618773928121-c32242e63f39?w=1200&h=800&fit=crop"]',
     NOW(), NOW(), 0, false
 ),
 -- Da Nang Rooms - Beach View
@@ -592,6 +616,7 @@ INSERT INTO rooms (
     2,
     'AVAILABLE',
     'SEA',
+    '["https://images.unsplash.com/photo-1611892440504-42a792e24d32?w=1200&h=800&fit=crop"]',
     NOW(), NOW(), 0, false
 ),
 (
@@ -602,6 +627,7 @@ INSERT INTO rooms (
     2,
     'AVAILABLE',
     'SEA',
+    '["https://images.unsplash.com/photo-1578683010236-d716f9a3f461?w=1200&h=800&fit=crop"]',
     NOW(), NOW(), 0, false
 ),
 -- Da Nang Rooms - Ocean Front
@@ -613,6 +639,7 @@ INSERT INTO rooms (
     3,
     'AVAILABLE',
     'SEA',
+    '["https://images.unsplash.com/photo-1618773928121-c32242e63f39?w=1200&h=800&fit=crop"]',
     NOW(), NOW(), 0, false
 ),
 (
@@ -623,6 +650,7 @@ INSERT INTO rooms (
     3,
     'RESERVED',
     'SEA',
+    '["https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=1200&h=800&fit=crop"]',
     NOW(), NOW(), 0, false
 )
 ON CONFLICT DO NOTHING;
@@ -633,7 +661,7 @@ ON CONFLICT DO NOTHING;
 -- ============================================================================
 INSERT INTO services (
     id, branch_id, name, type, description, base_price, unit,
-    duration_minutes, requires_booking, active, operating_hours,
+    duration_minutes, requires_booking, active, operating_hours, images,
     created_at, updated_at, version, deleted
 ) VALUES 
 (
@@ -648,6 +676,7 @@ INSERT INTO services (
     true,
     true,
     '24/7',
+    '["https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=1200&h=800&fit=crop"]',
     NOW(), NOW(), 0, false
 ),
 (
@@ -662,6 +691,7 @@ INSERT INTO services (
     true,
     true,
     '09:00 - 21:00',
+    '["https://images.unsplash.com/photo-1544161515-4ab6ce6db874?w=1200&h=800&fit=crop","https://images.unsplash.com/photo-1600334585358-93470feb59ca?w=1200&h=800&fit=crop"]',
     NOW(), NOW(), 0, false
 )
 ON CONFLICT DO NOTHING;

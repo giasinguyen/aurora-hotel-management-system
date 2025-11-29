@@ -1021,7 +1021,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"code\": \"AURORA_HCM_{{$timestamp}}\",\n    \"name\": \"Aurora Hotel Ho Chi Minh\",\n    \"address\": \"123 Nguyen Hue, District 1\",\n    \"city\": \"Ho Chi Minh\",\n    \"country\": \"Vietnam\",\n    \"phone\": \"02812345678\",\n    \"email\": \"hcm@aurorahotel.com\",\n    \"description\": \"Luxury 5-star hotel in the heart of Saigon\",\n    \"rating\": 5,\n    \"totalRooms\": 200,\n    \"status\": \"ACTIVE\"\n}",
+							"raw": "{\n    \"code\": \"AURORA_HCM_{{$timestamp}}\",\n    \"name\": \"Aurora Hotel Ho Chi Minh\",\n    \"address\": \"123 Nguyen Hue, District 1\",\n    \"ward\": \"Ben Nghe\",\n    \"district\": \"District 1\",\n    \"city\": \"Ho Chi Minh\",\n    \"phone\": \"02812345678\",\n    \"email\": \"hcm@aurorahotel.com\",\n    \"description\": \"Luxury 5-star hotel in the heart of Saigon\",\n    \"status\": \"ACTIVE\",\n    \"images\": [\"https://example.com/branch-1.jpg\", \"https://example.com/branch-2.jpg\"]\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1181,7 +1181,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"name\": \"Aurora Grand Hotel Ho Chi Minh\",\n    \"description\": \"Updated: Luxury 5-star hotel with ocean view\",\n    \"rating\": 5\n}",
+							"raw": "{\n    \"name\": \"Aurora Grand Hotel Ho Chi Minh\",\n    \"description\": \"Updated: Luxury 5-star hotel with ocean view\",\n    \"images\": [\"https://example.com/branch-updated-1.jpg\", \"https://example.com/branch-updated-2.jpg\"]\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -1898,7 +1898,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"name\": \"Infinity Pool\",\n    \"description\": \"Rooftop infinity pool with panoramic city view\",\n    \"branchId\": \"{{branchId}}\",\n    \"operatingHours\": \"06:00 - 22:00\",\n    \"isPaid\": false\n}",
+							"raw": "{\n    \"name\": \"Infinity Pool\",\n    \"branchId\": \"{{branchId}}\",\n    \"openingHours\": \"06:00 - 22:00\",\n    \"policies\": \"No diving. Children under 12 must be accompanied by adults.\",\n    \"images\": [\"https://example.com/facility-pool-1.jpg\"]\n}",
 							"options": {
 								"raw": {
 									"language": "json"
@@ -2152,7 +2152,7 @@
 						"header": [],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"name\": \"Infinity Pool & Jacuzzi\",\n    \"description\": \"Rooftop infinity pool with panoramic city view and hot tub\",\n    \"operatingHours\": \"06:00 - 23:00\"\n}",
+							"raw": "{\n    \"name\": \"Infinity Pool & Jacuzzi\",\n    \"openingHours\": \"06:00 - 23:00\",\n    \"policies\": \"No diving. Children under 12 must be accompanied by adults. Jacuzzi closes at 21:00.\",\n    \"images\": [\"https://example.com/facility-pool-updated-1.jpg\"]\n}",
 							"options": {
 								"raw": {
 									"language": "json"

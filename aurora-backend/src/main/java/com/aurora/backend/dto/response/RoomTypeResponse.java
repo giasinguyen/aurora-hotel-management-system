@@ -3,6 +3,7 @@ package com.aurora.backend.dto.response;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.util.List;
 import java.util.Set;
 
 @Getter
@@ -24,4 +25,5 @@ public class RoomTypeResponse {
     Integer totalRooms;
     Integer availableRooms;
     Set<AmenityResponse> amenities;
+    List<String> images;
 }

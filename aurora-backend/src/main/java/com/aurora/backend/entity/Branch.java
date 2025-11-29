@@ -6,8 +6,11 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
 
+import com.aurora.backend.converter.StringListConverter;
+
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -123,11 +126,11 @@ public class Branch extends BaseEntity {
     @Column(length = 500)
     String shortDescription;
     
-    // Branch images
-    @ElementCollection
-    @CollectionTable(name = "branch_images", joinColumns = @JoinColumn(name = "branch_id"))
-    @Column(name = "image_url", length = 500)
-    List<String> imageUrls;
+    // Branch images - lưu dưới dạng JSON array trong column
+    @Convert(converter = StringListConverter.class)
+    @Column(name = "images", columnDefinition = "TEXT")
+    @Builder.Default
+    List<String> images = new ArrayList<>();
 
     // Relationships
     @OneToMany(mappedBy = "branch", cascade = CascadeType.ALL)

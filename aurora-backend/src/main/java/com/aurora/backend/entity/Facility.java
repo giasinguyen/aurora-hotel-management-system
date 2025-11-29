@@ -1,10 +1,12 @@
 package com.aurora.backend.entity;
 
+import com.aurora.backend.converter.StringListConverter;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -58,11 +60,11 @@ public class Facility extends BaseEntity {
     @Builder.Default
     Boolean freeForGuests = true; // Miễn phí cho khách lưu trú
     
-    // Images
-    @ElementCollection
-    @CollectionTable(name = "facility_images", joinColumns = @JoinColumn(name = "facility_id"))
-    @Column(name = "image_url", length = 500)
-    List<String> imageUrls;
+    // Images - lưu dưới dạng JSON array trong column
+    @Convert(converter = StringListConverter.class)
+    @Column(name = "images", columnDefinition = "TEXT")
+    @Builder.Default
+    List<String> images = new ArrayList<>();
     
     // Facility Type Enum
     public enum FacilityType {

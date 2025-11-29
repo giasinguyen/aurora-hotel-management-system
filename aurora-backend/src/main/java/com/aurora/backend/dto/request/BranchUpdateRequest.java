@@ -9,6 +9,7 @@ import lombok.experimental.FieldDefaults;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.List;
 
 @Data
 @Builder
@@ -44,4 +45,7 @@ public class BranchUpdateRequest {
     
     @Size(max = 1000, message = "Description must not exceed 1000 characters")
     String description;
+    
+    // Images - danh sách URL ảnh
+    List<String> images;
 }
