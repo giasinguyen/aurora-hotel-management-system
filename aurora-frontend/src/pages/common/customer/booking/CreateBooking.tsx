@@ -1,24 +1,40 @@
-import { useState, useRef, type FormEvent } from "react";
+import { useState, useRef, useEffect, type FormEvent } from "react";
 import { motion, useInView } from "framer-motion";
 import { Calendar, Users, CreditCard, Check, ArrowRight, Sparkles } from "lucide-react";
 
 export default function CreateBooking() {
-  const [step, setStep] = useState(1);
-  const [formData, setFormData] = useState({
-    checkIn: "",
-    checkOut: "",
-    guests: 1,
-    roomType: "",
-    fullName: "",
-    email: "",
-    phone: "",
-    specialRequests: "",
-    paymentMethod: "credit-card"
-  });
+  // Khôi phục dữ liệu từ sessionStorage khi component mount
+  const getInitialStep = (): number => {
+    const saved = sessionStorage.getItem('bookingProgress');
+    return saved ? JSON.parse(saved).step : 1;
+  };
+
+  const getInitialFormData = () => {
+    const saved = sessionStorage.getItem('bookingProgress');
+    return saved ? JSON.parse(saved).formData : {
+      checkIn: "",
+      checkOut: "",
+      guests: 1,
+      roomType: "",
+      fullName: "",
+      email: "",
+      phone: "",
+      specialRequests: "",
+      paymentMethod: "credit-card"
+    };
+  };
+
+  const [step, setStep] = useState<number>(getInitialStep());
+  const [formData, setFormData] = useState(getInitialFormData());
   const [errors, setErrors] = useState<{[key: string]: string}>({});
 
   const formRef = useRef(null);
   const formInView = useInView(formRef, { once: true, margin: "-100px" });
+
+  // Lưu trạng thái vào sessionStorage mỗi khi có thay đổi
+  useEffect(() => {
+    sessionStorage.setItem('bookingProgress', JSON.stringify({ step, formData }));
+  }, [step, formData]);
 
   const roomTypes = [
     { id: "standard", name: "Phòng Tiêu Chuẩn", price: "1,200,000", image: "https://images.unsplash.com/photo-1611892440504-42a792e24d32?w=500" },
@@ -85,21 +101,30 @@ export default function CreateBooking() {
     if (step < 3) {
       setStep((s) => s + 1);
     } else {
-      // Save booking data
+      // Save booking data - Lưu đầy đủ thông tin
       const bookingData = {
         ...formData,
         roomName: roomTypes.find(r => r.id === formData.roomType)?.name,
         roomPrice: roomTypes.find(r => r.id === formData.roomType)?.price,
         confirmationCode: "ABH" + Math.random().toString(36).substr(2, 9).toUpperCase(),
-        bookingDate: new Date().toLocaleDateString('vi-VN')
+        bookingDate: new Date().toLocaleDateString('vi-VN'),
+        // Thêm các trường cần thiết
+        email: formData.email,
+        phone: formData.phone,
+        specialRequests: formData.specialRequests
       };
       sessionStorage.setItem('bookingData', JSON.stringify(bookingData));
       
+      // GIỮ LẠI bookingProgress để có thể quay lại
+      // sessionStorage.removeItem('bookingProgress'); // <-- KHÔNG XÓA NỮA
+      
       // Route based on payment method
       if (formData.paymentMethod === 'credit-card' || formData.paymentMethod === 'bank-transfer') {
-        window.location.href = '/customer/payment';
+        window.location.href = '/payment';
       } else {
-        window.location.href = '/customer/booking/confirm';
+        // Chỉ xóa khi thanh toán tại khách sạn (không cần quay lại)
+        sessionStorage.removeItem('bookingProgress');
+        window.location.href = '/booking/confirm';
       }
     }
   };
@@ -135,34 +160,90 @@ export default function CreateBooking() {
           </svg>
         </div>
       </section>
-
-      {/* Progress Steps */}
-      <div className="max-w-4xl mx-auto px-4 -mt-8 relative z-20">
-        <div className="bg-white rounded-2xl shadow-xl p-6 mb-12">
-          <div className="flex items-center justify-between">
-            {[1, 2, 3].map((s) => (
-              <div key={s} className="flex items-center flex-1">
-                <motion.div 
-                  className={`w-12 h-12 rounded-full flex items-center justify-center font-bold transition-all ${
-                    step >= s ? "bg-green-500 text-white" : "bg-gray-200 text-gray-500"
-                  }`}
-                  animate={{ scale: step === s ? 1.1 : 1 }}
-                  transition={{ type: "spring", stiffness: 300 }}
-                >
-                  {step > s ? <Check className="w-6 h-6" /> : s}
-                </motion.div>
-                {s < 3 && (
-                  <div className={`h-1 flex-1 mx-4 transition-all ${
-                    step > s ? "bg-green-500" : "bg-gray-200"
-                  }`}></div>
-                )}
-              </div>
-            ))}
-          </div>
-          <div className="flex justify-between mt-4 text-sm font-medium">
-            <span className={step >= 1 ? "text-green-600" : "text-gray-500"}>Chọn phòng</span>
-            <span className={step >= 2 ? "text-green-600" : "text-gray-500"}>Thông tin</span>
-            <span className={step >= 3 ? "text-green-600" : "text-gray-500"}>Thanh toán</span>
+{/* Progress Steps */}
+      <div className="max-w-5xl mx-auto px-4 -mt-8 relative z-20">
+        <div className="bg-white rounded-2xl shadow-xl p-8 mb-12">
+          <div className="flex items-center justify-between relative">
+            {[
+              { number: 1, label: "Chọn phòng", icon: Calendar },
+              { number: 2, label: "Thông tin", icon: Users },
+              { number: 3, label: "Thanh toán", icon: CreditCard }
+            ].map((item, index) => {
+              const Icon = item.icon;
+              const isCompleted = step > item.number;
+              const isCurrent = step === item.number;
+              const isClickable = item.number < step || item.number === step;
+              
+              return (
+                <div key={item.number} className="flex items-center flex-1">
+                  <div className="flex flex-col items-center flex-1">
+                    <motion.button
+                      type="button"
+                      onClick={() => {
+                        if (isClickable) {
+                          setStep(item.number);
+                        }
+                      }}
+                      disabled={!isClickable}
+                      className={`w-16 h-16 rounded-full flex items-center justify-center font-bold transition-all relative group ${
+                        isCompleted 
+                          ? "bg-green-500 text-white shadow-lg shadow-green-200" 
+                          : isCurrent
+                          ? "bg-green-500 text-white shadow-xl shadow-green-300"
+                          : "bg-gray-200 text-gray-400"
+                      } ${isClickable ? "cursor-pointer hover:scale-110" : "cursor-not-allowed"}`}
+                      whileHover={isClickable ? { scale: 1.1 } : {}}
+                      whileTap={isClickable ? { scale: 0.95 } : {}}
+                      animate={{ 
+                        scale: isCurrent ? 1.05 : 1,
+                      }}
+                      transition={{ type: "spring", stiffness: 300 }}
+                    >
+                      {isCompleted ? (
+                        <Check className="w-7 h-7" />
+                      ) : (
+                        <Icon className="w-7 h-7" />
+                      )}
+                      
+                      {isCurrent && (
+                        <motion.div
+                          className="absolute inset-0 rounded-full border-4 border-green-300"
+                          animate={{ scale: [1, 1.2, 1] }}
+                          transition={{ duration: 2, repeat: Infinity }}
+                        />
+                      )}
+                    </motion.button>
+                    
+                    <motion.span 
+                      className={`mt-3 text-sm font-semibold transition-all ${
+                        isCompleted || isCurrent ? "text-green-600" : "text-gray-400"
+                      }`}
+                      animate={{ 
+                        scale: isCurrent ? 1.05 : 1,
+                        fontWeight: isCurrent ? 700 : 600
+                      }}
+                    >
+                      {item.label}
+                    </motion.span>
+                  </div>
+                  
+                  {index < 2 && (
+                    <div className={`pb-8 ${index === 0 ? 'flex-1 px-4' : 'flex-[0.9] px-4'}`}>
+                      <div className="relative h-2 bg-gray-200 rounded-full overflow-hidden">
+                        <motion.div 
+                          className="absolute inset-y-0 left-0 bg-gradient-to-r from-green-500 to-emerald-400 rounded-full"
+                          initial={{ width: "0%" }}
+                          animate={{ 
+                            width: step > item.number ? "100%" : "0%"
+                          }}
+                          transition={{ duration: 0.5, ease: "easeInOut" }}
+                        />
+                      </div>
+                    </div>
+                  )}
+                </div>
+              );
+            })}
           </div>
         </div>
       </div>

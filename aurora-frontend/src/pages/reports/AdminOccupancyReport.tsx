@@ -11,6 +11,7 @@ import {
 } from '@/components/custom/reports';
 import { getBranchComparison } from '@/services/reportApi';
 import { getOccupancyStatistics } from '@/services/dashboardApi';
+import { exportOccupancyReport, type OccupancyExportData } from '@/utils/exportUtils';
 import type { ReportDateRange, BranchComparisonData } from '@/types/report.types';
 import type { OccupancyStatistics } from '@/types/dashboard.types';
 import { toast } from 'sonner';
@@ -46,8 +47,40 @@ export default function AdminOccupancyReport() {
   const avgOccupancy = branches.length > 0 ? branches.reduce((sum, b) => sum + b.occupancyRate, 0) / branches.length : systemStats?.occupancyRate || 0;
   const totalStaff = branches.reduce((sum, b) => sum + b.staffCount, 0);
 
-  const handleExportPDF = async () => { await new Promise(r => setTimeout(r, 1000)); toast.success('Đã xuất báo cáo PDF'); };
-  const handleExportExcel = async () => { await new Promise(r => setTimeout(r, 1000)); toast.success('Đã xuất báo cáo Excel'); };
+  // Prepare export data
+  const getExportData = useCallback((): OccupancyExportData => {
+    const occupiedRooms = Math.round(totalRooms * (avgOccupancy / 100));
+    return {
+      dateRange: {
+        from: dateRange.dateFrom,
+        to: dateRange.dateTo,
+      },
+      totalRooms,
+      occupancyRate: avgOccupancy,
+      availableRooms: totalRooms - occupiedRooms,
+      occupiedRooms,
+      branchOccupancy: branches.map(b => ({
+        branchName: b.branchName,
+        roomCount: b.roomCount,
+        occupancyRate: b.occupancyRate,
+        staffCount: b.staffCount,
+        averageRating: b.averageRating,
+      })),
+    };
+  }, [dateRange, totalRooms, avgOccupancy, branches]);
+
+  // Export handlers
+  const handleExportPDF = async () => {
+    await exportOccupancyReport(getExportData(), 'pdf');
+  };
+
+  const handleExportExcel = async () => {
+    await exportOccupancyReport(getExportData(), 'excel');
+  };
+
+  const handleExportCSV = async () => {
+    await exportOccupancyReport(getExportData(), 'csv');
+  };
 
   return (
     <div className="p-6 space-y-6">
@@ -57,7 +90,7 @@ export default function AdminOccupancyReport() {
           <h1 className="text-2xl font-bold text-gray-900">Báo cáo công suất (Admin)</h1>
           <p className="text-gray-500 mt-1">Tổng quan công suất toàn hệ thống</p>
         </div>
-        <ExportButtons onExportPDF={handleExportPDF} onExportExcel={handleExportExcel} loading={loading} />
+        <ExportButtons onExportPDF={handleExportPDF} onExportExcel={handleExportExcel} onExportCSV={handleExportCSV} loading={loading} />
       </div>
 
       {/* Filters */}

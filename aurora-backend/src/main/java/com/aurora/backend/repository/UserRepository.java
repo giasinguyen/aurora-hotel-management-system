@@ -1,6 +1,5 @@
 package com.aurora.backend.repository;
 
-import com.aurora.backend.dto.response.CustomerGrowthPoint;
 import com.aurora.backend.entity.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -32,6 +31,9 @@ public interface UserRepository extends JpaRepository<User, String> {
     @Query("SELECT DISTINCT u FROM User u JOIN u.roles r WHERE r.name = :roleName")
     List<User> findAllByRoleName(@Param("roleName") String roleName);
 
+    @Query("SELECT DISTINCT u FROM User u JOIN u.roles r WHERE r.name = :roleName")
+    Page<User> findAllByRoleNamePaginated(@Param("roleName") String roleName, Pageable pageable);
+
     @Query(value = """
     SELECT period_label, COUNT(*) as customers
     FROM (
@@ -45,4 +47,6 @@ public interface UserRepository extends JpaRepository<User, String> {
     ORDER BY period_label
     """, nativeQuery = true)
     List<Object[]> countCustomersByPeriodNative(@Param("format") String format);
+
+    long countByAssignedBranchId(String branchId);
 }

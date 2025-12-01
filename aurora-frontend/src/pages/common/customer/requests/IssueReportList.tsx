@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { AlertTriangle, User, Phone, Mail, CheckCircle, XCircle, AlertCircle, Search, Filter, Clock, Home, Wrench } from "lucide-react";
+import { AlertTriangle, User, Phone, Mail, CheckCircle, AlertCircle, Search, Filter, Clock, Home, Wrench } from "lucide-react";
 
 export default function IssueReportListPage() {
   const [reports, setReports] = useState<any[]>([]);

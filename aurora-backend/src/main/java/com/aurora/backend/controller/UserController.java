@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.aurora.backend.config.annotation.RequirePermission;
 import com.aurora.backend.constant.PermissionConstants;
+import com.aurora.backend.dto.request.ProfileUpdateRequest;
 import com.aurora.backend.dto.request.UserCreationRequest;
 import com.aurora.backend.dto.request.UserRegistrationRequest;
 import com.aurora.backend.dto.request.UserUpdateRequest;
@@ -18,6 +19,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
@@ -26,6 +28,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.multipart.MultipartFile;
 
 @Slf4j
 @RestController
@@ -55,6 +58,21 @@ public class UserController {
         return ApiResponse.<UserResponse>builder()
                 .message("User info retrieved successfully")
                 .result(userService.getUserByUsername(currentUsername))
+                .build();
+    }
+
+    @PutMapping("/myInfo")
+    @RequirePermission(PermissionConstants.Customer.PROFILE_UPDATE)
+    ApiResponse<UserResponse> updateMyInfo(@RequestBody @Valid ProfileUpdateRequest request) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String currentUsername = authentication.getName();
+        log.info("Updating current user info for: {}", currentUsername);
+        
+        UserResponse currentUser = userService.getUserByUsername(currentUsername);
+        
+        return ApiResponse.<UserResponse>builder()
+                .message("User info updated successfully")
+                .result(userService.updateMyProfile(currentUser.getId(), request))
                 .build();
     }
 
@@ -102,18 +120,35 @@ public class UserController {
                 .build();
     }
 
+    @GetMapping("/role/{roleName}")
+    @RequirePermission({PermissionConstants.Admin.ROLE_CREATE})
+    ApiResponse<Page<UserResponse>> getUsersByRole(
+            @PathVariable("roleName") String roleName,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "username") String sortBy,
+            @RequestParam(defaultValue = "asc") String sortDirection) {
+        
+        log.info("Fetching users with role: {} - page: {}, size: {}", roleName, page, size);
+        
+        Sort sort = sortDirection.equalsIgnoreCase("desc") 
+                ? Sort.by(sortBy).descending() 
+                : Sort.by(sortBy).ascending();
+        
+        Pageable pageable = PageRequest.of(page, size, sort);
+        
+        return ApiResponse.<Page<UserResponse>>builder()
+                .message("Users by role retrieved successfully")
+                .result(userService.getUsersByRoleName(roleName, pageable))
+                .build();
+    }
+
     @GetMapping("/{userId}")
-    @RequirePermission(PermissionConstants.Customer.PROFILE_VIEW)
+    @RequirePermission({PermissionConstants.Admin.USER_VIEW, PermissionConstants.Manager.STAFF_VIEW, PermissionConstants.Customer.PROFILE_VIEW})
     ApiResponse<UserResponse> getUser(@PathVariable("userId") String userId) {
         log.info("Fetching user with ID: {}", userId);
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String currentUsername = authentication.getName();
         
         UserResponse user = userService.getUser(userId);
-        if (!user.getUsername().equals(currentUsername)) {
-            throw new com.aurora.backend.exception.AppException(
-                com.aurora.backend.enums.ErrorCode.UNAUTHORIZED);
-        }
         
         return ApiResponse.<UserResponse>builder()
                 .message("User retrieved successfully")
@@ -132,19 +167,11 @@ public class UserController {
     }
 
     @PutMapping("/{userId}")
-    @RequirePermission(PermissionConstants.Customer.PROFILE_UPDATE)
+    @RequirePermission({PermissionConstants.Admin.USER_UPDATE, PermissionConstants.Customer.PROFILE_UPDATE})
     ApiResponse<UserResponse> updateUser(
             @PathVariable("userId") String userId,
             @RequestBody @Valid UserUpdateRequest userUpdateRequest) {
         log.info("Updating user with ID: {}", userId);
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        String currentUsername = authentication.getName();
-        
-        UserResponse user = userService.getUser(userId);
-        if (!user.getUsername().equals(currentUsername)) {
-            throw new com.aurora.backend.exception.AppException(
-                com.aurora.backend.enums.ErrorCode.UNAUTHORIZED);
-        }
         
         return ApiResponse.<UserResponse>builder()
                 .message("User updated successfully")
@@ -163,6 +190,28 @@ public class UserController {
                 .build();
     }
 
+    @PatchMapping("/{userId}/status")
+    @RequirePermission(PermissionConstants.Admin.USER_UPDATE)
+    ApiResponse<UserResponse> toggleUserStatus(
+            @PathVariable("userId") String userId,
+            @RequestBody java.util.Map<String, Boolean> statusRequest) {
+        log.info("Toggling user status for ID: {}", userId);
+        Boolean active = statusRequest.get("active");
+        if (active == null) {
+            throw new com.aurora.backend.exception.AppException(
+                com.aurora.backend.enums.ErrorCode.INVALID_KEY);
+        }
+        
+        // Get current user and update status
+        UserUpdateRequest updateRequest = new UserUpdateRequest();
+        updateRequest.setActive(active);
+        
+        return ApiResponse.<UserResponse>builder()
+                .message(active ? "User activated successfully" : "User deactivated successfully")
+                .result(userService.updateUser(userId, updateRequest))
+                .build();
+    }
+
     @GetMapping("/search")
     @RequirePermission({PermissionConstants.Admin.USER_CREATE, PermissionConstants.Staff.CUSTOMER_VIEW})
     ApiResponse<Page<UserResponse>> searchUsers(
@@ -178,4 +227,81 @@ public class UserController {
                 .result(userService.searchUsersByUsername(username, pageable))
                 .build();
     }
+
+    // ========== Role Management Endpoints ==========
+    
+    @PostMapping("/{userId}/roles/{roleId}")
+    @RequirePermission(PermissionConstants.Admin.ROLE_ASSIGN)
+    ApiResponse<UserResponse> assignRoleToUser(
+            @PathVariable("userId") String userId,
+            @PathVariable("roleId") String roleId) {
+        log.info("Assigning role {} to user {}", roleId, userId);
+        UserResponse user = userService.assignRoleToUser(userId, roleId);
+        return ApiResponse.<UserResponse>builder()
+                .message("Role assigned successfully")
+                .result(user)
+                .build();
+    }
+
+    @DeleteMapping("/{userId}/roles/{roleId}")
+    @RequirePermission(PermissionConstants.Admin.ROLE_ASSIGN)
+    ApiResponse<UserResponse> removeRoleFromUser(
+            @PathVariable("userId") String userId,
+            @PathVariable("roleId") String roleId) {
+        log.info("Removing role {} from user {}", roleId, userId);
+        UserResponse user = userService.removeRoleFromUser(userId, roleId);
+        return ApiResponse.<UserResponse>builder()
+                .message("Role removed successfully")
+                .result(user)
+                .build();
+    }
+
+    // ========== Permission Management Endpoints ==========
+    
+    @GetMapping("/{userId}/permissions")
+    @RequirePermission({PermissionConstants.Admin.PERMISSION_MANAGE, PermissionConstants.Admin.USER_VIEW})
+    ApiResponse<List<String>> getUserPermissions(@PathVariable("userId") String userId) {
+        log.info("Fetching disabled permissions for user {}", userId);
+        List<String> disabledPermissions = userService.getUserDisabledPermissions(userId);
+        return ApiResponse.<List<String>>builder()
+                .message("User permissions retrieved successfully")
+                .result(disabledPermissions)
+                .build();
+    }
+
+    @PutMapping("/{userId}/permissions")
+    @RequirePermission(PermissionConstants.Admin.PERMISSION_MANAGE)
+    ApiResponse<UserResponse> updateUserPermissions(
+            @PathVariable("userId") String userId,
+            @RequestBody java.util.Map<String, Object> permissionRequest) {
+        log.info("Updating permissions for user {}", userId);
+        
+        @SuppressWarnings("unchecked")
+        List<String> disabledPermissions = (List<String>) permissionRequest.get("disabledPermissions");
+        
+        if (disabledPermissions == null) {
+            disabledPermissions = new java.util.ArrayList<>();
+        }
+        
+        UserResponse user = userService.updateUserPermissions(userId, disabledPermissions);
+        return ApiResponse.<UserResponse>builder()
+                .message("User permissions updated successfully")
+                .result(user)
+                .build();
+    }
+    @PostMapping(value = "/avatar", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @RequirePermission(PermissionConstants.Customer.PROFILE_UPDATE)
+    public ApiResponse<UserResponse> uploadAvatar(@RequestParam("file") MultipartFile file) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String currentUsername = authentication.getName();
+
+        // Gọi service để upload ảnh và lưu URL vào user
+        UserResponse updatedUser = userService.uploadAvatar(currentUsername, file);
+
+        return ApiResponse.<UserResponse>builder()
+                .message("Avatar uploaded successfully")
+                .result(updatedUser)
+                .build();
+    }
 }
+// Thêm vào UserController.java

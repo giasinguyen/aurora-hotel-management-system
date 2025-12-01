@@ -6,6 +6,7 @@ import {
   BranchRevenueChart, BranchRadarChart, BranchRankingTable, SummaryCard,
 } from '@/components/custom/reports';
 import { getBranchComparison } from '@/services/reportApi';
+import { exportBranchComparisonReport, type BranchComparisonExportData } from '@/utils/exportUtils';
 import type { ReportDateRange, BranchComparisonData } from '@/types/report.types';
 import { toast } from 'sonner';
 
@@ -44,8 +45,43 @@ export default function BranchComparisonReport() {
   const avgRating = branches.length > 0 ? branches.reduce((sum, b) => sum + b.averageRating, 0) / branches.length : 0;
   const topBranch = branches.length > 0 ? [...branches].sort((a, b) => b.totalRevenue - a.totalRevenue)[0] : null;
 
-  const handleExportPDF = async () => { await new Promise(r => setTimeout(r, 1000)); toast.success('Đã xuất báo cáo PDF'); };
-  const handleExportExcel = async () => { await new Promise(r => setTimeout(r, 1000)); toast.success('Đã xuất báo cáo Excel'); };
+  // Prepare export data
+  const getExportData = useCallback((): BranchComparisonExportData => {
+    return {
+      dateRange: {
+        from: dateRange.dateFrom,
+        to: dateRange.dateTo,
+      },
+      totalBranches: branches.length,
+      totalRevenue,
+      totalBookings,
+      averageOccupancy: avgOccupancy,
+      branches: branches.map(b => ({
+        branchName: b.branchName,
+        branchCode: b.branchCode,
+        city: b.city,
+        roomCount: b.roomCount,
+        totalRevenue: b.totalRevenue,
+        totalBookings: b.totalBookings,
+        occupancyRate: b.occupancyRate,
+        averageRating: b.averageRating,
+        staffCount: b.staffCount,
+      })),
+    };
+  }, [dateRange, branches, totalRevenue, totalBookings, avgOccupancy]);
+
+  // Export handlers
+  const handleExportPDF = async () => {
+    await exportBranchComparisonReport(getExportData(), 'pdf');
+  };
+
+  const handleExportExcel = async () => {
+    await exportBranchComparisonReport(getExportData(), 'excel');
+  };
+
+  const handleExportCSV = async () => {
+    await exportBranchComparisonReport(getExportData(), 'csv');
+  };
 
   return (
     <div className="p-6 space-y-6">
@@ -55,7 +91,7 @@ export default function BranchComparisonReport() {
           <h1 className="text-2xl font-bold text-gray-900">So sánh chi nhánh</h1>
           <p className="text-gray-500 mt-1">Phân tích hiệu suất giữa các chi nhánh</p>
         </div>
-        <ExportButtons onExportPDF={handleExportPDF} onExportExcel={handleExportExcel} loading={loading} />
+        <ExportButtons onExportPDF={handleExportPDF} onExportExcel={handleExportExcel} onExportCSV={handleExportCSV} loading={loading} />
       </div>
 
       {/* Filters */}

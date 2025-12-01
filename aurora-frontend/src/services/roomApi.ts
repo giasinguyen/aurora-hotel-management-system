@@ -1,6 +1,7 @@
 import type { ApiResponse } from '@/types/apiResponse';
 import type { 
-  Room, 
+  Room,
+  RoomCategory,
   RoomCreationRequest, 
   RoomUpdateRequest,
   RoomType,
@@ -12,6 +13,7 @@ import axiosClient from '@/config/axiosClient';
 
 const ROOM_BASE_URL = '/api/v1/rooms';
 const ROOM_TYPE_BASE_URL = '/api/v1/room-types';
+const ROOM_CATEGORY_BASE_URL = '/api/v1/room-categories';
 
 // Spring Page response type
 interface SpringPage<T> {
@@ -132,7 +134,8 @@ export const roomTypeApi = {
   // Get room type by ID
   getById: async (id: string) => {
     const response = await axiosClient.get<ApiResponse<RoomType>>(
-      `${ROOM_TYPE_BASE_URL}/${id}`
+      `${ROOM_TYPE_BASE_URL}/${id}`,
+      { params: { _t: Date.now() } } // Cache busting
     );
     return response.data;
   },
@@ -182,4 +185,32 @@ export const roomTypeApi = {
   },
 };
 
-export default { roomApi, roomTypeApi };
+// ==================== ROOM CATEGORY API ====================
+
+export const roomCategoryApi = {
+  // Get all categories by branch
+  getByBranch: async (branchId: string) => {
+    const response = await axiosClient.get<ApiResponse<RoomCategory[]>>(
+      `${ROOM_CATEGORY_BASE_URL}/branch/${branchId}`
+    );
+    return response.data;
+  },
+
+  // Get category by ID
+  getById: async (id: string) => {
+    const response = await axiosClient.get<ApiResponse<RoomCategory>>(
+      `${ROOM_CATEGORY_BASE_URL}/${id}`
+    );
+    return response.data;
+  },
+
+  // Get category by ID with room types
+  getByIdWithRoomTypes: async (id: string) => {
+    const response = await axiosClient.get<ApiResponse<RoomCategory>>(
+      `${ROOM_CATEGORY_BASE_URL}/${id}/with-room-types`
+    );
+    return response.data;
+  },
+};
+
+export default { roomApi, roomTypeApi, roomCategoryApi };

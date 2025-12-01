@@ -1,13 +1,12 @@
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { Clock, Calendar, User, Phone, Mail, CheckCircle, XCircle, AlertCircle, Search, Filter, Sparkles } from "lucide-react";
+import { Clock, User, Phone, Mail, CheckCircle, XCircle, AlertCircle, Search, Filter } from "lucide-react";
 
 export default function LateCheckoutRequestListPage() {
   const [requests, setRequests] = useState<any[]>([]);
   const [filteredRequests, setFilteredRequests] = useState<any[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
-  const [selectedRequest, setSelectedRequest] = useState<any>(null);
 
   // Mock data
   useEffect(() => {
@@ -128,19 +127,12 @@ export default function LateCheckoutRequestListPage() {
     setRequests(requests.map(req =>
       req.id === id ? { ...req, status: "approved" } : req
     ));
-    setSelectedRequest(null);
   };
 
   const handleReject = (id: number) => {
     setRequests(requests.map(req =>
       req.id === id ? { ...req, status: "rejected" } : req
     ));
-    setSelectedRequest(null);
-  };
-
-  const fadeInUp = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0 }
   };
 
   return (

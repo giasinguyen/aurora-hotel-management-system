@@ -4,10 +4,13 @@ import com.aurora.backend.config.annotation.RequirePermission;
 import com.aurora.backend.config.annotation.RequirePermission.LogicType;
 import com.aurora.backend.constant.PermissionConstants;
 import com.aurora.backend.dto.response.ApiResponse;
+import com.aurora.backend.dto.response.BranchComparisonResponse;
 import com.aurora.backend.dto.response.CustomerGrowthPoint;
 import com.aurora.backend.dto.response.DashboardOverviewResponse;
 import com.aurora.backend.dto.response.OccupancyStatistics;
 import com.aurora.backend.dto.response.RevenueStatistics;
+import com.aurora.backend.dto.response.ShiftReportResponse;
+import com.aurora.backend.dto.response.ShiftSummaryResponse;
 import com.aurora.backend.dto.response.TopRoomTypeResponse;
 import com.aurora.backend.enums.DashboardGroupBy;
 import com.aurora.backend.service.DashboardService;
@@ -160,6 +163,60 @@ public class DashboardController {
         DashboardGroupBy bucket = DashboardGroupBy.from(period);
         List<CustomerGrowthPoint> result = dashboardService.getCustomerGrowth(bucket);
         return ApiResponse.<List<CustomerGrowthPoint>>builder()
+                .result(result)
+                .build();
+    }
+
+    // =====================
+    // Branch Comparison Reports
+    // =====================
+
+    @GetMapping("/branch-comparison")
+    @RequirePermission(PermissionConstants.Admin.DASHBOARD_VIEW_ADMIN)
+    public ApiResponse<List<BranchComparisonResponse>> getBranchComparison(
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateFrom,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateTo
+    ) {
+        List<BranchComparisonResponse> result = dashboardService.getBranchComparison(dateFrom, dateTo);
+        return ApiResponse.<List<BranchComparisonResponse>>builder()
+                .result(result)
+                .build();
+    }
+
+    // =====================
+    // Shift Reports
+    // =====================
+
+    @GetMapping("/shift-report")
+    @RequirePermission(value = {
+            PermissionConstants.Admin.DASHBOARD_VIEW_ADMIN,
+            PermissionConstants.Manager.DASHBOARD_VIEW_MANAGER,
+            PermissionConstants.Staff.DASHBOARD_VIEW_STAFF
+    }, logic = LogicType.OR)
+    public ApiResponse<List<ShiftReportResponse>> getShiftReport(
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateFrom,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateTo,
+            @RequestParam(required = false) String branchId,
+            @RequestParam(required = false) String staffId
+    ) {
+        List<ShiftReportResponse> result = dashboardService.getShiftReport(dateFrom, dateTo, branchId, staffId);
+        return ApiResponse.<List<ShiftReportResponse>>builder()
+                .result(result)
+                .build();
+    }
+
+    @GetMapping("/shift-summary")
+    @RequirePermission(value = {
+            PermissionConstants.Admin.DASHBOARD_VIEW_ADMIN,
+            PermissionConstants.Manager.DASHBOARD_VIEW_MANAGER
+    }, logic = LogicType.OR)
+    public ApiResponse<ShiftSummaryResponse> getShiftSummary(
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateFrom,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dateTo,
+            @RequestParam(required = false) String branchId
+    ) {
+        ShiftSummaryResponse result = dashboardService.getShiftSummary(dateFrom, dateTo, branchId);
+        return ApiResponse.<ShiftSummaryResponse>builder()
                 .result(result)
                 .build();
     }

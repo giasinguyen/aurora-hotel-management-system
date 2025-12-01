@@ -5,6 +5,8 @@ import jakarta.validation.constraints.Positive;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.util.List;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -24,4 +26,6 @@ public class RoomCreationRequest {
     Integer floor;
     
     String status;
+    
+    List<String> images;
 }

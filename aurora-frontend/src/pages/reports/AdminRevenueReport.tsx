@@ -2,32 +2,27 @@ import { useState, useEffect, useCallback } from 'react';
 import {
   DollarSign,
   TrendingUp,
-  TrendingDown,
   Building2,
   CalendarCheck,
   Users,
   BarChart3,
   PieChart as PieChartIcon,
-  ArrowUpRight,
-  ArrowDownRight,
 } from 'lucide-react';
 import {
-  BarChart,
-  Bar,
   XAxis,
   YAxis,
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-  LineChart,
-  Line,
-  AreaChart,
   Area,
+  Line,
   ComposedChart,
   Legend,
   PieChart as RechartsPie,
   Pie,
   Cell,
+  BarChart,
+  Bar,
 } from 'recharts';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -60,6 +55,7 @@ import {
   getAdminOverview,
 } from '@/services/dashboardApi';
 import { getBranchComparison } from '@/services/reportApi';
+import { exportRevenueReport, type RevenueExportData } from '@/utils/exportUtils';
 import type { ReportDateRange, BranchComparisonData } from '@/types/report.types';
 import type { 
   RevenueStatistics, 
@@ -70,7 +66,6 @@ import type {
 import { toast } from 'sonner';
 
 // Colors
-const COLORS = ['#f59e0b', '#3b82f6', '#10b981', '#ef4444', '#8b5cf6', '#ec4899'];
 const BRANCH_COLORS = ['#f59e0b', '#3b82f6', '#10b981', '#ef4444', '#8b5cf6', '#ec4899'];
 
 // Format currency
@@ -95,15 +90,15 @@ const formatFullCurrency = (value: number) => {
 export default function AdminRevenueReport() {
   // State
   const [dateRange, setDateRange] = useState<ReportDateRange>({
-    dateFrom: null,
-    dateTo: null,
+    dateFrom: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+    dateTo: new Date().toISOString().split('T')[0],
   });
   const [groupBy, setGroupBy] = useState<DashboardGroupBy>('MONTH');
   const [loading, setLoading] = useState(false);
 
   // Data states
   const [overview, setOverview] = useState<DashboardOverview | null>(null);
-  const [revenueStats, setRevenueStats] = useState<RevenueStatistics | null>(null);
+  const [revenueStats, setRevenueStats] = useState<RevenueStatistics[]>([]);
   const [paymentMethods, setPaymentMethods] = useState<PaymentMethodRevenue | null>(null);
   const [branchData, setBranchData] = useState<BranchComparisonData[]>([]);
 
@@ -132,18 +127,16 @@ export default function AdminRevenueReport() {
   }, [dateRange.dateFrom, dateRange.dateTo, groupBy]);
 
   useEffect(() => {
-    if (dateRange.dateFrom || dateRange.dateTo) {
-      fetchData();
-    }
-  }, [fetchData, dateRange.dateFrom, dateRange.dateTo]);
+    fetchData();
+  }, [fetchData]);
 
-  // Chart data
-  const revenueChartData = revenueStats?.dataPoints?.map(point => ({
-    name: point.label,
+  // Chart data from revenue stats array
+  const revenueChartData = revenueStats.map((point: RevenueStatistics) => ({
+    name: point.periodLabel,
     revenue: point.revenue,
-    bookings: point.bookings,
-    average: point.bookings > 0 ? Math.round(point.revenue / point.bookings) : 0,
-  })) || [];
+    bookings: point.bookingCount,
+    average: point.bookingCount > 0 ? Math.round(point.revenue / point.bookingCount) : 0,
+  }));
 
   const paymentMethodData = paymentMethods ? [
     { name: 'Tiền mặt', value: paymentMethods.cash || 0, color: '#10b981' },
@@ -165,15 +158,48 @@ export default function AdminRevenueReport() {
   const totalBookings = branchData.reduce((sum, b) => sum + b.totalBookings, 0);
   const avgRevenue = totalBookings > 0 ? totalRevenue / totalBookings : 0;
 
+  // Prepare export data
+  const getExportData = useCallback((): RevenueExportData => {
+    const paymentTotal = paymentMethodData.reduce((sum, p) => sum + p.value, 0);
+    return {
+      dateRange: {
+        from: dateRange.dateFrom,
+        to: dateRange.dateTo,
+      },
+      totalRevenue: overview?.totalRevenue || totalRevenue,
+      totalBookings: overview?.totalBookings || totalBookings,
+      averageBookingValue: avgRevenue || (overview?.totalRevenue || 0) / (overview?.totalBookings || 1),
+      revenueGrowth: 15.3, // TODO: Calculate from actual data
+      revenueData: revenueChartData.map(item => ({
+        period: item.name,
+        revenue: item.revenue,
+        bookings: item.bookings,
+      })),
+      branchRevenue: branchData.map(b => ({
+        branchName: b.branchName,
+        revenue: b.totalRevenue,
+        bookings: b.totalBookings,
+        percentage: totalRevenue > 0 ? (b.totalRevenue / totalRevenue) * 100 : 0,
+      })),
+      paymentMethods: paymentMethodData.map(p => ({
+        method: p.name,
+        amount: p.value,
+        percentage: paymentTotal > 0 ? (p.value / paymentTotal) * 100 : 0,
+      })),
+    };
+  }, [dateRange, overview, totalRevenue, totalBookings, avgRevenue, revenueChartData, branchData, paymentMethodData]);
+
   // Export handlers
   const handleExportPDF = async () => {
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    toast.success('Đã xuất báo cáo PDF');
+    await exportRevenueReport(getExportData(), 'pdf');
   };
 
   const handleExportExcel = async () => {
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    toast.success('Đã xuất báo cáo Excel');
+    await exportRevenueReport(getExportData(), 'excel');
+  };
+
+  const handleExportCSV = async () => {
+    await exportRevenueReport(getExportData(), 'csv');
   };
 
   return (
@@ -187,6 +213,7 @@ export default function AdminRevenueReport() {
         <ExportButtons
           onExportPDF={handleExportPDF}
           onExportExcel={handleExportExcel}
+          onExportCSV={handleExportCSV}
           loading={loading}
         />
       </div>
@@ -414,7 +441,7 @@ export default function AdminRevenueReport() {
                       outerRadius={120}
                       paddingAngle={3}
                       dataKey="revenue"
-                      label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                      label={({ name, percent }) => `${name} ${((percent || 0) * 100).toFixed(0)}%`}
                     >
                       {branchRevenueData.map((entry, index) => (
                         <Cell key={`cell-${index}`} fill={entry.color} />
@@ -534,7 +561,7 @@ export default function AdminRevenueReport() {
                       outerRadius={120}
                       paddingAngle={3}
                       dataKey="value"
-                      label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                      label={({ name, percent }) => `${name} ${((percent || 0) * 100).toFixed(0)}%`}
                     >
                       {paymentMethodData.map((entry, index) => (
                         <Cell key={`cell-${index}`} fill={entry.color} />

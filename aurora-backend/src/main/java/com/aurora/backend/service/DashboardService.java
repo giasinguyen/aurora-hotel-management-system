@@ -1,9 +1,12 @@
 package com.aurora.backend.service;
 
+import com.aurora.backend.dto.response.BranchComparisonResponse;
 import com.aurora.backend.dto.response.CustomerGrowthPoint;
 import com.aurora.backend.dto.response.DashboardOverviewResponse;
 import com.aurora.backend.dto.response.OccupancyStatistics;
 import com.aurora.backend.dto.response.RevenueStatistics;
+import com.aurora.backend.dto.response.ShiftReportResponse;
+import com.aurora.backend.dto.response.ShiftSummaryResponse;
 import com.aurora.backend.dto.response.TopRoomTypeResponse;
 import com.aurora.backend.enums.DashboardGroupBy;
 
@@ -35,4 +38,11 @@ public interface DashboardService {
     Map<String, Long> getBookingsBySource(LocalDate dateFrom, LocalDate dateTo, String branchId);
 
     List<CustomerGrowthPoint> getCustomerGrowth(DashboardGroupBy period);
+
+    List<BranchComparisonResponse> getBranchComparison(LocalDate dateFrom, LocalDate dateTo);
+
+    List<ShiftReportResponse> getShiftReport(LocalDate dateFrom, LocalDate dateTo, 
+                                              String branchId, String staffId);
+
+    ShiftSummaryResponse getShiftSummary(LocalDate dateFrom, LocalDate dateTo, String branchId);
 }

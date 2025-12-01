@@ -3,6 +3,8 @@ package com.aurora.backend.dto.response;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.util.List;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -16,4 +18,5 @@ public class ServiceResponse {
     String type;
     String description;
     Double basePrice;
+    List<String> images;
 }

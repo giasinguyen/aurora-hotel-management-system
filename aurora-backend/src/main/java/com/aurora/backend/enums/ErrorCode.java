@@ -92,6 +92,8 @@ public enum ErrorCode {
     ROLE_NOT_EXISTED(1700, "Role not found", HttpStatus.NOT_FOUND),
     ROLE_EXISTED(1701, "Role already exists", HttpStatus.BAD_REQUEST),
     ROLE_NAME_REQUIRED(1702, "Role name is required", HttpStatus.BAD_REQUEST),
+    ROLE_ALREADY_ASSIGNED(1703, "Role is already assigned to this user", HttpStatus.BAD_REQUEST),
+    ROLE_NOT_ASSIGNED(1704, "Role is not assigned to this user", HttpStatus.BAD_REQUEST),
     
     // Permission errors
     PERMISSION_NOT_EXISTED(1800, "Permission not found", HttpStatus.NOT_FOUND),
@@ -155,20 +157,6 @@ public enum ErrorCode {
     BRANCH_CITY_REQUIRED(2407, "City is required", HttpStatus.BAD_REQUEST),
     BRANCH_DISTRICT_REQUIRED(2408, "District is required", HttpStatus.BAD_REQUEST),
     BRANCH_WARD_REQUIRED(2409, "Ward is required", HttpStatus.BAD_REQUEST),
-    
-    // Review errors
-    REVIEW_NOT_FOUND(2500, "Review not found", HttpStatus.NOT_FOUND),
-    REVIEW_ALREADY_EXISTS(2501, "Review already exists for this booking", HttpStatus.BAD_REQUEST),
-    REVIEW_NOT_ALLOWED(2502, "Only checked-out customers can review", HttpStatus.FORBIDDEN),
-    REVIEW_EDIT_EXPIRED(2503, "Review can only be edited within 24 hours", HttpStatus.FORBIDDEN),
-    RATING_REQUIRED(2504, "Rating is required", HttpStatus.BAD_REQUEST),
-    RATING_INVALID(2505, "Rating must be between 1 and 5", HttpStatus.BAD_REQUEST),
-    COMMENT_REQUIRED(2506, "Comment is required", HttpStatus.BAD_REQUEST),
-    COMMENT_TOO_SHORT(2507, "Comment must be at least 10 characters", HttpStatus.BAD_REQUEST),
-    TOO_MANY_PHOTOS(2508, "Maximum 5 photos allowed", HttpStatus.BAD_REQUEST),
-    REVIEW_NOT_OWNER(2509, "You can only edit your own reviews", HttpStatus.FORBIDDEN),
-    REJECTION_REASON_REQUIRED(2510, "Rejection reason is required", HttpStatus.BAD_REQUEST),
-    REVIEW_ALREADY_MODERATED(2511, "Review has already been moderated", HttpStatus.BAD_REQUEST),
     
     // VNPay payment errors
     BOOKING_NOT_CONFIRMED(2600, "Booking must be confirmed before payment", HttpStatus.BAD_REQUEST),

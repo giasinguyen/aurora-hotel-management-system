@@ -23,9 +23,9 @@ spring:
       mode: always
       encoding: UTF-8
       schema-locations:
-        - classpath:db/fix-email-verified.sql
-        - classpath:db/init-vector-store.sql
-        - classpath:db/init-roles-permissions.sql
+        - classpath:db/init-auto/fix-email-verified.sql
+        - classpath:db/init-auto/init-vector-store.sql
+        - classpath:db/init-auto/init-roles-permissions.sql
   jpa:
     hibernate:
       ddl-auto: update

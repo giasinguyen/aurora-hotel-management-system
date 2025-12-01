@@ -3,6 +3,8 @@ package com.aurora.backend.dto.response;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.util.List;
+
 @Getter
 @Setter
 @Builder
@@ -21,4 +23,6 @@ public class RoomResponse {
     Integer capacityAdults;
     Integer capacityChildren;
     Double sizeM2;
+    String viewType;
+    List<String> images;
 }

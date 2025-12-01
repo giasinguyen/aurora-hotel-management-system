@@ -89,9 +89,26 @@ export default function CustomerPaymentPage() {
 
   const handlePayment = () => {
     setPaymentCompleted(true);
+    
+    // Xóa bookingProgress sau khi hoàn tất thanh toán
+    sessionStorage.removeItem('bookingProgress');
+    
     setTimeout(() => {
-      window.location.href = '/customer/booking/confirm';
+      window.location.href = '/booking/confirm';
     }, 2000);
+  };
+
+  const handleBackToBooking = () => {
+    // bookingProgress đã được giữ lại, chỉ cần đảm bảo step = 3
+    const progressStr = sessionStorage.getItem('bookingProgress');
+    if (progressStr) {
+      const progress = JSON.parse(progressStr);
+      progress.step = 3; // Đảm bảo về step 3
+      sessionStorage.setItem('bookingProgress', JSON.stringify(progress));
+    }
+    
+    // Điều hướng về trang booking
+    window.location.href = '/booking/create';
   };
 
   const formatCardNumber = (value: string) => {
@@ -158,6 +175,22 @@ export default function CustomerPaymentPage() {
 
       {/* Payment Section */}
       <section className="max-w-6xl mx-auto px-4 pb-20 -mt-8 relative z-20">
+        {/* Back Button */}
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="mb-6"
+        >
+          <button
+            onClick={handleBackToBooking}
+            className="flex items-center gap-2 px-6 py-3 bg-white border-2 border-green-500 text-green-600 rounded-xl font-semibold hover:bg-green-50 transition-all shadow-md"
+          >
+            <ArrowRight className="w-5 h-5 rotate-180" />
+            Quay Lại Đặt Phòng
+          </button>
+        </motion.div>
+
         <div className="grid lg:grid-cols-3 gap-8">
           {/* Payment Form */}
           <motion.div 

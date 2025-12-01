@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -17,6 +18,8 @@ public interface BranchRepository extends JpaRepository<Branch, String> {
     boolean existsByCode(String code);
     
     Page<Branch> findByStatus(Branch.BranchStatus status, Pageable pageable);
+    
+    List<Branch> findAllByStatus(Branch.BranchStatus status);
     
     Page<Branch> findByCity(String city, Pageable pageable);
     

@@ -54,6 +54,7 @@ export default function BookingList() {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [branches, setBranches] = useState<Branch[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   
   // Pagination
   const [currentPage, setCurrentPage] = useState(0);
@@ -79,9 +80,13 @@ export default function BookingList() {
     const fetchBranches = async () => {
       try {
         const response = await branchApi.getAll({ page: 0, size: 100 });
-        setBranches(response.result.content);
-      } catch (error) {
-        console.error('Failed to fetch branches:', error);
+        if (response?.result?.content) {
+          setBranches(response.result.content);
+        } else {
+          setBranches([]);
+        }
+      } catch {
+        setBranches([]);
       }
     };
     fetchBranches();
@@ -91,6 +96,8 @@ export default function BookingList() {
   const fetchBookings = useCallback(async () => {
     try {
       setIsLoading(true);
+      setError(null);
+      
       const response = await bookingApi.search({
         hotelId: selectedBranch || undefined,
         status: selectedStatus as BookingStatus || undefined,
@@ -100,13 +107,49 @@ export default function BookingList() {
         sortDir: sortDirection,
       });
       
-      const pageData = response.result;
-      setBookings(pageData.content);
-      setTotalPages(pageData.totalPages);
-      setTotalElements(pageData.totalElements);
-    } catch (error) {
-      console.error('Failed to fetch bookings:', error);
-      toast.error('Không thể tải danh sách đặt phòng');
+      // Safe access với fallback
+      const pageData = response?.result;
+      if (pageData) {
+        const bookingsData = pageData.content || [];
+        setBookings(bookingsData);
+        setTotalPages(pageData.totalPages ?? 0);
+        setTotalElements(pageData.totalElements ?? 0);
+      } else {
+        setBookings([]);
+        setTotalPages(0);
+        setTotalElements(0);
+      }
+    } catch (error: unknown) {
+      
+      // Xử lý error chi tiết hơn
+      let errorMessage = 'Không thể tải danh sách đặt phòng';
+      
+      if (error && typeof error === 'object') {
+        if ('response' in error && error.response) {
+          const axiosError = error as { response?: { status?: number; data?: { message?: string } } };
+          if (axiosError.response?.status === 404) {
+            errorMessage = 'API endpoint không tồn tại. Vui lòng kiểm tra backend.';
+          } else if (axiosError.response?.status === 403) {
+            errorMessage = 'Bạn không có quyền truy cập.';
+          } else if (axiosError.response?.status === 401) {
+            errorMessage = 'Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại.';
+          } else if (axiosError.response?.data?.message) {
+            errorMessage = axiosError.response.data.message;
+          }
+        } else if ('message' in error && typeof error.message === 'string') {
+          errorMessage = error.message;
+        }
+      }
+      
+      setError(errorMessage);
+      setBookings([]);
+      setTotalPages(0);
+      setTotalElements(0);
+      
+      // Chỉ toast error nếu không phải lỗi network (để tránh spam)
+      if (error && typeof error === 'object' && 'message' in error) {
+        toast.error(errorMessage);
+      }
     } finally {
       setIsLoading(false);
     }
@@ -122,8 +165,7 @@ export default function BookingList() {
       await bookingApi.confirm(bookingId, {});
       toast.success('Xác nhận đặt phòng thành công');
       fetchBookings();
-    } catch (error) {
-      console.error('Failed to confirm booking:', error);
+    } catch {
       toast.error('Không thể xác nhận đặt phòng');
     }
   };
@@ -138,8 +180,7 @@ export default function BookingList() {
       setCancelDialogOpen(false);
       setSelectedBookingId(null);
       fetchBookings();
-    } catch (error) {
-      console.error('Failed to cancel booking:', error);
+    } catch {
       toast.error('Không thể hủy đặt phòng');
     }
   };
@@ -182,7 +223,7 @@ export default function BookingList() {
       header: 'Mã đặt phòng',
       cell: (booking) => (
         <span className="font-mono font-medium text-primary">
-          {booking.bookingCode}
+          {booking?.bookingCode || 'N/A'}
         </span>
       ),
       sortable: true,
@@ -192,28 +233,30 @@ export default function BookingList() {
       header: 'Khách hàng',
       cell: (booking) => (
         <div>
-          <div className="font-medium">{booking.customerName}</div>
-          <div className="text-sm text-muted-foreground">{booking.branchName}</div>
+          <div className="font-medium">{booking?.customerName || 'N/A'}</div>
+          <div className="text-sm text-muted-foreground">{booking?.branchName || ''}</div>
         </div>
       ),
     },
     {
       key: 'checkin',
       header: 'Ngày nhận',
-      cell: (booking) => formatDate(booking.checkin),
+      cell: (booking) => booking?.checkin ? formatDate(booking.checkin) : 'N/A',
       sortable: true,
     },
     {
       key: 'checkout',
       header: 'Ngày trả',
-      cell: (booking) => formatDate(booking.checkout),
+      cell: (booking) => booking?.checkout ? formatDate(booking.checkout) : 'N/A',
       sortable: true,
     },
     {
       key: 'totalPrice',
       header: 'Tổng tiền',
       cell: (booking) => (
-        <span className="font-medium">{formatCurrency(booking.totalPrice)}</span>
+        <span className="font-medium">
+          {booking?.totalPrice != null ? formatCurrency(booking.totalPrice) : 'N/A'}
+        </span>
       ),
       sortable: true,
     },
@@ -221,7 +264,15 @@ export default function BookingList() {
       key: 'status',
       header: 'Trạng thái',
       cell: (booking) => {
+        if (!booking?.status) {
+          return <StatusBadge label="N/A" variant="outline" />;
+        }
+        
         const config = bookingStatusConfig[booking.status as BookingStatus];
+        if (!config) {
+          return <StatusBadge label={String(booking.status)} variant="outline" />;
+        }
+        
         return <StatusBadge label={config.label} variant={config.variant} />;
       },
     },
@@ -229,66 +280,80 @@ export default function BookingList() {
       key: 'paymentStatus',
       header: 'Thanh toán',
       cell: (booking) => {
+        if (!booking?.paymentStatus) {
+          return <StatusBadge label="N/A" variant="outline" />;
+        }
+        
         const config = paymentStatusConfig[booking.paymentStatus as PaymentStatus];
+        if (!config) {
+          return <StatusBadge label={String(booking.paymentStatus)} variant="outline" />;
+        }
+        
         return <StatusBadge label={config.label} variant={config.variant} />;
       },
     },
     {
       key: 'actions',
       header: '',
-      cell: (booking) => (
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon">
-              <MoreHorizontal className="h-4 w-4" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuLabel>Thao tác</DropdownMenuLabel>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => navigate(`/admin/bookings/${booking.id}`)}>
-              <Eye className="h-4 w-4 mr-2" />
-              Xem chi tiết
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => navigate(`/admin/bookings/${booking.id}/edit`)}>
-              <Edit className="h-4 w-4 mr-2" />
-              Chỉnh sửa
-            </DropdownMenuItem>
-            {booking.status === 'PENDING' && (
-              <>
-                <DropdownMenuSeparator />
-                <DropdownMenuItem onClick={() => handleConfirmBooking(booking.id)}>
-                  <CheckCircle className="h-4 w-4 mr-2 text-green-500" />
-                  Xác nhận
-                </DropdownMenuItem>
-                <DropdownMenuItem
-                  className="text-destructive"
-                  onClick={() => {
-                    setSelectedBookingId(booking.id);
-                    setCancelDialogOpen(true);
-                  }}
-                >
-                  <XCircle className="h-4 w-4 mr-2" />
-                  Hủy đặt phòng
-                </DropdownMenuItem>
-              </>
-            )}
-          </DropdownMenuContent>
-        </DropdownMenu>
-      ),
+      cell: (booking) => {
+        if (!booking?.id) {
+          return null;
+        }
+        
+        return (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon">
+                <MoreHorizontal className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuLabel>Thao tác</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem onClick={() => navigate(`/admin/booking/${booking.id}`)}>
+                <Eye className="h-4 w-4 mr-2" />
+                Xem chi tiết
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={() => navigate(`/admin/booking/upsert`)}>
+                <Edit className="h-4 w-4 mr-2" />
+                Chỉnh sửa
+              </DropdownMenuItem>
+              {booking.status === 'PENDING' && (
+                <>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={() => handleConfirmBooking(booking.id)}>
+                    <CheckCircle className="h-4 w-4 mr-2 text-green-500" />
+                    Xác nhận
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    className="text-destructive"
+                    onClick={() => {
+                      setSelectedBookingId(booking.id);
+                      setCancelDialogOpen(true);
+                    }}
+                  >
+                    <XCircle className="h-4 w-4 mr-2" />
+                    Hủy đặt phòng
+                  </DropdownMenuItem>
+                </>
+              )}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        );
+      },
       className: 'w-[50px]',
     },
   ];
 
-  // Filter options
+  // Filter options với safe fallback
   const statusOptions = Object.entries(bookingStatusConfig).map(([value, config]) => ({
     value,
     label: config.label,
   }));
 
-  const branchOptions = branches.map((branch) => ({
+  const branchOptions = (branches || []).map((branch) => ({
     value: branch.id,
-    label: branch.name,
+    label: branch.name || 'Không có tên',
   }));
 
   return (
@@ -296,11 +361,26 @@ export default function BookingList() {
       <PageHeader
         title="Quản lý đặt phòng"
         description="Xem và quản lý tất cả đặt phòng trong hệ thống"
-        onAdd={() => navigate('/admin/bookings/create')}
+        onAdd={() => navigate('/admin/booking/upsert')}
         addButtonText="Tạo đặt phòng"
         onRefresh={fetchBookings}
         isLoading={isLoading}
       />
+
+      {/* Error Message */}
+      {error && (
+        <Card>
+          <CardContent className="pt-6">
+            <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+              <p className="text-red-800 font-semibold mb-2">⚠️ Lỗi khi tải dữ liệu</p>
+              <p className="text-red-700 text-sm mb-4">{error}</p>
+              <Button onClick={() => fetchBookings()} variant="outline" size="sm">
+                Thử lại
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       <Card>
         <CardHeader>
@@ -342,7 +422,7 @@ export default function BookingList() {
         <CardContent className="pt-6">
           <DataTable
             columns={columns}
-            data={bookings}
+            data={bookings || []}
             keyExtractor={(booking) => booking.id}
             isLoading={isLoading}
             emptyMessage="Không có đặt phòng nào"

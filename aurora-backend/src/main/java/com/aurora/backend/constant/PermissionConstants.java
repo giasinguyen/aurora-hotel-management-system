@@ -22,9 +22,6 @@ public final class PermissionConstants {
         public static final String PROFILE_VIEW = "PROFILE_VIEW";
         public static final String PROFILE_UPDATE = "PROFILE_UPDATE";
         public static final String SERVICE_REGISTER = "SERVICE_REGISTER";
-        public static final String REVIEW_CREATE = "REVIEW_CREATE";
-        public static final String REVIEW_UPDATE_OWN = "REVIEW_UPDATE_OWN";
-        public static final String REVIEW_DELETE_OWN = "REVIEW_DELETE_OWN";
     }
 
     public static final class Staff {
@@ -42,7 +39,6 @@ public final class PermissionConstants {
         public static final String CUSTOMER_VIEW = "CUSTOMER_VIEW";
         public static final String PAYMENT_VIEW_ALL = "PAYMENT_VIEW_ALL";
         public static final String SERVICE_MANAGE = "SERVICE_MANAGE";
-        public static final String REVIEW_VIEW_ALL = "REVIEW_VIEW_ALL";
         public static final String DASHBOARD_VIEW_STAFF = "DASHBOARD_VIEW_STAFF";
     }
 
@@ -60,8 +56,6 @@ public final class PermissionConstants {
         public static final String REPORT_VIEW = "REPORT_VIEW";
         public static final String REPORT_EXPORT = "REPORT_EXPORT";
         public static final String STAFF_VIEW = "STAFF_VIEW";
-        public static final String REVIEW_VIEW_ALL = "REVIEW_VIEW_ALL";
-        public static final String REVIEW_MODERATE = "REVIEW_MODERATE";
         public static final String DASHBOARD_VIEW_MANAGER = "DASHBOARD_VIEW_MANAGER";
     }
 
@@ -84,9 +78,6 @@ public final class PermissionConstants {
         public static final String BRANCH_DELETE = "BRANCH_DELETE";
         public static final String BRANCH_ASSIGN_MANAGER = "BRANCH_ASSIGN_MANAGER";
         public static final String BRANCH_REMOVE_MANAGER = "BRANCH_REMOVE_MANAGER";
-        public static final String REVIEW_VIEW_ALL = "REVIEW_VIEW_ALL";
-        public static final String REVIEW_MODERATE = "REVIEW_MODERATE";
-        public static final String REVIEW_UPDATE_ALL = "REVIEW_UPDATE_ALL";
         public static final String DASHBOARD_VIEW_ADMIN = "DASHBOARD_VIEW_ADMIN";
     }
 }

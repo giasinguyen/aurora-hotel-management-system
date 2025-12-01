@@ -13,7 +13,6 @@ const AdminPage = () => {
 
   // Check if user has admin role
   const isAdmin = user?.roles?.includes('ADMIN');
-  console.log(user);
   if (!isAdmin) {
     return <Navigate to="/" replace />;
   }

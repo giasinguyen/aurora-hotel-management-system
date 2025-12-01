@@ -109,6 +109,7 @@ public class RoomTypeServiceImpl implements RoomTypeService {
     }
 
     @Override
+    @Transactional
     public RoomTypeResponse updateRoomType(String id, RoomTypeUpdateRequest request) {
         log.info("Updating room type with ID: {}", id);
 

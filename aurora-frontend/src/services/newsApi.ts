@@ -1,6 +1,5 @@
 // NOTE: axiosClient và BASE_URL sẽ được sử dụng khi backend implement
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-import axiosClient from '@/config/axiosClient';
 import type { ApiResponse, PageResponseDto } from '@/types/apiResponse';
 import type { 
   News, 
@@ -12,8 +11,7 @@ import type {
 // NOTE: Backend NewsController chưa được implement
 // Các functions dưới đây sử dụng mock data tạm thời
 // Khi backend implement, chỉ cần bỏ comment các dòng API call
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-const BASE_URL = '/api/v1/news';
+// const BASE_URL = '/api/v1/news';
 
 // Mock data
 const mockNews: News[] = [

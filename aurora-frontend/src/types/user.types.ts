@@ -12,8 +12,14 @@ export interface User {
   dob?: string;
   email?: string;
   phone?: string;
+  address?: string;
   avatarUrl?: string;
   roles: Role[];
+  active: boolean;
+  emailVerified?: boolean;
+  assignedBranchId?: string;
+  assignedBranchName?: string;
+  lastLoginAt?: string;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -35,7 +41,30 @@ export interface UserUpdateRequest {
   dob?: string;
   email?: string;
   phone?: string;
+  address?: string;
   roles?: string[];
+  active?: boolean;
+}
+
+export interface ProfileUpdateRequest {
+  firstName?: string;
+  lastName?: string;
+  dob?: string;
+  email?: string;
+  phone?: string;
+  address?: string;
+}
+
+// User Permission Override - để tắt/bật quyền cho từng user
+export interface UserPermissionOverride {
+  userId: string;
+  permissionId: string;
+  permissionName: string;
+  enabled: boolean;
+}
+
+export interface UpdateUserPermissionsRequest {
+  disabledPermissions: string[]; // List of permission IDs to disable
 }
 
 export interface UserSearchParams {
@@ -70,9 +99,8 @@ export interface RoleCreationRequest {
 }
 
 export interface RoleUpdateRequest {
-  name?: string;
   description?: string;
-  permissions?: string[];
+  permissionIds?: string[];
 }
 
 export interface RoleSearchParams {

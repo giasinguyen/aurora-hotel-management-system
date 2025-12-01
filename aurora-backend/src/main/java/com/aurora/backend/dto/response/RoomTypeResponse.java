@@ -3,6 +3,8 @@ package com.aurora.backend.dto.response;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.math.BigDecimal;
+import java.util.List;
 import java.util.Set;
 
 @Getter
@@ -17,11 +19,20 @@ public class RoomTypeResponse {
     String branchName;
     String name;
     String code;
+    
+    // Price information
+    BigDecimal basePrice;
+    BigDecimal weekendPrice;
+    
+    // Capacity information
     Integer capacityAdults;
     Integer capacityChildren;
+    Integer maxOccupancy;
+    
     Double sizeM2;
     Boolean refundable;
     Integer totalRooms;
     Integer availableRooms;
     Set<AmenityResponse> amenities;
+    List<String> images;
 }

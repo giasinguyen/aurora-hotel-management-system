@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { useAppDispatch, useAppSelector } from "@/hooks/useRedux";
 import { setLanguage } from "@/features/slices/languageSlice";
+import { setBranch, BRANCHES } from "@/features/slices/branchSlice";
 import UserMenu from "@/pages/common/components/UserMenu";
 import {
   Sheet,
@@ -43,6 +44,9 @@ export default function Header() {
   const currentLanguage = useAppSelector(
     (state) => state.language.currentLanguage
   );
+  const currentBranch = useAppSelector(
+    (state) => state.branch.currentBranch
+  );
   const isLogin = useAppSelector((state) => state.auth.isLogin);
   const [isScrolled, setIsScrolled] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -76,6 +80,10 @@ export default function Header() {
 
   const handleLanguageChange = (value: string) => {
     dispatch(setLanguage(value));
+  };
+
+  const handleBranchChange = (value: string) => {
+    dispatch(setBranch(value));
   };
 
   const handleNavClick = () => {
@@ -137,6 +145,39 @@ export default function Header() {
             >
               <Search className="w-5 h-5" />
             </button>
+
+            {/* Branch Select - Desktop */}
+            <Select
+              value={currentBranch.id}
+              onValueChange={handleBranchChange}
+            >
+              <SelectTrigger
+                className={
+                  "w-auto h-10 rounded-lg px-3 transition-all " +
+                  (isScrolled
+                    ? "bg-gray-100 text-gray-700 hover:bg-gray-200 border-gray-300"
+                    : "bg-white/20 text-white hover:bg-white/30 border-white/30")
+                }
+              >
+                <span className="text-sm font-medium">
+                  {currentBranch.code}
+                </span>
+              </SelectTrigger>
+              <SelectContent>
+                {Object.values(BRANCHES).map((branch) => (
+                  <SelectItem key={branch.id} value={branch.id}>
+                    <div className="flex flex-col">
+                      <span className="font-medium">
+                        {branch.name} ({branch.code})
+                      </span>
+                      <span className="text-xs font-medium">
+                        {branch.address}
+                      </span>
+                    </div>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
 
             {/* Language Select - Desktop */}
             <Select
@@ -233,6 +274,32 @@ export default function Header() {
                   ))}
                 </nav>
                 <div className="absolute bottom-6 left-6 right-6 space-y-3">
+                  {/* Branch Select - Mobile */}
+                  <Select
+                    value={currentBranch.id}
+                    onValueChange={handleBranchChange}
+                  >
+                    <SelectTrigger className="w-full bg-gray-100 text-gray-700 hover:bg-gray-200 border-gray-300">
+                      <span className="text-sm font-medium">
+                        {currentBranch.name} ({currentBranch.code})
+                      </span>
+                    </SelectTrigger>
+                    <SelectContent className="border-gray-200 shadow-lg">
+                      {Object.values(BRANCHES).map((branch) => (
+                        <SelectItem key={branch.id} value={branch.id}>
+                          <div className="flex flex-col">
+                            <span className="font-medium">
+                              {branch.name} ({branch.code})
+                            </span>
+                            <span className="text-xs font-medium">
+                              {branch.address}
+                            </span>
+                          </div>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+
                   {/* Language Select - Mobile */}
                   <Select
                     value={currentLanguage}

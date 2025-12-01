@@ -153,6 +153,7 @@ const LoginPage = () => {
                 <Label htmlFor="password">Mật khẩu</Label>
                 <Link
                   to="/auth?mode=forgot-password"
+                  tabIndex={-1}
                   className="text-sm text-amber-600 hover:text-amber-700 transition-colors"
                 >
                   Quên mật khẩu?

@@ -3,6 +3,8 @@ package com.aurora.backend.dto.response;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.util.List;
+
 @Getter
 @Setter
 @Builder
@@ -16,4 +18,5 @@ public class FacilityResponse {
     String name;
     String openingHours;
     String policies;
+    List<String> images;
 }

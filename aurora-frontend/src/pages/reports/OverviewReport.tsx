@@ -35,6 +35,7 @@ import {
   ReportEmptyState,
 } from '@/components/custom/reports';
 import { getAdminOverview, getRevenueStatistics, getOccupancyStatistics, getTopRoomTypes, getRevenueByPaymentMethod, getBookingsBySource, getCustomerGrowth } from '@/services/dashboardApi';
+import { exportOverviewReport, type OverviewExportData } from '@/utils/exportUtils';
 import type { ReportDateRange } from '@/types/report.types';
 import type { 
   DashboardOverview, 
@@ -155,15 +156,42 @@ export default function OverviewReport() {
     customers: point.customers,
   }));
 
+  // Prepare export data
+  const getExportData = useCallback((): OverviewExportData => {
+    return {
+      dateRange: {
+        from: dateRange.dateFrom,
+        to: dateRange.dateTo,
+      },
+      overview: {
+        totalRevenue: overview?.totalRevenue || 0,
+        totalBookings: overview?.totalBookings || 0,
+        totalCustomers: overview?.newCustomers || 0,
+        occupancyRate: occupancyStats?.occupancyRate || 0,
+      },
+      revenueByMonth: revenueStats.map(point => ({
+        period: point.periodLabel,
+        revenue: point.revenue,
+        bookings: point.bookingCount,
+      })),
+      topRoomTypes: topRoomTypes.map(rt => ({
+        name: rt.roomTypeName,
+        bookings: rt.bookings,
+      })),
+    };
+  }, [dateRange, overview, occupancyStats, revenueStats, topRoomTypes]);
+
   // Export handlers
   const handleExportPDF = async () => {
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    toast.success('Đã xuất báo cáo PDF');
+    await exportOverviewReport(getExportData(), 'pdf');
   };
 
   const handleExportExcel = async () => {
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    toast.success('Đã xuất báo cáo Excel');
+    await exportOverviewReport(getExportData(), 'excel');
+  };
+
+  const handleExportCSV = async () => {
+    await exportOverviewReport(getExportData(), 'csv');
   };
 
   return (
@@ -177,6 +205,7 @@ export default function OverviewReport() {
         <ExportButtons
           onExportPDF={handleExportPDF}
           onExportExcel={handleExportExcel}
+          onExportCSV={handleExportCSV}
           loading={loading}
         />
       </div>

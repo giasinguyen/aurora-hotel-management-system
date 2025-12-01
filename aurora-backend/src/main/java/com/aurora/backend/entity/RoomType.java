@@ -1,5 +1,6 @@
 package com.aurora.backend.entity;
 
+import com.aurora.backend.converter.StringListConverter;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.*;
@@ -7,6 +8,7 @@ import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -30,10 +32,14 @@ public class RoomType extends BaseEntity {
     @JoinColumn(name = "branch_id", nullable = false)
     Branch branch;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_id")
+    RoomCategory category;  // Hạng phòng: Standard, Deluxe, Presidential Suite
+
     @NotBlank(message = "Room type name is required")
     @Size(max = 100, message = "Name cannot exceed 100 characters")
     @Column(nullable = false, length = 100)
-    String name;   // Deluxe, Suite, Standard, Premium...
+    String name;   // Single Bedroom City View, Couple Bedroom Sea View...
     
     @NotBlank(message = "Room type code is required")
     @Pattern(regexp = "^[A-Z]{3,5}$", message = "Code must be 3-5 uppercase letters")
@@ -96,11 +102,11 @@ public class RoomType extends BaseEntity {
     @Column(length = 500)
     String shortDescription;
     
-    // Images
-    @ElementCollection
-    @CollectionTable(name = "room_type_images", joinColumns = @JoinColumn(name = "room_type_id"))
-    @Column(name = "image_url", length = 500)
-    List<String> imageUrls;
+    // Images - lưu dưới dạng JSON array trong column
+    @Convert(converter = StringListConverter.class)
+    @Column(name = "images", columnDefinition = "TEXT")
+    @Builder.Default
+    List<String> images = new ArrayList<>();
 
     @OneToMany(mappedBy = "roomType")
     Set<Room> rooms;

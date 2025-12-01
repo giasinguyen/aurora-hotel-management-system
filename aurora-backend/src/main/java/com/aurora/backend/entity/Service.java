@@ -1,11 +1,13 @@
 package com.aurora.backend.entity;
 
+import com.aurora.backend.converter.StringListConverter;
 import jakarta.persistence.*;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -56,11 +58,11 @@ public class Service extends BaseEntity {
     @Builder.Default
     Boolean active = true; // Dịch vụ có đang hoạt động không
     
-    // Images
-    @ElementCollection
-    @CollectionTable(name = "service_images", joinColumns = @JoinColumn(name = "service_id"))
-    @Column(name = "image_url", length = 500)
-    List<String> imageUrls;
+    // Images - lưu dưới dạng JSON array trong column
+    @Convert(converter = StringListConverter.class)
+    @Column(name = "images", columnDefinition = "TEXT")
+    @Builder.Default
+    List<String> images = new ArrayList<>();
     
     // Operating hours (if different from branch)
     @Column(length = 100)

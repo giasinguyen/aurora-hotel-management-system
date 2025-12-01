@@ -4,6 +4,7 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.time.LocalDate;
+import java.util.List;
 import java.util.Set;
 
 @Getter
@@ -18,5 +19,11 @@ public class UserResponse {
     String firstName;
     String lastName;
     LocalDate dob;
+    String phone;
+    String email;
+    String address;
+    String avatarUrl;
+    Boolean active;
     Set<RoleResponse> roles;
+    List<String> disabledPermissions;
 }

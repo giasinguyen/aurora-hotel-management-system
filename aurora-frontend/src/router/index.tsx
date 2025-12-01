@@ -33,6 +33,8 @@ import GuestRoomListPage from "@/pages/common/RoomList";
 import PaymentReturnPage from "@/pages/common/PaymentReturn";
 import AboutPage from "@/pages/common/About";
 import AccommodationPage from "@/pages/common/Accommodation";
+import AccommodationCategoryPage from "@/pages/common/AccommodationCategory";
+import BookingPage from "@/pages/common/Booking";
 // Common - Customer Area
 import ProfilePage from "@/pages/common/customer/account/Profile";
 import ProfileUpsertPage from "@/pages/common/customer/account/ProfileUpsert";
@@ -79,6 +81,7 @@ import ShiftReportPage from "@/pages/reports/ShiftReport";
 
 // Role
 import RoleManagementPage from "@/pages/role/RoleManagement";
+import RoleDetailPage from "@/pages/role/RoleDetail";
 
 // Rooms
 import RoomListPage from "@/pages/rooms/RoomList";
@@ -105,6 +108,8 @@ const router = createBrowserRouter([
       { index: true, element: <HomePage /> },
       { path: "about", element: <AboutPage /> },
       { path: "accommodation", element: <AccommodationPage /> },
+      { path: "accommodation/:categoryId", element: <AccommodationCategoryPage /> },
+      { path: "booking", element: <BookingPage /> },
       { path: "service", element: <ServicePage /> },
       { path: "branches", element: <GuestBranchListPage /> },
       { path: "rooms", element: <GuestRoomListPage /> },
@@ -117,10 +122,10 @@ const router = createBrowserRouter([
       // Customer
       { path: "profile", element: <ProfilePage /> },
       { path: "profile/upsert", element: <ProfileUpsertPage /> },
-      { path: "booking", element: <CustomerBookingListPage /> },
-      { path: "booking/create", element: <CreateBookingPage /> },
-      { path: "booking/confirm", element: <ConfirmBookingPage /> },
-      { path: "booking/:id", element: <CustomerBookingDetailPage /> },
+      { path: "my-bookings", element: <CustomerBookingListPage /> },
+      { path: "my-bookings/create", element: <CreateBookingPage /> },
+      { path: "my-bookings/confirm", element: <ConfirmBookingPage /> },
+      { path: "my-bookings/:id", element: <CustomerBookingDetailPage /> },
       { path: "favorites", element: <FavoriteListPage /> },
       { path: "late-checkout-requests", element: <LateCheckoutRequestListPage /> },
       { path: "late-checkout-requests/upsert", element: <LateCheckoutRequestUpsertPage /> },
@@ -165,7 +170,7 @@ const router = createBrowserRouter([
       { path: "services/upsert", element: <ServiceUpsertPage /> },
       { path: "users", element: <UserListPage /> },
       { path: "users/upsert", element: <UserUpsertPage /> },
-      { path: "users/:id", element: <UserDetailPage /> },
+      { path: "users/detail", element: <UserDetailPage /> },
       { path: "users/:id/assign-branch", element: <AssignBranchPage /> },
       { path: "promotions", element: <PromotionListPage /> },
       { path: "promotions/upsert", element: <PromotionUpsertPage /> },
@@ -200,9 +205,10 @@ const router = createBrowserRouter([
       { path: "branches/upsert", element: <BranchUpsertPage /> },
       { path: "users", element: <UserListPage /> },
       { path: "users/upsert", element: <UserUpsertPage /> },
-      { path: "users/:id", element: <UserDetailPage /> },
+      { path: "users/detail", element: <UserDetailPage /> },
       { path: "users/:id/assign-branch", element: <AssignBranchPage /> },
       { path: "roles", element: <RoleManagementPage /> },
+      { path: "roles/:id", element: <RoleDetailPage /> },
       { path: "documents", element: <DocumentListPage /> },
       { path: "documents/upsert", element: <DocumentUpsertPage /> },
       { path: "reports/overview", element: <OverviewReportPage /> },

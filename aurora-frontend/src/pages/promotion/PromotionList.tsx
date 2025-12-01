@@ -25,7 +25,7 @@ import {
 } from '@/components/custom';
 
 import { promotionApi } from '@/services/promotionApi';
-import type { Promotion, PromotionStatus, getPromotionStatus, PROMOTION_STATUS_CONFIG } from '@/types/promotion.types';
+import type { Promotion, PromotionStatus } from '@/types/promotion.types';
 
 // Get promotion status
 const getStatus = (promotion: Promotion): PromotionStatus => {
@@ -241,11 +241,11 @@ export default function PromotionList() {
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Thao tác</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => navigate(`/admin/promotions/${promotion.id}`)}>
+            <DropdownMenuItem onClick={() => navigate(`/admin/promotions/upsert?id=${promotion.id}&view=true`)}>
               <Eye className="h-4 w-4 mr-2" />
               Xem chi tiết
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => navigate(`/admin/promotions/${promotion.id}/edit`)}>
+            <DropdownMenuItem onClick={() => navigate(`/admin/promotions/upsert?id=${promotion.id}`)}>
               <Edit className="h-4 w-4 mr-2" />
               Chỉnh sửa
             </DropdownMenuItem>
@@ -278,7 +278,7 @@ export default function PromotionList() {
       <PageHeader
         title="Quản lý khuyến mãi"
         description="Xem và quản lý tất cả khuyến mãi trong hệ thống"
-        onAdd={() => navigate('/admin/promotions/create')}
+        onAdd={() => navigate('/admin/promotions/upsert')}
         addButtonText="Thêm khuyến mãi"
         onRefresh={fetchPromotions}
         isLoading={isLoading}

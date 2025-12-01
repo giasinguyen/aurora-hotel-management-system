@@ -6,6 +6,7 @@ import lombok.experimental.FieldDefaults;
 
 import java.time.LocalDate;
 import java.time.LocalTime;
+import java.util.List;
 
 @Data
 @Builder
@@ -50,4 +51,7 @@ public class BranchResponse {
     Integer totalRooms;
     Integer totalStaff;
     Integer availableRooms; // Count of rooms with status AVAILABLE
+    
+    // Images
+    List<String> images;
 }

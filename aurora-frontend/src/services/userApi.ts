@@ -4,7 +4,9 @@ import type {
   User, 
   UserCreationRequest, 
   UserUpdateRequest, 
-  UserSearchParams 
+  ProfileUpdateRequest,
+  UserSearchParams,
+  UpdateUserPermissionsRequest
 } from '@/types/user.types';
 
 const BASE_URL = '/api/v1/users';
@@ -22,6 +24,24 @@ export const getUsers = async (): Promise<ApiResponse<User[]>> => {
  */
 export const getUsersPaginated = async (params?: UserSearchParams): Promise<ApiResponse<PageResponseDto<User>>> => {
   const response = await axiosClient.get(`${BASE_URL}/paginated`, { 
+    params: {
+      page: params?.page ?? 0,
+      size: params?.size ?? 10,
+      sortBy: params?.sortBy ?? 'username',
+      sortDirection: params?.sortDir ?? 'asc',
+    }
+  });
+  return response.data;
+};
+
+/**
+ * Get users by role name with pagination
+ */
+export const getUsersByRole = async (
+  roleName: string,
+  params?: { page?: number; size?: number; sortBy?: string; sortDir?: string }
+): Promise<ApiResponse<PageResponseDto<User>>> => {
+  const response = await axiosClient.get(`${BASE_URL}/role/${roleName}`, {
     params: {
       page: params?.page ?? 0,
       size: params?.size ?? 10,
@@ -53,6 +73,14 @@ export const getUserByUsername = async (username: string): Promise<ApiResponse<U
  */
 export const getMyInfo = async (): Promise<ApiResponse<User>> => {
   const response = await axiosClient.get(`${BASE_URL}/myInfo`);
+  return response.data;
+};
+
+/**
+ * Update current logged-in user info (self profile update)
+ */
+export const updateMyInfo = async (data: ProfileUpdateRequest): Promise<ApiResponse<User>> => {
+  const response = await axiosClient.put(`${BASE_URL}/myInfo`, data);
   return response.data;
 };
 
@@ -102,15 +130,75 @@ export const searchUsers = async (params: UserSearchParams): Promise<ApiResponse
   return response.data;
 };
 
-export default {
+/**
+ * Toggle user active status (activate/deactivate)
+ */
+export const toggleUserStatus = async (id: string, active: boolean): Promise<ApiResponse<User>> => {
+  const response = await axiosClient.patch(`${BASE_URL}/${id}/status`, { active });
+  return response.data;
+};
+
+/**
+ * Assign role to user
+ */
+export const assignRoleToUser = async (userId: string, roleId: string): Promise<ApiResponse<User>> => {
+  const response = await axiosClient.post(`${BASE_URL}/${userId}/roles/${roleId}`);
+  return response.data;
+};
+
+/**
+ * Remove role from user
+ */
+export const removeRoleFromUser = async (userId: string, roleId: string): Promise<ApiResponse<User>> => {
+  const response = await axiosClient.delete(`${BASE_URL}/${userId}/roles/${roleId}`);
+  return response.data;
+};
+
+/**
+ * Update user permissions (disable specific permissions)
+ */
+export const updateUserPermissions = async (userId: string, data: UpdateUserPermissionsRequest): Promise<ApiResponse<User>> => {
+  const response = await axiosClient.put(`${BASE_URL}/${userId}/permissions`, data);
+  return response.data;
+};
+
+/**
+ * Get user's effective permissions (considering overrides)
+ */
+export const getUserPermissions = async (userId: string): Promise<ApiResponse<string[]>> => {
+  const response = await axiosClient.get(`${BASE_URL}/${userId}/permissions`);
+  return response.data;
+};
+export const uploadAvatar = async (file: File): Promise<ApiResponse<User>> => {
+  const formData = new FormData();
+  formData.append('file', file); // Key 'file' phải khớp với @RequestParam bên Java
+
+  // Giả định endpoint là POST /api/v1/users/avatar
+  const response = await axiosClient.post(`${BASE_URL}/avatar`, formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
+  return response.data;
+};
+export const userApi = {
   getUsers,
   getUsersPaginated,
   getUserById,
   getUserByUsername,
   getMyInfo,
+  updateMyInfo,
   createUser,
   registerUser,
   updateUser,
   deleteUser,
   searchUsers,
+  toggleUserStatus,
+  assignRoleToUser,
+  removeRoleFromUser,
+  updateUserPermissions,
+  getUserPermissions,
+  uploadAvatar,
 };
+
+export default userApi;

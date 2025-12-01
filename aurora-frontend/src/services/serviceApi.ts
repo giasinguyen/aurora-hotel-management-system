@@ -3,8 +3,7 @@ import type {
   HotelService, 
   ServiceCreationRequest, 
   ServiceUpdateRequest,
-  ServiceSearchParams,
-  ServiceType
+  ServiceSearchParams
 } from '@/types/service.types';
 import axiosClient from '@/config/axiosClient';
 

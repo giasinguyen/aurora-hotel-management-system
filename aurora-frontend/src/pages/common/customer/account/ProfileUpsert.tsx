@@ -2,6 +2,17 @@ import { motion, useInView } from "framer-motion";
 import { useRef, useState, type ChangeEvent } from "react";
 import { User, Mail, Phone, MapPin, Calendar, Save, X, Camera, ArrowLeft } from "lucide-react";
 
+// ===================== API CONFIGURATION =====================
+const USE_API = false; // Đổi thành true khi muốn dùng API thực
+const API_BASE_URL = '/api'; // Thay đổi base URL của API ở đây
+
+// ===================== CLOUDINARY CONFIGURATION =====================
+const CLOUDINARY_CLOUD_NAME = 'your_cloud_name'; // Thay bằng cloud name của bạn
+const CLOUDINARY_UPLOAD_PRESET = 'your_upload_preset'; // Thay bằng upload preset của bạn
+const CLOUDINARY_UPLOAD_URL = `https://api.cloudinary.com/v1_1/${CLOUDINARY_CLOUD_NAME}/image/upload`;
+// ====================================================================
+// ============================================================
+
 export default function ProfileUpsertPage() {
   const formRef = useRef(null);
   const formInView = useInView(formRef, { once: true, margin: "-50px" });
@@ -16,17 +27,103 @@ export default function ProfileUpsertPage() {
   });
 
   const [avatar, setAvatar] = useState("https://images.unsplash.com/photo-1633332755192-727a05c4013d?w=400&h=400&fit=crop");
+  const [avatarFile, setAvatarFile] = useState<File | null>(null);
+  const [uploading, setUploading] = useState(false);
 
-   const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+  const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value
     });
   };
 
-  const handleSubmit = () => {
-    console.log("Form submitted:", formData);
-    alert("Cập nhật hồ sơ thành công!");
+  const handleAvatarChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      setAvatarFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        if (typeof reader.result === "string") {
+          setAvatar(reader.result);
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const uploadToCloudinary = async (file: File): Promise<string> => {
+    try {
+      setUploading(true);
+      
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('upload_preset', CLOUDINARY_UPLOAD_PRESET);
+      formData.append('folder', 'avatars'); // Optional: tạo folder riêng cho avatars
+
+      const response = await fetch(CLOUDINARY_UPLOAD_URL, {
+        method: 'POST',
+        body: formData
+      });
+
+      if (!response.ok) {
+        throw new Error('Upload to Cloudinary failed');
+      }
+
+      const data = await response.json();
+      return data.secure_url; // URL của ảnh trên Cloudinary
+      
+    } catch (error) {
+      console.error('Cloudinary upload error:', error);
+      throw error;
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const handleSubmit = async () => {
+    if (!USE_API) {
+      // Mock mode
+      console.log("Mock: Form submitted:", formData);
+      console.log("Mock: Avatar file:", avatarFile?.name);
+      alert("Cập nhật hồ sơ thành công!");
+      window.location.href = '/profile';
+      return;
+    }
+
+    try {
+      let avatarUrl = avatar;
+
+      // Step 1: Upload avatar lên Cloudinary nếu có file mới
+      if (avatarFile) {
+        console.log('Uploading avatar to Cloudinary...');
+        avatarUrl = await uploadToCloudinary(avatarFile);
+        console.log('Avatar uploaded successfully:', avatarUrl);
+      }
+
+      // Step 2: Update profile với avatar URL mới
+      const response = await fetch(`${API_BASE_URL}/user/profile`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify({
+          ...formData,
+          avatar: avatarUrl // Lưu URL từ Cloudinary
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('Không thể cập nhật thông tin');
+      }
+
+      alert("Cập nhật hồ sơ thành công!");
+      window.location.href = '/profile';
+
+    } catch (err) {
+      console.error('Error updating profile:', err);
+      alert('Không thể cập nhật hồ sơ. Vui lòng thử lại.');
+    }
   };
 
   const fadeInUp = {
@@ -61,7 +158,7 @@ export default function ProfileUpsertPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-emerald-50">
       {/* Header Section */}
-      <div className="bg-gradient-to-br from-green-500 via-green-600 to-emerald-600 text-white py-12">
+      <div className="bg-gradient-to-br from-green-500 via-green-600 to-emerald-600 text-white py-12 pt-24">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
             initial="hidden"
@@ -114,22 +211,11 @@ export default function ProfileUpsertPage() {
                   className="absolute bottom-0 right-0 bg-green-500 text-white p-3 rounded-full shadow-lg hover:bg-green-600 transition-all cursor-pointer"
                 >
                   <Camera className="w-5 h-5" />
-                   <input 
+                  <input 
                     type="file" 
                     className="hidden" 
                     accept="image/*"
-                    onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                      const file = e.target.files?.[0];
-                      if (file) {
-                        const reader = new FileReader();
-                        reader.onloadend = () => {
-                          if (typeof reader.result === "string") {
-                            setAvatar(reader.result);
-                          }
-                        };
-                        reader.readAsDataURL(file);
-                      }
-                    }}
+                    onChange={handleAvatarChange}
                   />
                 </motion.label>
               </div>
@@ -255,19 +341,20 @@ export default function ProfileUpsertPage() {
               <motion.button
                 type="button"
                 onClick={handleSubmit}
-                whileHover={{ scale: 1.02, boxShadow: "0 10px 30px rgba(34, 197, 94, 0.3)" }}
-                whileTap={{ scale: 0.98 }}
-                className="flex-1 bg-green-500 text-white px-8 py-4 rounded-xl font-semibold hover:bg-green-600 transition-all flex items-center justify-center gap-2 shadow-lg"
+                disabled={uploading}
+                whileHover={!uploading ? { scale: 1.02, boxShadow: "0 10px 30px rgba(34, 197, 94, 0.3)" } : {}}
+                whileTap={!uploading ? { scale: 0.98 } : {}}
+                className="flex-1 bg-green-500 text-white px-8 py-4 rounded-xl font-semibold hover:bg-green-600 transition-all flex items-center justify-center gap-2 shadow-lg disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <Save className="w-5 h-5" />
-                Lưu Thay Đổi
+                {uploading ? 'Đang tải ảnh lên...' : 'Lưu Thay Đổi'}
               </motion.button>
               
               <motion.button
                 type="button"
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
-                onClick={() => window.history.back()}
+                onClick={() => window.location.href = '/profile'}
                 className="flex-1 sm:flex-none bg-gray-100 text-gray-700 px-8 py-4 rounded-xl font-semibold hover:bg-gray-200 transition-all flex items-center justify-center gap-2"
               >
                 <X className="w-5 h-5" />

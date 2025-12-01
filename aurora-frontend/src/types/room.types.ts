@@ -1,5 +1,20 @@
 // Room Types for Aurora Hotel Management System
 
+// Room Category (Hạng phòng)
+export interface RoomCategory {
+  id: string;
+  branchId: string;
+  branchName: string;
+  name: string;
+  code: string;
+  description?: string;
+  displayOrder: number;
+  active: boolean;
+  imageUrl?: string;
+  totalRoomTypes?: number;
+  roomTypes?: RoomType[];
+}
+
 export interface Room {
   id: string;
   branchId: string;
@@ -12,6 +27,8 @@ export interface Room {
   capacityAdults: number;
   capacityChildren: number;
   sizeM2: number;
+  viewType?: string; // e.g., 'CITY', 'RIVER', 'SEA', 'GARDEN'
+  images?: string[]; // Array of image URLs
 }
 
 export type RoomStatus = 
@@ -64,23 +81,37 @@ export interface RoomType {
   id: string;
   branchId: string;
   branchName: string;
+  categoryId?: string;
   name: string;
   code: string;
+  basePrice: number;
+  weekendPrice?: number;
+  holidayPrice?: number;
   capacityAdults: number;
   capacityChildren: number;
+  maxOccupancy: number;
   sizeM2: number;
+  bedType?: string;
+  numberOfBeds?: number;
   refundable: boolean;
+  smokingAllowed?: boolean;
+  description?: string;
+  shortDescription?: string;
   totalRooms: number;
   availableRooms: number;
   amenities: Amenity[];
+  images?: string[];
 }
 
 export interface RoomTypeCreationRequest {
   branchId: string;
   name: string;
   code: string;
+  basePrice: number;
+  weekendPrice?: number;
   capacityAdults: number;
   capacityChildren: number;
+  maxOccupancy: number;
   sizeM2: number;
   refundable?: boolean;
   amenityIds?: string[];
@@ -89,8 +120,11 @@ export interface RoomTypeCreationRequest {
 export interface RoomTypeUpdateRequest {
   name?: string;
   code?: string;
+  basePrice?: number;
+  weekendPrice?: number;
   capacityAdults?: number;
   capacityChildren?: number;
+  maxOccupancy?: number;
   sizeM2?: number;
   refundable?: boolean;
   amenityIds?: string[];

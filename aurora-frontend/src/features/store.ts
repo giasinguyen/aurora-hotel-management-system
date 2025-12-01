@@ -12,10 +12,12 @@ import {
 import storage from "redux-persist/lib/storage";
 import languageReducer from "./slices/languageSlice";
 import authReducer from "./slices/auth/authSlice";
+import branchReducer from "./slices/branchSlice";
 
 const rootReducer = combineReducers({
   language: languageReducer,
   auth: authReducer,
+  branch: branchReducer,
 });
 
 const persistConfig = {

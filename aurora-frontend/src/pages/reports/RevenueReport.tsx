@@ -10,17 +10,13 @@ import {
   Receipt,
 } from 'lucide-react';
 import {
-  BarChart,
-  Bar,
   XAxis,
   YAxis,
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-  LineChart,
   Line,
   Area,
-  AreaChart,
   ComposedChart,
   Legend,
   PieChart as RechartsPie,
@@ -57,6 +53,7 @@ import {
   getRevenueByPaymentMethod,
   getAdminOverview,
 } from '@/services/dashboardApi';
+import { exportRevenueReport, type RevenueExportData } from '@/utils/exportUtils';
 import type { ReportDateRange } from '@/types/report.types';
 import type { 
   RevenueStatistics, 
@@ -65,9 +62,6 @@ import type {
   DashboardGroupBy,
 } from '@/types/dashboard.types';
 import { toast } from 'sonner';
-
-// Colors
-const COLORS = ['#f59e0b', '#3b82f6', '#10b981', '#ef4444', '#8b5cf6', '#ec4899'];
 
 // Format currency
 const formatCurrency = (value: number) => {
@@ -91,8 +85,8 @@ const formatFullCurrency = (value: number) => {
 export default function RevenueReport() {
   // State
   const [dateRange, setDateRange] = useState<ReportDateRange>({
-    dateFrom: null,
-    dateTo: null,
+    dateFrom: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+    dateTo: new Date().toISOString().split('T')[0],
   });
   const [branchId, setBranchId] = useState<string | null>(null);
   const [groupBy, setGroupBy] = useState<DashboardGroupBy>('DAY');
@@ -100,7 +94,7 @@ export default function RevenueReport() {
 
   // Data states
   const [overview, setOverview] = useState<DashboardOverview | null>(null);
-  const [revenueStats, setRevenueStats] = useState<RevenueStatistics | null>(null);
+  const [revenueStats, setRevenueStats] = useState<RevenueStatistics[]>([]);
   const [paymentMethods, setPaymentMethods] = useState<PaymentMethodRevenue | null>(null);
 
   // Fetch data
@@ -130,18 +124,16 @@ export default function RevenueReport() {
   }, [dateRange.dateFrom, dateRange.dateTo, branchId, groupBy]);
 
   useEffect(() => {
-    if (dateRange.dateFrom || dateRange.dateTo) {
-      fetchData();
-    }
-  }, [fetchData, dateRange.dateFrom, dateRange.dateTo]);
+    fetchData();
+  }, [fetchData]);
 
-  // Chart data
-  const revenueChartData = revenueStats?.dataPoints?.map(point => ({
-    name: point.label,
+  // Chart data from revenue stats array
+  const revenueChartData = revenueStats.map((point: RevenueStatistics) => ({
+    name: point.periodLabel,
     revenue: point.revenue,
-    bookings: point.bookings,
-    average: point.bookings > 0 ? Math.round(point.revenue / point.bookings) : 0,
-  })) || [];
+    bookings: point.bookingCount,
+    average: point.bookingCount > 0 ? Math.round(point.revenue / point.bookingCount) : 0,
+  }));
 
   const paymentMethodData = paymentMethods ? [
     { name: 'Tiền mặt', value: paymentMethods.cash || 0, icon: Wallet, color: '#10b981' },
@@ -158,15 +150,51 @@ export default function RevenueReport() {
     ? ((overview.totalRevenue - previousRevenue) / previousRevenue) * 100
     : 0;
 
+  // Prepare export data
+  const getExportData = useCallback((): RevenueExportData => {
+    return {
+      dateRange: {
+        from: dateRange.dateFrom,
+        to: dateRange.dateTo,
+      },
+      totalRevenue: overview?.totalRevenue || 0,
+      totalBookings: overview?.totalBookings || 0,
+      averageBookingValue: overview?.totalBookings 
+        ? (overview.totalRevenue || 0) / overview.totalBookings 
+        : 0,
+      revenueGrowth: revenueChange,
+      revenueData: revenueChartData.map(d => ({
+        period: d.name,
+        revenue: d.revenue,
+        bookings: d.bookings,
+      })),
+      paymentMethods: paymentMethodData.map(pm => ({
+        method: pm.name,
+        amount: pm.value,
+        percentage: totalPayment > 0 ? (pm.value / totalPayment) * 100 : 0,
+      })),
+    };
+  }, [dateRange, overview, revenueChange, revenueChartData, paymentMethodData, totalPayment]);
+
   // Export handlers
   const handleExportPDF = async () => {
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    toast.success('Đã xuất báo cáo PDF');
+    try {
+      await exportRevenueReport(getExportData(), 'pdf');
+      toast.success('Đã xuất báo cáo PDF');
+    } catch (error) {
+      console.error('Export PDF failed:', error);
+      toast.error('Xuất báo cáo PDF thất bại');
+    }
   };
 
   const handleExportExcel = async () => {
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    toast.success('Đã xuất báo cáo Excel');
+    try {
+      await exportRevenueReport(getExportData(), 'excel');
+      toast.success('Đã xuất báo cáo Excel');
+    } catch (error) {
+      console.error('Export Excel failed:', error);
+      toast.error('Xuất báo cáo Excel thất bại');
+    }
   };
 
   return (

@@ -4,6 +4,8 @@ import jakarta.validation.constraints.Positive;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.util.List;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -18,4 +20,6 @@ public class RoomUpdateRequest {
     Integer floor;
     
     String status;
+    
+    List<String> images;
 }

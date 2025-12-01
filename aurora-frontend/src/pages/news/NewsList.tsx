@@ -36,9 +36,7 @@ import {
 } from '@/components/custom';
 
 import type { 
-  News, 
-  NewsCategory, 
-  NewsStatus 
+  News
 } from '@/types/news.types';
 
 import {
