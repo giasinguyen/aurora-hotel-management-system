@@ -19,6 +19,7 @@ import com.aurora.backend.repository.RoleRepository;
 import com.aurora.backend.repository.UserRepository;
 import com.aurora.backend.service.AuthenticationService;
 import com.aurora.backend.service.RefreshTokenRedisService;
+import com.aurora.backend.service.StaffShiftService;
 import com.nimbusds.jose.*;
 import com.nimbusds.jose.crypto.MACSigner;
 import com.nimbusds.jwt.JWTClaimsSet;
@@ -56,6 +57,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     UserRepository userRepository;
     RoleRepository roleRepository;
     RefreshTokenRedisService refreshTokenRedisService;
+    StaffShiftService staffShiftService;
     PasswordEncoder passwordEncoder;
     PasswordResetTokenRepository passwordResetTokenRepository;
     EmailVerificationTokenRepository emailVerificationTokenRepository;
@@ -126,6 +128,9 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             handleFailedLogin(user);
             throw new AppException(ErrorCode.UNAUTHENTICATED);
         }
+
+        // Validate shift for STAFF role
+        validateStaffShift(user);
 
         handleSuccessfulLogin(user);
 
@@ -303,6 +308,31 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         user.setLastLoginAt(LocalDateTime.now());
         userRepository.save(user);
         log.info("Successful login for user: {}", user.getUsername());
+    }
+
+    /**
+     * Validate if staff member has an active shift before allowing login
+     * Only STAFF role members are subject to shift validation
+     */
+    private void validateStaffShift(User user) {
+        // Check if user has STAFF role
+        boolean isStaff = user.getRoles().stream()
+            .anyMatch(role -> "STAFF".equalsIgnoreCase(role.getName()));
+        
+        if (!isStaff) {
+            // Not a staff member, no shift validation needed
+            return;
+        }
+        
+        // Check if staff has active shift now
+        boolean hasActiveShift = staffShiftService.hasActiveShiftNow(user.getId());
+        
+        if (!hasActiveShift) {
+            log.warn("Staff login denied - no active shift: {}", user.getUsername());
+            throw new AppException(ErrorCode.NO_ACTIVE_SHIFT);
+        }
+        
+        log.info("Staff shift validation passed for: {}", user.getUsername());
     }
 
     private AuthResult buildAuthResult(User user, SessionMetaRequest sessionMetaRequest) {

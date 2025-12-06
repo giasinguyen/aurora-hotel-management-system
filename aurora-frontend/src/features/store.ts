@@ -14,12 +14,14 @@ import languageReducer from "./slices/languageSlice";
 import authReducer from "./slices/auth/authSlice";
 import branchReducer from "./slices/branchSlice";
 import ragReducer from "./slices/ragSlice";
+import shiftReducer from "./slices/shiftSlice";
 
 const rootReducer = combineReducers({
   language: languageReducer,
   auth: authReducer,
   branch: branchReducer,
   rag: ragReducer,
+  shift: shiftReducer,
 });
 
 const persistConfig = {

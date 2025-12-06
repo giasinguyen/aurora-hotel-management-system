@@ -399,9 +399,10 @@ ON CONFLICT DO NOTHING;
 -- Mỗi category có 2 loại: Single/Couple/Three Bedroom + View (City/Sea)
 -- CHỈ TẠO CHO HCM BRANCH
 -- LƯU Ý: sizeM2 -> sizem2 (không phải size_m2), numberOfBeds -> number_of_beds
+-- price_from: Giá tham khảo từ (minimum price reference)
 -- ============================================================================
 INSERT INTO room_types (
-    id, branch_id, category_id, name, code, base_price, weekend_price,
+    id, branch_id, category_id, name, code, price_from,
     capacity_adults, capacity_children, max_occupancy,
     sizem2, bed_type, number_of_beds, refundable, smoking_allowed,
     description, short_description, images,
@@ -416,7 +417,6 @@ INSERT INTO room_types (
     'Single Bedroom City View',
     'SSCV',
     1200000.00,
-    1400000.00,
     1, 0, 1,
     25.0,
     'SINGLE',
@@ -435,7 +435,6 @@ INSERT INTO room_types (
     'Couple Bedroom Sea View',
     'SCSV',
     1500000.00,
-    1800000.00,
     2, 0, 2,
     30.0,
     'QUEEN',
@@ -456,7 +455,6 @@ INSERT INTO room_types (
     'Deluxe Single Bedroom City View',
     'DSCV',
     1800000.00,
-    2200000.00,
     1, 1, 2,
     35.0,
     'KING',
@@ -475,7 +473,6 @@ INSERT INTO room_types (
     'Deluxe Couple Bedroom Sea View',
     'DCSV',
     2200000.00,
-    2600000.00,
     2, 1, 3,
     40.0,
     'KING',
@@ -496,7 +493,6 @@ INSERT INTO room_types (
     'Presidential Two Bedroom City View',
     'PTCV',
     4500000.00,
-    5500000.00,
     4, 2, 6,
     80.0,
     'KING',
@@ -515,7 +511,6 @@ INSERT INTO room_types (
     'Presidential Three Bedroom Sea View',
     'PTSV',
     6500000.00,
-    8000000.00,
     6, 2, 8,
     120.0,
     'KING',
@@ -561,9 +556,11 @@ ON CONFLICT DO NOTHING;
 -- ============================================================================
 -- 7. ROOMS (Phòng cụ thể)
 -- Tạo 10 phòng cho HCM - phân bố theo các loại
+-- Mỗi phòng có base_price riêng và sale_percent (dynamic pricing)
 -- ============================================================================
 INSERT INTO rooms (
-    id, branch_id, room_type_id, room_number, floor, status, view_type, images,
+    id, branch_id, room_type_id, room_number, floor, status, view_type, 
+    base_price, sale_percent, images,
     created_at, updated_at, version, deleted
 ) VALUES 
 -- Standard Single Bedroom City View (2 phòng)
@@ -575,6 +572,8 @@ INSERT INTO rooms (
     3,
     'AVAILABLE',
     'CITY',
+    1200000.00,
+    0.00,
     '["https://images.unsplash.com/photo-1566665797739-1674de7a421a?w=1200&h=800&fit=crop"]',
     NOW(), NOW(), 0, false
 ),
@@ -586,6 +585,8 @@ INSERT INTO rooms (
     3,
     'AVAILABLE',
     'CITY',
+    1200000.00,
+    10.00,
     '["https://images.unsplash.com/photo-1566665797739-1674de7a421a?w=1200&h=800&fit=crop"]',
     NOW(), NOW(), 0, false
 ),
@@ -598,6 +599,8 @@ INSERT INTO rooms (
     5,
     'AVAILABLE',
     'SEA',
+    1500000.00,
+    0.00,
     '["https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=1200&h=800&fit=crop"]',
     NOW(), NOW(), 0, false
 ),
@@ -609,6 +612,8 @@ INSERT INTO rooms (
     5,
     'OCCUPIED',
     'SEA',
+    1500000.00,
+    0.00,
     '["https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=1200&h=800&fit=crop"]',
     NOW(), NOW(), 0, false
 ),
@@ -621,6 +626,8 @@ INSERT INTO rooms (
     8,
     'AVAILABLE',
     'CITY',
+    1800000.00,
+    15.00,
     '["https://images.unsplash.com/photo-1596394516093-501ba68a0ba6?w=1200&h=800&fit=crop"]',
     NOW(), NOW(), 0, false
 ),
@@ -632,6 +639,8 @@ INSERT INTO rooms (
     8,
     'CLEANING',
     'CITY',
+    1800000.00,
+    0.00,
     '["https://images.unsplash.com/photo-1596394516093-501ba68a0ba6?w=1200&h=800&fit=crop"]',
     NOW(), NOW(), 0, false
 ),
@@ -644,6 +653,8 @@ INSERT INTO rooms (
     10,
     'AVAILABLE',
     'SEA',
+    2200000.00,
+    20.00,
     '["https://images.unsplash.com/photo-1568605117037-4d9c780fac89?w=1200&h=800&fit=crop"]',
     NOW(), NOW(), 0, false
 ),
@@ -655,6 +666,8 @@ INSERT INTO rooms (
     10,
     'AVAILABLE',
     'SEA',
+    2200000.00,
+    0.00,
     '["https://images.unsplash.com/photo-1568605117037-4d9c780fac89?w=1200&h=800&fit=crop"]',
     NOW(), NOW(), 0, false
 ),
@@ -667,6 +680,8 @@ INSERT INTO rooms (
     15,
     'AVAILABLE',
     'CITY',
+    4500000.00,
+    0.00,
     '["https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=1200&h=800&fit=crop"]',
     NOW(), NOW(), 0, false
 ),
@@ -679,6 +694,8 @@ INSERT INTO rooms (
     20,
     'AVAILABLE',
     'SEA',
+    6500000.00,
+    5.00,
     '["https://images.unsplash.com/photo-1618773928121-c32242e63f39?w=1200&h=800&fit=crop"]',
     NOW(), NOW(), 0, false
 )

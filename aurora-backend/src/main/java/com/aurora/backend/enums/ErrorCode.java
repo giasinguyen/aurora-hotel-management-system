@@ -170,6 +170,32 @@ public enum ErrorCode {
     // Dashboard errors
     DASHBOARD_DATE_RANGE_INVALID(2700, "Date range cannot exceed 365 days", HttpStatus.BAD_REQUEST),
     DASHBOARD_BRANCH_REQUIRED(2701, "Assigned branch is required for this dashboard", HttpStatus.BAD_REQUEST),
+    
+    // Work Shift errors
+    SHIFT_NOT_FOUND(2800, "Work shift not found", HttpStatus.NOT_FOUND),
+    SHIFT_NAME_EXISTED(2801, "Shift name already exists in this branch", HttpStatus.BAD_REQUEST),
+    SHIFT_TIME_OVERLAP(2802, "Shift time overlaps with existing shift", HttpStatus.BAD_REQUEST),
+    SHIFT_INVALID_TIME_RANGE(2803, "Start time must be before end time", HttpStatus.BAD_REQUEST),
+    SHIFT_INACTIVE(2804, "Cannot assign inactive shift", HttpStatus.BAD_REQUEST),
+    
+    // Shift Assignment errors
+    ASSIGNMENT_NOT_FOUND(2900, "Shift assignment not found", HttpStatus.NOT_FOUND),
+    ASSIGNMENT_ALREADY_EXISTS(2901, "Staff already assigned to this shift on this date", HttpStatus.BAD_REQUEST),
+    ASSIGNMENT_DATE_PAST(2902, "Cannot assign shifts for past dates", HttpStatus.BAD_REQUEST),
+    ASSIGNMENT_OVERLAP(2903, "Staff has overlapping shift on this date", HttpStatus.BAD_REQUEST),
+    ASSIGNMENT_COMPLETED(2904, "Cannot modify completed assignment", HttpStatus.BAD_REQUEST),
+    NO_ACTIVE_SHIFT(2905, "You don't have an active shift at this time. Please contact your manager.", HttpStatus.FORBIDDEN),
+    INVALID_DATE_RANGE(2906, "Start date must be before or equal to end date", HttpStatus.BAD_REQUEST),
+    
+    // Shift Check-in errors
+    CHECKIN_NOT_FOUND(3000, "Check-in record not found", HttpStatus.NOT_FOUND),
+    CHECKIN_WRONG_DATE(3001, "Can only check in for today's shift", HttpStatus.BAD_REQUEST),
+    CHECKIN_ALREADY_EXISTS(3002, "Already checked in. Please check out first.", HttpStatus.BAD_REQUEST),
+    ALREADY_CHECKED_IN(3002, "Already checked in. Please check out first.", HttpStatus.BAD_REQUEST), // Alias
+    CHECKIN_TOO_EARLY(3003, "Too early to check in", HttpStatus.BAD_REQUEST),
+    CHECKOUT_NOT_CHECKED_IN(3004, "No active check-in found. Please check in first.", HttpStatus.BAD_REQUEST),
+    NOT_CHECKED_IN(3004, "No active check-in found. Please check in first.", HttpStatus.BAD_REQUEST), // Alias
+    SHIFT_CANCELLED(3005, "Cannot check in to cancelled shift", HttpStatus.BAD_REQUEST),
     ;
 
     ErrorCode(int code, String message, HttpStatusCode statusCode) {

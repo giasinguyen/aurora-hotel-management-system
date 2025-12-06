@@ -44,8 +44,7 @@ interface FormState {
   branchId: string;
   name: string;
   code: string;
-  basePrice: number;
-  weekendPrice: number;
+  priceFrom: number;
   capacityAdults: number;
   capacityChildren: number;
   maxOccupancy: number;
@@ -58,8 +57,7 @@ interface FormErrors {
   branchId?: string;
   name?: string;
   code?: string;
-  basePrice?: string;
-  weekendPrice?: string;
+  priceFrom?: string;
   capacityAdults?: string;
   capacityChildren?: string;
   maxOccupancy?: string;
@@ -100,8 +98,7 @@ export default function RoomTypeForm({
     branchId: roomType?.branchId || '',
     name: roomType?.name || '',
     code: roomType?.code || '',
-    basePrice: roomType?.basePrice || 500000,
-    weekendPrice: roomType?.weekendPrice || 0,
+    priceFrom: roomType?.priceFrom || 500000,
     capacityAdults: roomType?.capacityAdults || 2,
     capacityChildren: roomType?.capacityChildren || 0,
     maxOccupancy: roomType?.maxOccupancy || 2,
@@ -119,8 +116,7 @@ export default function RoomTypeForm({
         branchId: roomType.branchId || '',
         name: roomType.name || '',
         code: roomType.code || '',
-        basePrice: roomType.basePrice || 500000,
-        weekendPrice: roomType.weekendPrice || 0,
+        priceFrom: roomType.priceFrom || 500000,
         capacityAdults: roomType.capacityAdults || 2,
         capacityChildren: roomType.capacityChildren || 0,
         maxOccupancy: roomType.maxOccupancy || 2,
@@ -189,11 +185,8 @@ export default function RoomTypeForm({
     } else if (!/^[A-Z]{3,5}$/.test(formState.code)) {
       newErrors.code = 'Mã phải gồm 3-5 chữ in hoa';
     }
-    if (!formState.basePrice || formState.basePrice <= 0) {
-      newErrors.basePrice = 'Giá cơ bản phải lớn hơn 0';
-    }
-    if (formState.weekendPrice && formState.weekendPrice < 0) {
-      newErrors.weekendPrice = 'Giá cuối tuần không được âm';
+    if (!formState.priceFrom || formState.priceFrom <= 0) {
+      newErrors.priceFrom = 'Giá tham khảo từ phải lớn hơn 0';
     }
     if (formState.capacityAdults < 1 || formState.capacityAdults > 20) {
       newErrors.capacityAdults = 'Số người lớn từ 1-20';
@@ -223,8 +216,7 @@ export default function RoomTypeForm({
       const updateData: RoomTypeUpdateRequest = {
         name: formState.name,
         code: formState.code,
-        basePrice: formState.basePrice,
-        weekendPrice: formState.weekendPrice > 0 ? formState.weekendPrice : undefined,
+        priceFrom: formState.priceFrom,
         capacityAdults: formState.capacityAdults,
         capacityChildren: formState.capacityChildren,
         maxOccupancy: formState.maxOccupancy,
@@ -239,8 +231,7 @@ export default function RoomTypeForm({
         branchId: formState.branchId,
         name: formState.name,
         code: formState.code,
-        basePrice: formState.basePrice,
-        weekendPrice: formState.weekendPrice > 0 ? formState.weekendPrice : undefined,
+        priceFrom: formState.priceFrom,
         capacityAdults: formState.capacityAdults,
         capacityChildren: formState.capacityChildren,
         maxOccupancy: formState.maxOccupancy,
@@ -400,42 +391,23 @@ export default function RoomTypeForm({
           </div>
         </CardHeader>
         <CardContent className="grid gap-6 md:grid-cols-2">
-          {/* Base Price */}
+          {/* Price From */}
           <div className="space-y-2">
             <Label className="flex items-center gap-2">
               <DollarSign className="h-4 w-4 text-muted-foreground" />
-              Giá cơ bản (VNĐ/đêm) <span className="text-destructive">*</span>
+              Giá tham khảo từ (VNĐ/đêm) <span className="text-destructive">*</span>
             </Label>
             <Input
               type="number"
-              value={formState.basePrice}
-              onChange={(e) => updateField('basePrice', parseFloat(e.target.value) || 0)}
+              value={formState.priceFrom}
+              onChange={(e) => updateField('priceFrom', parseFloat(e.target.value) || 0)}
               min={0}
               step={10000}
               placeholder="500000"
-              className={`h-11 ${errors.basePrice ? 'border-destructive' : ''}`}
+              className={`h-11 ${errors.priceFrom ? 'border-destructive' : ''}`}
             />
-            <p className="text-sm text-muted-foreground">Giá áp dụng cho ngày thường trong tuần</p>
-            {errors.basePrice && <p className="text-sm text-destructive">{errors.basePrice}</p>}
-          </div>
-
-          {/* Weekend Price */}
-          <div className="space-y-2">
-            <Label className="flex items-center gap-2">
-              <DollarSign className="h-4 w-4 text-muted-foreground" />
-              Giá cuối tuần (VNĐ/đêm)
-            </Label>
-            <Input
-              type="number"
-              value={formState.weekendPrice}
-              onChange={(e) => updateField('weekendPrice', parseFloat(e.target.value) || 0)}
-              min={0}
-              step={10000}
-              placeholder="600000"
-              className={`h-11 ${errors.weekendPrice ? 'border-destructive' : ''}`}
-            />
-            <p className="text-sm text-muted-foreground">Để trống hoặc 0 sẽ dùng giá cơ bản</p>
-            {errors.weekendPrice && <p className="text-sm text-destructive">{errors.weekendPrice}</p>}
+            <p className="text-sm text-muted-foreground">Giá tham khảo thấp nhất của loại phòng này</p>
+            {errors.priceFrom && <p className="text-sm text-destructive">{errors.priceFrom}</p>}
           </div>
         </CardContent>
       </Card>

@@ -93,7 +93,7 @@ export default function RoomTypeDetailCard({ roomType }: RoomTypeDetailCardProps
               </div>
             </div>
             <div className="text-right">
-              <div className="text-2xl font-bold">{formatCurrency(roomType.basePrice)}</div>
+              <div className="text-2xl font-bold">{formatCurrency(roomType.priceFrom)}</div>
               <div className="text-emerald-100 text-sm">/đêm (giá cơ bản)</div>
               {roomType.weekendPrice && roomType.weekendPrice > 0 && (
                 <div className="text-sm text-emerald-200 mt-1">
@@ -123,7 +123,7 @@ export default function RoomTypeDetailCard({ roomType }: RoomTypeDetailCardProps
               label="Giá cơ bản"
               value={
                 <span className="text-lg font-semibold text-green-600">
-                  {formatCurrency(roomType.basePrice)}
+                  {formatCurrency(roomType.priceFrom)}
                 </span>
               }
             />
@@ -265,7 +265,7 @@ export default function RoomTypeDetailCard({ roomType }: RoomTypeDetailCardProps
             <div className="mx-auto mb-2 p-3 rounded-full bg-green-500 text-white w-fit">
               <DollarSign className="h-5 w-5" />
             </div>
-            <p className="text-lg font-bold text-green-700">{formatCurrency(roomType.basePrice)}</p>
+            <p className="text-lg font-bold text-green-700">{formatCurrency(roomType.priceFrom)}</p>
             <p className="text-sm text-green-600">Giá/đêm</p>
           </CardContent>
         </Card>

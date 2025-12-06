@@ -85,6 +85,8 @@ import RoleDetailPage from "@/pages/role/RoleDetail";
 
 // Rooms
 import RoomListPage from "@/pages/rooms/RoomList";
+import RoomCategoryListPage from "@/pages/rooms/RoomCategoryList";
+import RoomCategoryUpsertPage from "@/pages/rooms/RoomCategoryUpsert";
 import RoomTypeListPage from "@/pages/rooms/RoomTypeList";
 import RoomTypeUpsertPage from "@/pages/rooms/RoomTypeUpsert";
 import RoomUpsertPage from "@/pages/rooms/RoomUpsert";
@@ -92,6 +94,10 @@ import RoomUpsertPage from "@/pages/rooms/RoomUpsert";
 // Services
 import ServiceListPage from "@/pages/services/ServiceList";
 import ServiceUpsertPage from "@/pages/services/ServiceUpsert";
+
+// Shifts
+import ShiftManagementPage from "@/pages/shifts/ShiftManagement";
+import StaffShiftDashboard from "@/pages/shifts/StaffShiftDashboard";
 
 // User (shared)
 import UserDetailPage from "@/pages/user/UserDetail";
@@ -149,6 +155,8 @@ const router = createBrowserRouter([
       { path: "booking/:id", element: <BookingDetailPage /> },
       { path: "users/upsert", element: <UserUpsertPage /> },
       { path: "reports/shift", element: <ShiftReportPage /> },
+      { path: "shifts", element: <StaffShiftDashboard /> },
+      { path: "my-shift", element: <StaffShiftDashboard /> },
       { path: "profile", element: <UserProfilePage /> },
     ],
   },
@@ -162,6 +170,7 @@ const router = createBrowserRouter([
       { path: "booking/upsert", element: <BookingUpsertPage /> },
       { path: "booking/:id", element: <BookingDetailPage /> },
       { path: "reports/shift", element: <ShiftReportPage /> },
+      { path: "shifts", element: <ShiftManagementPage /> },
       { path: "rooms", element: <RoomListPage /> },
       { path: "rooms/upsert", element: <RoomUpsertPage /> },
       { path: "room-types", element: <RoomTypeListPage /> },
@@ -195,6 +204,8 @@ const router = createBrowserRouter([
       { path: "rooms/upsert", element: <RoomUpsertPage /> },
       { path: "room-types", element: <RoomTypeListPage /> },
       { path: "room-types/upsert", element: <RoomTypeUpsertPage /> },
+      { path: "room-categories", element: <RoomCategoryListPage /> },
+      { path: "room-categories/upsert", element: <RoomCategoryUpsertPage /> },
       { path: "services", element: <ServiceListPage /> },
       { path: "services/upsert", element: <ServiceUpsertPage /> },
       { path: "promotions", element: <PromotionListPage /> },
@@ -209,6 +220,7 @@ const router = createBrowserRouter([
       { path: "users/:id/assign-branch", element: <AssignBranchPage /> },
       { path: "roles", element: <RoleManagementPage /> },
       { path: "roles/:id", element: <RoleDetailPage /> },
+      { path: "shifts", element: <ShiftManagementPage /> },
       { path: "documents", element: <DocumentListPage /> },
       { path: "documents/upsert", element: <DocumentUpsertPage /> },
       { path: "reports/overview", element: <OverviewReportPage /> },

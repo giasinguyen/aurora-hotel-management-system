@@ -19,12 +19,9 @@ public class RoomTypeUpdateRequest {
     @Pattern(regexp = "^[A-Z]{3,5}$", message = "CODE_PATTERN_INVALID")
     String code;
     
-    // Price information
-    @DecimalMin(value = "0.01", message = "BASE_PRICE_POSITIVE")
-    BigDecimal basePrice;
-    
-    @DecimalMin(value = "0.01", message = "WEEKEND_PRICE_POSITIVE")
-    BigDecimal weekendPrice;
+    // Price information - Only reference minimum price
+    @DecimalMin(value = "0.01", message = "PRICE_FROM_POSITIVE")
+    BigDecimal priceFrom;
     
     // Capacity information
     @Positive(message = "CAPACITY_ADULTS_POSITIVE")

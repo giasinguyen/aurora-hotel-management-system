@@ -40,6 +40,11 @@ public final class PermissionConstants {
         public static final String PAYMENT_VIEW_ALL = "PAYMENT_VIEW_ALL";
         public static final String SERVICE_MANAGE = "SERVICE_MANAGE";
         public static final String DASHBOARD_VIEW_STAFF = "DASHBOARD_VIEW_STAFF";
+        
+        // Shift permissions for staff
+        public static final String SHIFT_VIEW = "SHIFT_VIEW";
+        public static final String SHIFT_CHECKIN = "SHIFT_CHECKIN";
+        public static final String SHIFT_CHECKOUT = "SHIFT_CHECKOUT";
     }
 
     public static final class Manager {
@@ -57,6 +62,14 @@ public final class PermissionConstants {
         public static final String REPORT_EXPORT = "REPORT_EXPORT";
         public static final String STAFF_VIEW = "STAFF_VIEW";
         public static final String DASHBOARD_VIEW_MANAGER = "DASHBOARD_VIEW_MANAGER";
+        
+        // Shift management permissions for managers
+        public static final String SHIFT_CREATE = "SHIFT_CREATE";
+        public static final String SHIFT_UPDATE = "SHIFT_UPDATE";
+        public static final String SHIFT_DELETE = "SHIFT_DELETE";
+        public static final String SHIFT_ASSIGN = "SHIFT_ASSIGN";
+        public static final String SHIFT_UNASSIGN = "SHIFT_UNASSIGN";
+        public static final String SHIFT_VIEW_ALL = "SHIFT_VIEW_ALL";
     }
 
     public static final class Admin {

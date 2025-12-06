@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
+import VideoHero from "@/components/custom/VideoHero";
 import { roomCategoryApi } from '@/services/roomApi';
 import type { RoomCategory, RoomType } from '@/types/room.types';
 import { toast } from 'sonner';
@@ -7,6 +8,14 @@ import { Loader2, ChevronLeft, Users, Maximize, Bed } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import {
+  Breadcrumb,
+  BreadcrumbList,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from '@/components/ui/breadcrumb';
 
 export default function AccommodationCategoryPage() {
   const { categoryId } = useParams<{ categoryId: string }>();
@@ -78,19 +87,37 @@ export default function AccommodationCategoryPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero Section */}
-      <div className="relative h-64 bg-gradient-to-r from-gray-800 to-gray-900">
-        <div className="absolute inset-0 bg-black/40" />
-        <div className="relative container mx-auto px-4 h-full flex flex-col justify-center">
-          <Button 
-            variant="ghost" 
-            onClick={() => navigate('/accommodation')}
-            className="mb-4 text-white hover:bg-white/20 w-fit"
-          >
-            <ChevronLeft className="mr-2 h-4 w-4" />
-            Quay lại
-          </Button>
-          <h1 className="text-4xl md:text-5xl font-bold text-white mb-3">{category.name}</h1>
-          <p className="text-lg text-gray-200 max-w-3xl">{category.description}</p>
+      <VideoHero>
+        <div className="container mx-auto px-4">
+          <div className="text-center text-white">
+            <h1 className="text-4xl md:text-5xl font-bold mb-4">{category.name}</h1>
+            <p className="text-xl opacity-90 max-w-3xl mx-auto">{category.description}</p>
+          </div>
+        </div>
+      </VideoHero>
+
+      {/* Breadcrumb Navigation */}
+      <div className="bg-white border-b">
+        <div className="container mx-auto px-4 py-4">
+          <Breadcrumb>
+            <BreadcrumbList>
+              <BreadcrumbItem>
+                <BreadcrumbLink asChild>
+                  <Link to="/">Trang chủ</Link>
+                </BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem>
+                <BreadcrumbLink asChild>
+                  <Link to="/accommodation">Hạng phòng</Link>
+                </BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem>
+                <BreadcrumbPage>{category.name}</BreadcrumbPage>
+              </BreadcrumbItem>
+            </BreadcrumbList>
+          </Breadcrumb>
         </div>
       </div>
 
@@ -161,7 +188,7 @@ export default function AccommodationCategoryPage() {
                         <div>
                           <p className="text-sm text-gray-500">Giá từ</p>
                           <p className="text-3xl font-bold text-amber-600">
-                            {formatCurrency(roomType.basePrice)}
+                            {formatCurrency(roomType.priceFrom)}
                             <span className="text-base text-gray-500 font-normal">/đêm</span>
                           </p>
                         </div>

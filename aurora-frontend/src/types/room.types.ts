@@ -28,6 +28,9 @@ export interface Room {
   capacityChildren: number;
   sizeM2: number;
   viewType?: string; // e.g., 'CITY', 'RIVER', 'SEA', 'GARDEN'
+  basePrice: number; // Giá gốc của phòng
+  salePercent: number; // % giảm giá (0-100)
+  displayPrice: number; // Giá hiển thị sau khi tính giảm giá
   images?: string[]; // Array of image URLs
 }
 
@@ -45,9 +48,10 @@ export interface RoomCreationRequest {
   roomNumber: string;
   floor: number;
   status?: RoomStatus;
-  capacityAdults?: number;
-  capacityChildren?: number;
-  sizeM2?: number;
+  viewType?: string;
+  basePrice: number; // Giá gốc của phòng
+  salePercent?: number; // % giảm giá (0-100), mặc định 0
+  images?: string[];
 }
 
 export interface RoomUpdateRequest {
@@ -55,9 +59,10 @@ export interface RoomUpdateRequest {
   roomNumber?: string;
   floor?: number;
   status?: RoomStatus;
-  capacityAdults?: number;
-  capacityChildren?: number;
-  sizeM2?: number;
+  viewType?: string;
+  basePrice?: number; // Giá gốc của phòng
+  salePercent?: number; // % giảm giá (0-100)
+  images?: string[];
 }
 
 export interface RoomSearchParams {
@@ -76,7 +81,6 @@ export interface Amenity {
   name: string;
   icon?: string;
 }
-
 export interface RoomType {
   id: string;
   branchId: string;
@@ -84,9 +88,7 @@ export interface RoomType {
   categoryId?: string;
   name: string;
   code: string;
-  basePrice: number;
-  weekendPrice?: number;
-  holidayPrice?: number;
+  priceFrom: number; // Giá tham khảo từ (minimum price reference)
   capacityAdults: number;
   capacityChildren: number;
   maxOccupancy: number;
@@ -107,27 +109,27 @@ export interface RoomTypeCreationRequest {
   branchId: string;
   name: string;
   code: string;
-  basePrice: number;
-  weekendPrice?: number;
+  priceFrom: number; // Giá tham khảo từ
   capacityAdults: number;
   capacityChildren: number;
   maxOccupancy: number;
   sizeM2: number;
   refundable?: boolean;
   amenityIds?: string[];
+  images?: string[];
 }
 
 export interface RoomTypeUpdateRequest {
   name?: string;
   code?: string;
-  basePrice?: number;
-  weekendPrice?: number;
+  priceFrom?: number; // Giá tham khảo từ
   capacityAdults?: number;
   capacityChildren?: number;
   maxOccupancy?: number;
   sizeM2?: number;
   refundable?: boolean;
   amenityIds?: string[];
+  images?: string[];
 }
 
 export interface RoomTypeSearchParams {

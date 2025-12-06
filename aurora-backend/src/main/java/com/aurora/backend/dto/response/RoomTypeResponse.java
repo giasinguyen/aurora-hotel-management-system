@@ -17,12 +17,12 @@ public class RoomTypeResponse {
     String id;
     String branchId;
     String branchName;
+    String categoryId;
     String name;
     String code;
     
-    // Price information
-    BigDecimal basePrice;
-    BigDecimal weekendPrice;
+    // Price information - Only reference minimum price
+    BigDecimal priceFrom; // Giá tham khảo từ
     
     // Capacity information
     Integer capacityAdults;
