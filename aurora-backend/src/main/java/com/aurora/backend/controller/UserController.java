@@ -19,6 +19,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
@@ -27,6 +28,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.multipart.MultipartFile;
 
 @Slf4j
 @RestController
@@ -287,4 +289,19 @@ public class UserController {
                 .result(user)
                 .build();
     }
+    @PostMapping(value = "/avatar", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @RequirePermission(PermissionConstants.Customer.PROFILE_UPDATE)
+    public ApiResponse<UserResponse> uploadAvatar(@RequestParam("file") MultipartFile file) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        String currentUsername = authentication.getName();
+
+        // Gọi service để upload ảnh và lưu URL vào user
+        UserResponse updatedUser = userService.uploadAvatar(currentUsername, file);
+
+        return ApiResponse.<UserResponse>builder()
+                .message("Avatar uploaded successfully")
+                .result(updatedUser)
+                .build();
+    }
 }
+// Thêm vào UserController.java

@@ -32,29 +32,25 @@ public class RoomType extends BaseEntity {
     @JoinColumn(name = "branch_id", nullable = false)
     Branch branch;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_id")
+    RoomCategory category;  // Hạng phòng: Standard, Deluxe, Presidential Suite
+
     @NotBlank(message = "Room type name is required")
     @Size(max = 100, message = "Name cannot exceed 100 characters")
     @Column(nullable = false, length = 100)
-    String name;   // Deluxe, Suite, Standard, Premium...
+    String name;   // Single Bedroom City View, Couple Bedroom Sea View...
     
     @NotBlank(message = "Room type code is required")
     @Pattern(regexp = "^[A-Z]{3,5}$", message = "Code must be 3-5 uppercase letters")
     @Column(length = 20)
     String code;   // DEL, STE, STD, PRM
     
-    // CRITICAL: Price information
-    @NotNull(message = "Base price is required")
-    @DecimalMin(value = "0.0", inclusive = false, message = "Base price must be greater than 0")
-    @Column(nullable = false, precision = 10, scale = 2)
-    BigDecimal basePrice; // Giá cơ bản trong tuần
-    
-    @DecimalMin(value = "0.0", inclusive = false, message = "Weekend price must be greater than 0")
-    @Column(precision = 10, scale = 2)
-    BigDecimal weekendPrice; // Giá cuối tuần (optional, nếu null thì dùng basePrice)
-    
-    @DecimalMin(value = "0.0", inclusive = false, message = "Holiday price must be greater than 0")
-    @Column(precision = 10, scale = 2)
-    BigDecimal holidayPrice; // Giá ngày lễ (optional)
+    // CRITICAL: Price information - Only minimum price reference
+    @NotNull(message = "Price from is required")
+    @DecimalMin(value = "0.0", inclusive = false, message = "Price from must be greater than 0")
+    @Column(name = "price_from", nullable = false, precision = 10, scale = 2)
+    BigDecimal priceFrom; // Giá tham khảo từ (giá thấp nhất của các phòng thuộc loại này)
     
     // Capacity information
     @NotNull(message = "Adult capacity is required")

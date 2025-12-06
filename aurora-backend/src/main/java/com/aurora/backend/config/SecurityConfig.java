@@ -68,7 +68,9 @@ public class SecurityConfig {
             "/api/v1/branches/**",
             "/api/v1/rooms/search",
             "/api/v1/rooms/{id}",
+            "/api/v1/rooms/room-type/**",
             "/api/v1/room-types/**",
+            "/api/v1/room-categories/**",
             "/api/v1/promotions/**",
             "/api/v1/services/**",
             "/api/v1/facilities/**",
@@ -124,8 +126,12 @@ public class SecurityConfig {
         // Allow frontend origins
         configuration.setAllowedOrigins(Arrays.asList(
                 "http://localhost:3000",
+                "http://localhost:3001",
+                "http://localhost:3002",
                 "http://localhost:5173",
                 "http://127.0.0.1:3000",
+                "http://127.0.0.1:3001",
+                "http://127.0.0.1:3002",
                 "http://127.0.0.1:5173"
         ));
 

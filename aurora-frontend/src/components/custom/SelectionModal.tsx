@@ -53,12 +53,26 @@ export default function SelectionModal() {
     dispatch(setLanguage("en"));
     dispatch(setBranch("hcm"));
     dispatch(setSelectionCompleted(true));
+    
+    // Lưu default branch vào localStorage
+    const defaultBranch = BRANCHES.find(b => b.id === "hcm");
+    if (defaultBranch) {
+      localStorage.setItem('selectedBranchId', defaultBranch.apiId);
+      localStorage.setItem('selectedBranchName', defaultBranch.name);
+    }
   };
 
   const handleConfirm = () => {
     dispatch(setLanguage(selectedLanguage));
     dispatch(setBranch(selectedBranch));
     dispatch(setSelectionCompleted(true));
+    
+    // Lưu branchId vào localStorage để sử dụng trong accommodation
+    const branch = BRANCHES.find(b => b.id === selectedBranch);
+    if (branch) {
+      localStorage.setItem('selectedBranchId', branch.apiId);
+      localStorage.setItem('selectedBranchName', branch.name);
+    }
   };
 
   if (isSelectionCompleted) {

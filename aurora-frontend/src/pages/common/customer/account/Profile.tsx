@@ -1,42 +1,23 @@
 import { motion, useInView } from "framer-motion";
 import { useRef, useState } from "react";
-import { User, Mail, Phone, MapPin, Calendar, Edit, Camera } from "lucide-react";
+import { User, Mail, Phone, MapPin, Calendar, Edit, Camera, Loader2 } from "lucide-react";
+import { useMyProfile } from "@/hooks/useMyProfile";
 
-// ===================== API CONFIGURATION =====================
-const USE_API = false; // Đổi thành true khi muốn dùng API thực
-const API_BASE_URL = '/api'; // Thay đổi base URL của API ở đây
-// ============================================================
-
-// Mock user data
-const userData = {
-  name: "Nguyễn Văn An",
-  email: "nguyenvanan@example.com",
-  phone: "+84 123 456 789",
-  address: "123 Đường Lê Lợi, Quận 1, TP.HCM",
-  joinDate: "15/03/2023",
-  avatar: "https://images.unsplash.com/photo-1633332755192-727a05c4013d?w=400&h=400&fit=crop"
-};
 
 export default function CustomerProfilePage() {
   const [activeTab, setActiveTab] = useState("personal");
   const profileRef = useRef(null);
   const profileInView = useInView(profileRef, { once: true, margin: "-50px" });
+  
+  const { user, loading, uploadAvatar } = useMyProfile();
 
+  // Animation variants - SIMPLIFIED
   const fadeInUp = {
-    hidden: { opacity: 0, y: 40 },
+    hidden: { opacity: 0, y: 20 },
     visible: { 
       opacity: 1, 
       y: 0,
-      transition: { duration: 0.6 }
-    }
-  };
-
-  const scaleIn = {
-    hidden: { opacity: 0, scale: 0.9 },
-    visible: { 
-      opacity: 1, 
-      scale: 1,
-      transition: { duration: 0.5 }
+      transition: { duration: 0.4 }
     }
   };
 
@@ -45,40 +26,58 @@ export default function CustomerProfilePage() {
     visible: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.15,
-        delayChildren: 0.2
+        staggerChildren: 0.1,
+        delayChildren: 0.1
       }
     }
   };
-
-  // Handle avatar upload - Ready for API
-  const handleAvatarUpload = async (file: File) => {
-    if (!USE_API) {
-      console.log('Mock: Avatar uploaded', file.name);
+  const handleAvatarUpload = async (file : File) => {
+    if (!file) return;
+    
+    if (file.size > 5 * 1024 * 1024) {
+      alert('Kích thước ảnh không được vượt quá 5MB');
       return;
     }
 
-    try {
-      const formData = new FormData();
-      formData.append('avatar', file);
-
-      const response = await fetch(`${API_BASE_URL}/user/avatar`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
-        },
-        body: formData
-      });
-
-      if (!response.ok) throw new Error('Upload failed');
-      const data = await response.json();
-      console.log('Avatar uploaded:', data.avatarUrl);
-      // TODO: Update UI with new avatar
-    } catch (err) {
-      console.error('Error uploading avatar:', err);
-      alert('Không thể tải ảnh lên. Vui lòng thử lại.');
+    if (!file.type.startsWith('image/')) {
+      alert('Vui lòng chọn file ảnh');
+      return;
     }
+
+    await uploadAvatar(file);
   };
+
+  const formatJoinDate = (dateString?: string | null): string => {
+    if (!dateString) return 'Chưa cập nhật';
+    const date = new Date(dateString);
+    return date.toLocaleDateString('vi-VN');
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="w-12 h-12 text-green-500 animate-spin mx-auto mb-4" />
+          <p className="text-gray-600">Đang tải thông tin...</p>
+        </div>
+      </div>
+    );
+  }
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-white flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-gray-600 mb-4">Không thể tải thông tin người dùng</p>
+          <button
+            onClick={() => window.location.href = '/login'}
+            className="bg-green-500 text-white px-6 py-2 rounded-lg hover:bg-green-600"
+          >
+            Đăng nhập
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-white">
@@ -86,9 +85,9 @@ export default function CustomerProfilePage() {
       <div className="bg-gradient-to-br from-green-500 via-green-600 to-emerald-600 text-white py-16">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
-            initial="hidden"
-            animate="visible"
-            variants={fadeInUp}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
             className="text-center"
           >
             <h1 className="text-4xl md:text-5xl font-bold mb-3">Hồ Sơ Của Tôi</h1>
@@ -100,9 +99,9 @@ export default function CustomerProfilePage() {
       {/* Main Content */}
       <div ref={profileRef} className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 -mt-12 pb-16">
         <motion.div
-          initial="hidden"
-          animate={profileInView ? "visible" : "hidden"}
-          variants={scaleIn}
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.4 }}
           className="bg-white rounded-2xl shadow-xl overflow-hidden"
         >
           {/* Avatar Section */}
@@ -115,8 +114,8 @@ export default function CustomerProfilePage() {
               >
                 <div className="w-32 h-32 rounded-full overflow-hidden ring-4 ring-green-500 ring-offset-4">
                   <img
-                    src={userData.avatar}
-                    alt={userData.name}
+                    src={user.avatarUrl || `https://ui-avatars.com/api/?name=${encodeURIComponent(`${user.firstName} ${user.lastName}`)}&background=22c55e&color=fff`}
+                    alt={`${user.firstName} ${user.lastName}`}
                     className="w-full h-full object-cover"
                   />
                 </div>
@@ -139,15 +138,19 @@ export default function CustomerProfilePage() {
               </motion.div>
 
               <div className="text-center md:text-left flex-1">
-                <h2 className="text-3xl font-bold text-gray-900 mb-2">{userData.name}</h2>
+                <h2 className="text-3xl font-bold text-gray-900 mb-2">
+                  {user.firstName && user.lastName 
+                    ? `${user.firstName} ${user.lastName}` 
+                    : user.username}
+                </h2>
                 <p className="text-gray-600 flex items-center justify-center md:justify-start gap-2">
                   <Calendar className="w-4 h-4" />
-                  Thành viên từ {userData.joinDate}
+                  Thành viên từ {formatJoinDate(user.createdAt)}
                 </p>
               </div>
 
               <motion.button
-                whileHover={{ scale: 1.05, boxShadow: "0 10px 30px rgba(34, 197, 94, 0.3)" }}
+                whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => window.location.href = '/profile/upsert'}
                 className="bg-green-500 text-white px-6 py-3 rounded-xl font-semibold hover:bg-green-600 transition-all flex items-center gap-2 shadow-lg"
@@ -194,16 +197,34 @@ export default function CustomerProfilePage() {
             {activeTab === "personal" && (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 {[
-                  { icon: User, label: "Họ và Tên", value: userData.name },
-                  { icon: Mail, label: "Email", value: userData.email },
-                  { icon: Phone, label: "Số Điện Thoại", value: userData.phone },
-                  { icon: MapPin, label: "Địa Chỉ", value: userData.address }
+                  { 
+                    icon: User, 
+                    label: "Họ và Tên", 
+                    value: user.firstName && user.lastName 
+                      ? `${user.firstName} ${user.lastName}` 
+                      : 'Chưa cập nhật' 
+                  },
+                  { 
+                    icon: Mail, 
+                    label: "Email", 
+                    value: user.email || 'Chưa cập nhật' 
+                  },
+                  { 
+                    icon: Phone, 
+                    label: "Số Điện Thoại", 
+                    value: user.phone || 'Chưa cập nhật' 
+                  },
+                  { 
+                    icon: MapPin, 
+                    label: "Địa Chỉ", 
+                    value: user.address || 'Chưa cập nhật' 
+                  }
                 ].map((item, index) => (
                   <motion.div
                     key={index}
                     variants={fadeInUp}
-                    whileHover={{ y: -5, boxShadow: "0 10px 30px rgba(0,0,0,0.1)" }}
-                    className="bg-gradient-to-br from-green-50 to-emerald-50 p-6 rounded-xl border border-green-100 transition-all"
+                    whileHover={{ y: -5 }}
+                    className="bg-gradient-to-br from-green-50 to-emerald-50 p-6 rounded-xl border border-green-100 transition-all shadow-sm hover:shadow-md"
                   >
                     <div className="flex items-start gap-4">
                       <div className="bg-green-500 text-white p-3 rounded-lg">

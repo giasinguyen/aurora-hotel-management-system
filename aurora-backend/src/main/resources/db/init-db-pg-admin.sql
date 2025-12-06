@@ -20,15 +20,16 @@
 -- 1. branches (không phụ thuộc)
 -- 2. amenities (không phụ thuộc)
 -- 3. facilities (phụ thuộc branches)
--- 4. room_types (phụ thuộc branches)
--- 5. room_type_amenities (phụ thuộc room_types, amenities)
--- 6. rooms (phụ thuộc branches, room_types)
--- 7. services (phụ thuộc branches)
--- 8. promotions (phụ thuộc branches)
--- 9. bookings (phụ thuộc branches, users, promotions)
--- 10. booking_rooms (phụ thuộc bookings, rooms)
--- 11. service_bookings (phụ thuộc bookings, services, users)
--- 12. payments (phụ thuộc bookings)
+-- 4. room_categories (phụ thuộc branches) - MỚI: Hạng phòng
+-- 5. room_types (phụ thuộc branches, room_categories)
+-- 6. room_type_amenities (phụ thuộc room_types, amenities)
+-- 7. rooms (phụ thuộc branches, room_types)
+-- 8. services (phụ thuộc branches)
+-- 9. promotions (phụ thuộc branches)
+-- 10. bookings (phụ thuộc branches, users, promotions)
+-- 11. booking_rooms (phụ thuộc bookings, rooms)
+-- 12. service_bookings (phụ thuộc bookings, services, users)
+-- 13. payments (phụ thuộc bookings)
 -- ============================================================================
 
 -- ============================================================================
@@ -347,317 +348,362 @@ INSERT INTO facilities (
 ON CONFLICT DO NOTHING;
 
 -- ============================================================================
--- 4. ROOM TYPES (Loại phòng)
--- Tạo 2 room types cho mỗi branch
--- LƯU Ý: sizeM2 -> sizem2 (không phải size_m2), numberOfBeds -> number_of_beds
+-- 4. ROOM CATEGORIES (Hạng phòng)
+-- Tạo 3 categories: Standard Room, Deluxe Room, Presidential Suite
+-- CHỈ TẠO CHO HCM BRANCH
 -- ============================================================================
-INSERT INTO room_types (
-    id, branch_id, name, code, base_price, weekend_price,
-    capacity_adults, capacity_children, max_occupancy,
-    sizem2, bed_type, number_of_beds, refundable, smoking_allowed,
-    description, images,
+INSERT INTO room_categories (
+    id, branch_id, name, code, description, display_order, active, image_url,
     created_at, updated_at, version, deleted
 ) VALUES 
--- Hanoi Room Types
+-- Standard Room Category
 (
-    'roomtype-hn-dlx-001',
-    'branch-hanoi-001',
-    'Deluxe City View',
+    'category-hcm-std-001',
+    'branch-hcm-001',
+    'Standard Room',
+    'STD',
+    'Phòng tiêu chuẩn với đầy đủ tiện nghi cơ bản, phù hợp cho khách du lịch và công tác',
+    1,
+    true,
+    'https://images.unsplash.com/photo-1566665797739-1674de7a421a?w=800&h=600&fit=crop',
+    NOW(), NOW(), 0, false
+),
+-- Deluxe Room Category
+(
+    'category-hcm-dlx-001',
+    'branch-hcm-001',
+    'Deluxe Room',
     'DLX',
-    1500000.00,
-    1800000.00,
-    2, 1, 3,
-    35.0,
-    'King',
-    1,
-    true, false,
-    'Phòng Deluxe view thành phố 35m2',
-    '["https://images.unsplash.com/photo-1611892440504-42a792e24d32?w=1200&h=800&fit=crop","https://images.unsplash.com/photo-1590490360182-c33d57733427?w=1200&h=800&fit=crop"]',
+    'Phòng cao cấp với không gian rộng rãi và view đẹp, dịch vụ hoàn hảo',
+    2,
+    true,
+    'https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=800&h=600&fit=crop',
     NOW(), NOW(), 0, false
 ),
+-- Presidential Suite Category
 (
-    'roomtype-hn-exe-001',
-    'branch-hanoi-001',
-    'Executive Lake View',
-    'EXE',
-    2500000.00,
-    3000000.00,
-    2, 1, 3,
-    45.0,
-    'King',
-    1,
-    true, false,
-    'Phòng Executive view Hồ Hoàn Kiếm 45m2',
-    '["https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=1200&h=800&fit=crop","https://images.unsplash.com/photo-1578683010236-d716f9a3f461?w=1200&h=800&fit=crop"]',
-    NOW(), NOW(), 0, false
-),
--- HCM Room Types
-(
-    'roomtype-hcm-sup-001',
+    'category-hcm-pre-001',
     'branch-hcm-001',
-    'Superior Room',
-    'SUP',
-    1300000.00,
-    1500000.00,
-    2, 1, 3,
-    30.0,
-    'Queen',
-    1,
-    true, false,
-    'Phòng Superior hiện đại 30m2',
-    '["https://images.unsplash.com/photo-1566665797739-1674de7a421a?w=1200&h=800&fit=crop"]',
-    NOW(), NOW(), 0, false
-),
-(
-    'roomtype-hcm-drv-001',
-    'branch-hcm-001',
-    'Deluxe River View',
-    'DRV',
-    2200000.00,
-    2600000.00,
-    2, 1, 3,
-    40.0,
-    'King',
-    1,
-    true, false,
-    'Phòng Deluxe view sông Sài Gòn 40m2',
-    '["https://images.unsplash.com/photo-1596394516093-501ba68a0ba6?w=1200&h=800&fit=crop","https://images.unsplash.com/photo-1568605117037-4d9c780fac89?w=1200&h=800&fit=crop"]',
-    NOW(), NOW(), 0, false
-),
--- Da Nang Room Types
-(
-    'roomtype-dn-bch-001',
-    'branch-danang-001',
-    'Beach View Room',
-    'BCH',
-    1800000.00,
-    2200000.00,
-    2, 1, 3,
-    35.0,
-    'King',
-    1,
-    true, false,
-    'Phòng view biển trực diện 35m2',
-    '["https://images.unsplash.com/photo-1618773928121-c32242e63f39?w=1200&h=800&fit=crop"]',
-    NOW(), NOW(), 0, false
-),
-(
-    'roomtype-dn-ocn-001',
-    'branch-danang-001',
-    'Ocean Front Deluxe',
-    'OCN',
-    2800000.00,
-    3200000.00,
-    2, 1, 3,
-    50.0,
-    'King',
-    1,
-    true, false,
-    'Phòng Deluxe view biển với ban công 50m2',
-    '["https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?w=1200&h=800&fit=crop","https://images.unsplash.com/photo-1611892440504-42a792e24d32?w=1200&h=800&fit=crop"]',
+    'Presidential Suite',
+    'PRE',
+    'Phòng tổng thống sang trọng bậc nhất với đầy đủ tiện nghi 5 sao và dịch vụ butler riêng',
+    3,
+    true,
+    'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=800&h=600&fit=crop',
     NOW(), NOW(), 0, false
 )
 ON CONFLICT DO NOTHING;
 
 -- ============================================================================
--- 5. ROOM TYPE AMENITIES (Liên kết loại phòng - tiện nghi)
+-- 5. ROOM TYPES (Loại phòng trong hạng)
+-- Mỗi category có 2 loại: Single/Couple/Three Bedroom + View (City/Sea)
+-- CHỈ TẠO CHO HCM BRANCH
+-- LƯU Ý: sizeM2 -> sizem2 (không phải size_m2), numberOfBeds -> number_of_beds
+-- price_from: Giá tham khảo từ (minimum price reference)
 -- ============================================================================
-INSERT INTO room_type_amenities (room_type_id, amenity_id)
-SELECT rt.id, a.id
-FROM room_types rt, amenities a
-WHERE rt.id = 'roomtype-hn-dlx-001'
-AND a.id IN ('amenity-wifi-001', 'amenity-tv-001', 'amenity-ac-001', 'amenity-safe-001')
+INSERT INTO room_types (
+    id, branch_id, category_id, name, code, price_from,
+    capacity_adults, capacity_children, max_occupancy,
+    sizem2, bed_type, number_of_beds, refundable, smoking_allowed,
+    description, short_description, images,
+    created_at, updated_at, version, deleted
+) VALUES 
+-- ===== STANDARD ROOM CATEGORY =====
+-- Standard Single Bedroom City View
+(
+    'roomtype-hcm-std-single-city-001',
+    'branch-hcm-001',
+    'category-hcm-std-001',
+    'Single Bedroom City View',
+    'SSCV',
+    1200000.00,
+    1, 0, 1,
+    25.0,
+    'SINGLE',
+    1,
+    true, false,
+    'Phòng đơn tiêu chuẩn với view thành phố, phù hợp cho khách công tác. Trang bị đầy đủ tiện nghi cơ bản: TV, minibar, điều hòa, wifi miễn phí.',
+    'Phòng đơn view thành phố 25m²',
+    '["https://images.unsplash.com/photo-1566665797739-1674de7a421a?w=1200&h=800&fit=crop"]',
+    NOW(), NOW(), 0, false
+),
+-- Standard Couple Bedroom Sea View
+(
+    'roomtype-hcm-std-couple-sea-001',
+    'branch-hcm-001',
+    'category-hcm-std-001',
+    'Couple Bedroom Sea View',
+    'SCSV',
+    1500000.00,
+    2, 0, 2,
+    30.0,
+    'QUEEN',
+    1,
+    true, false,
+    'Phòng đôi tiêu chuẩn với view sông Sài Gòn lãng mạn, giường Queen size thoải mái. Thích hợp cho cặp đôi, gia đình nhỏ.',
+    'Phòng đôi view sông 30m²',
+    '["https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=1200&h=800&fit=crop"]',
+    NOW(), NOW(), 0, false
+),
+
+-- ===== DELUXE ROOM CATEGORY =====
+-- Deluxe Single Bedroom City View
+(
+    'roomtype-hcm-dlx-single-city-001',
+    'branch-hcm-001',
+    'category-hcm-dlx-001',
+    'Deluxe Single Bedroom City View',
+    'DSCV',
+    1800000.00,
+    1, 1, 2,
+    35.0,
+    'KING',
+    1,
+    true, false,
+    'Phòng đơn cao cấp với giường King size, view toàn cảnh thành phố từ tầng cao. Nội thất sang trọng, phòng tắm đứng hiện đại.',
+    'Phòng đơn cao cấp view thành phố 35m²',
+    '["https://images.unsplash.com/photo-1596394516093-501ba68a0ba6?w=1200&h=800&fit=crop"]',
+    NOW(), NOW(), 0, false
+),
+-- Deluxe Couple Bedroom Sea View
+(
+    'roomtype-hcm-dlx-couple-sea-001',
+    'branch-hcm-001',
+    'category-hcm-dlx-001',
+    'Deluxe Couple Bedroom Sea View',
+    'DCSV',
+    2200000.00,
+    2, 1, 3,
+    40.0,
+    'KING',
+    1,
+    true, false,
+    'Phòng đôi cao cấp view sông tuyệt đẹp, có ban công riêng. Bồn tắm nằm, minibar cao cấp, máy pha cà phê Nespresso.',
+    'Phòng đôi cao cấp view sông 40m²',
+    '["https://images.unsplash.com/photo-1568605117037-4d9c780fac89?w=1200&h=800&fit=crop"]',
+    NOW(), NOW(), 0, false
+),
+
+-- ===== PRESIDENTIAL SUITE CATEGORY =====
+-- Presidential Two Bedroom City View
+(
+    'roomtype-hcm-pre-two-city-001',
+    'branch-hcm-001',
+    'category-hcm-pre-001',
+    'Presidential Two Bedroom City View',
+    'PTCV',
+    4500000.00,
+    4, 2, 6,
+    80.0,
+    'KING',
+    2,
+    true, false,
+    'Suite 2 phòng ngủ siêu sang với view panorama thành phố. Phòng khách rộng, bếp nhỏ, 2 phòng tắm, dịch vụ butler 24/7.',
+    'Suite 2 phòng ngủ view thành phố 80m²',
+    '["https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=1200&h=800&fit=crop"]',
+    NOW(), NOW(), 0, false
+),
+-- Presidential Three Bedroom Sea View
+(
+    'roomtype-hcm-pre-three-sea-001',
+    'branch-hcm-001',
+    'category-hcm-pre-001',
+    'Presidential Three Bedroom Sea View',
+    'PTSV',
+    6500000.00,
+    6, 2, 8,
+    120.0,
+    'KING',
+    3,
+    true, false,
+    'Suite tổng thống 3 phòng ngủ đẳng cấp nhất với view sông Sài Gòn 270°. Phòng khách 50m², phòng ăn riêng, bếp đầy đủ, 3 phòng tắm marble, spa mini, dịch vụ butler & limousine.',
+    'Suite tổng thống 3 phòng ngủ view sông 120m²',
+    '["https://images.unsplash.com/photo-1618773928121-c32242e63f39?w=1200&h=800&fit=crop","https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=1200&h=800&fit=crop"]',
+    NOW(), NOW(), 0, false
+)
 ON CONFLICT DO NOTHING;
 
+-- ============================================================================
+-- 6. ROOM TYPE AMENITIES (Liên kết loại phòng - tiện nghi)
+-- ============================================================================
+-- Standard Room Types - Basic amenities
 INSERT INTO room_type_amenities (room_type_id, amenity_id)
 SELECT rt.id, a.id
 FROM room_types rt, amenities a
-WHERE rt.id = 'roomtype-hn-exe-001'
-AND a.id IN ('amenity-wifi-001', 'amenity-tv-001', 'amenity-ac-001', 'amenity-safe-001', 
-             'amenity-bathtub-001', 'amenity-minibar-001', 'amenity-coffee-001')
-ON CONFLICT DO NOTHING;
-
-INSERT INTO room_type_amenities (room_type_id, amenity_id)
-SELECT rt.id, a.id
-FROM room_types rt, amenities a
-WHERE rt.id = 'roomtype-hcm-sup-001'
+WHERE rt.id IN ('roomtype-hcm-std-single-city-001', 'roomtype-hcm-std-couple-sea-001')
 AND a.id IN ('amenity-wifi-001', 'amenity-tv-001', 'amenity-ac-001', 'amenity-shower-001')
 ON CONFLICT DO NOTHING;
 
+-- Deluxe Room Types - Premium amenities
 INSERT INTO room_type_amenities (room_type_id, amenity_id)
 SELECT rt.id, a.id
 FROM room_types rt, amenities a
-WHERE rt.id = 'roomtype-hcm-drv-001'
+WHERE rt.id IN ('roomtype-hcm-dlx-single-city-001', 'roomtype-hcm-dlx-couple-sea-001')
 AND a.id IN ('amenity-wifi-001', 'amenity-tv-001', 'amenity-ac-001', 'amenity-safe-001',
              'amenity-bathtub-001', 'amenity-minibar-001')
 ON CONFLICT DO NOTHING;
 
+-- Presidential Suite Types - All amenities
 INSERT INTO room_type_amenities (room_type_id, amenity_id)
 SELECT rt.id, a.id
 FROM room_types rt, amenities a
-WHERE rt.id = 'roomtype-dn-bch-001'
-AND a.id IN ('amenity-wifi-001', 'amenity-tv-001', 'amenity-ac-001', 'amenity-shower-001')
-ON CONFLICT DO NOTHING;
-
-INSERT INTO room_type_amenities (room_type_id, amenity_id)
-SELECT rt.id, a.id
-FROM room_types rt, amenities a
-WHERE rt.id = 'roomtype-dn-ocn-001'
+WHERE rt.id IN ('roomtype-hcm-pre-two-city-001', 'roomtype-hcm-pre-three-sea-001')
 AND a.id IN ('amenity-wifi-001', 'amenity-tv-001', 'amenity-ac-001', 'amenity-safe-001',
-             'amenity-bathtub-001', 'amenity-minibar-001', 'amenity-coffee-001')
+             'amenity-bathtub-001', 'amenity-minibar-001', 'amenity-coffee-001', 
+             'amenity-bed-001', 'amenity-shower-001')
 ON CONFLICT DO NOTHING;
 
 -- ============================================================================
--- 6. ROOMS (Phòng)
--- Tạo 2 rooms cho mỗi room type
+-- 7. ROOMS (Phòng cụ thể)
+-- Tạo 10 phòng cho HCM - phân bố theo các loại
+-- Mỗi phòng có base_price riêng và sale_percent (dynamic pricing)
 -- ============================================================================
 INSERT INTO rooms (
-    id, branch_id, room_type_id, room_number, floor, status, view_type, images,
+    id, branch_id, room_type_id, room_number, floor, status, view_type, 
+    base_price, sale_percent, images,
     created_at, updated_at, version, deleted
 ) VALUES 
--- Hanoi Rooms - Deluxe
+-- Standard Single Bedroom City View (2 phòng)
 (
-    'room-hn-1001',
-    'branch-hanoi-001',
-    'roomtype-hn-dlx-001',
-    '1001',
-    10,
-    'AVAILABLE',
-    'CITY',
-    '["https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=1200&h=800&fit=crop"]',
-    NOW(), NOW(), 0, false
-),
-(
-    'room-hn-1002',
-    'branch-hanoi-001',
-    'roomtype-hn-dlx-001',
-    '1002',
-    10,
-    'AVAILABLE',
-    'CITY',
-    '["https://images.unsplash.com/photo-1590490360182-c33d57733427?w=1200&h=800&fit=crop"]',
-    NOW(), NOW(), 0, false
-),
--- Hanoi Rooms - Executive
-(
-    'room-hn-1501',
-    'branch-hanoi-001',
-    'roomtype-hn-exe-001',
-    '1501',
-    15,
-    'AVAILABLE',
-    'CITY',
-    '["https://images.unsplash.com/photo-1578683010236-d716f9a3f461?w=1200&h=800&fit=crop"]',
-    NOW(), NOW(), 0, false
-),
-(
-    'room-hn-1502',
-    'branch-hanoi-001',
-    'roomtype-hn-exe-001',
-    '1502',
-    15,
-    'OCCUPIED',
-    'CITY',
-    '["https://images.unsplash.com/photo-1611892440504-42a792e24d32?w=1200&h=800&fit=crop"]',
-    NOW(), NOW(), 0, false
-),
--- HCM Rooms - Superior
-(
-    'room-hcm-5001',
+    'room-hcm-301',
     'branch-hcm-001',
-    'roomtype-hcm-sup-001',
-    '5001',
-    5,
+    'roomtype-hcm-std-single-city-001',
+    '301',
+    3,
     'AVAILABLE',
     'CITY',
+    1200000.00,
+    0.00,
     '["https://images.unsplash.com/photo-1566665797739-1674de7a421a?w=1200&h=800&fit=crop"]',
     NOW(), NOW(), 0, false
 ),
 (
-    'room-hcm-5002',
+    'room-hcm-302',
     'branch-hcm-001',
-    'roomtype-hcm-sup-001',
-    '5002',
-    5,
-    'CLEANING',
+    'roomtype-hcm-std-single-city-001',
+    '302',
+    3,
+    'AVAILABLE',
     'CITY',
-    '["https://images.unsplash.com/photo-1596394516093-501ba68a0ba6?w=1200&h=800&fit=crop"]',
+    1200000.00,
+    10.00,
+    '["https://images.unsplash.com/photo-1566665797739-1674de7a421a?w=1200&h=800&fit=crop"]',
     NOW(), NOW(), 0, false
 ),
--- HCM Rooms - Deluxe River
+-- Standard Couple Bedroom Sea View (2 phòng)
 (
-    'room-hcm-8001',
+    'room-hcm-501',
     'branch-hcm-001',
-    'roomtype-hcm-drv-001',
-    '8001',
+    'roomtype-hcm-std-couple-sea-001',
+    '501',
+    5,
+    'AVAILABLE',
+    'SEA',
+    1500000.00,
+    0.00,
+    '["https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=1200&h=800&fit=crop"]',
+    NOW(), NOW(), 0, false
+),
+(
+    'room-hcm-502',
+    'branch-hcm-001',
+    'roomtype-hcm-std-couple-sea-001',
+    '502',
+    5,
+    'OCCUPIED',
+    'SEA',
+    1500000.00,
+    0.00,
+    '["https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=1200&h=800&fit=crop"]',
+    NOW(), NOW(), 0, false
+),
+-- Deluxe Single Bedroom City View (2 phòng)
+(
+    'room-hcm-801',
+    'branch-hcm-001',
+    'roomtype-hcm-dlx-single-city-001',
+    '801',
     8,
     'AVAILABLE',
     'CITY',
+    1800000.00,
+    15.00,
+    '["https://images.unsplash.com/photo-1596394516093-501ba68a0ba6?w=1200&h=800&fit=crop"]',
+    NOW(), NOW(), 0, false
+),
+(
+    'room-hcm-802',
+    'branch-hcm-001',
+    'roomtype-hcm-dlx-single-city-001',
+    '802',
+    8,
+    'CLEANING',
+    'CITY',
+    1800000.00,
+    0.00,
+    '["https://images.unsplash.com/photo-1596394516093-501ba68a0ba6?w=1200&h=800&fit=crop"]',
+    NOW(), NOW(), 0, false
+),
+-- Deluxe Couple Bedroom Sea View (2 phòng)
+(
+    'room-hcm-1001',
+    'branch-hcm-001',
+    'roomtype-hcm-dlx-couple-sea-001',
+    '1001',
+    10,
+    'AVAILABLE',
+    'SEA',
+    2200000.00,
+    20.00,
     '["https://images.unsplash.com/photo-1568605117037-4d9c780fac89?w=1200&h=800&fit=crop"]',
     NOW(), NOW(), 0, false
 ),
 (
-    'room-hcm-8002',
+    'room-hcm-1002',
     'branch-hcm-001',
-    'roomtype-hcm-drv-001',
-    '8002',
-    8,
+    'roomtype-hcm-dlx-couple-sea-001',
+    '1002',
+    10,
+    'AVAILABLE',
+    'SEA',
+    2200000.00,
+    0.00,
+    '["https://images.unsplash.com/photo-1568605117037-4d9c780fac89?w=1200&h=800&fit=crop"]',
+    NOW(), NOW(), 0, false
+),
+-- Presidential Two Bedroom City View (1 phòng)
+(
+    'room-hcm-1501',
+    'branch-hcm-001',
+    'roomtype-hcm-pre-two-city-001',
+    '1501',
+    15,
     'AVAILABLE',
     'CITY',
-    '["https://images.unsplash.com/photo-1618773928121-c32242e63f39?w=1200&h=800&fit=crop"]',
+    4500000.00,
+    0.00,
+    '["https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=1200&h=800&fit=crop"]',
     NOW(), NOW(), 0, false
 ),
--- Da Nang Rooms - Beach View
+-- Presidential Three Bedroom Sea View (1 phòng)
 (
-    'room-dn-2001',
-    'branch-danang-001',
-    'roomtype-dn-bch-001',
+    'room-hcm-2001',
+    'branch-hcm-001',
+    'roomtype-hcm-pre-three-sea-001',
     '2001',
-    2,
+    20,
     'AVAILABLE',
     'SEA',
-    '["https://images.unsplash.com/photo-1611892440504-42a792e24d32?w=1200&h=800&fit=crop"]',
-    NOW(), NOW(), 0, false
-),
-(
-    'room-dn-2002',
-    'branch-danang-001',
-    'roomtype-dn-bch-001',
-    '2002',
-    2,
-    'AVAILABLE',
-    'SEA',
-    '["https://images.unsplash.com/photo-1578683010236-d716f9a3f461?w=1200&h=800&fit=crop"]',
-    NOW(), NOW(), 0, false
-),
--- Da Nang Rooms - Ocean Front
-(
-    'room-dn-3001',
-    'branch-danang-001',
-    'roomtype-dn-ocn-001',
-    '3001',
-    3,
-    'AVAILABLE',
-    'SEA',
+    6500000.00,
+    5.00,
     '["https://images.unsplash.com/photo-1618773928121-c32242e63f39?w=1200&h=800&fit=crop"]',
-    NOW(), NOW(), 0, false
-),
-(
-    'room-dn-3002',
-    'branch-danang-001',
-    'roomtype-dn-ocn-001',
-    '3002',
-    3,
-    'RESERVED',
-    'SEA',
-    '["https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=1200&h=800&fit=crop"]',
     NOW(), NOW(), 0, false
 )
 ON CONFLICT DO NOTHING;
 
 -- ============================================================================
--- 7. SERVICES (Dịch vụ)
--- Tạo 2 services
+-- 8. SERVICES (Dịch vụ)
+-- Tạo 2 services cho HCM
 -- ============================================================================
 INSERT INTO services (
     id, branch_id, name, type, description, base_price, unit,
@@ -665,11 +711,11 @@ INSERT INTO services (
     created_at, updated_at, version, deleted
 ) VALUES 
 (
-    'service-airport-001',
-    'branch-hanoi-001',
-    'Airport Transfer',
+    'service-hcm-airport-001',
+    'branch-hcm-001',
+    'Airport Transfer HCM',
     'AIRPORT_TRANSFER',
-    'Đưa đón sân bay Nội Bài - Khách sạn (1 chiều)',
+    'Đưa đón sân bay Tân Sơn Nhất - Khách sạn (1 chiều)',
     500000.00,
     'trip',
     60,
@@ -680,11 +726,11 @@ INSERT INTO services (
     NOW(), NOW(), 0, false
 ),
 (
-    'service-spa-001',
-    'branch-hanoi-001',
-    'Spa & Massage',
+    'service-hcm-spa-001',
+    'branch-hcm-001',
+    'Spa & Massage HCM',
     'SPA',
-    'Liệu trình spa thư giãn 90 phút',
+    'Liệu trình spa thư giãn 90 phút tại HCM',
     800000.00,
     'session',
     90,
@@ -697,8 +743,8 @@ INSERT INTO services (
 ON CONFLICT DO NOTHING;
 
 -- ============================================================================
--- 8. PROMOTIONS (Khuyến mãi)
--- Tạo 2 promotions
+-- 9. PROMOTIONS (Khuyến mãi)
+-- Tạo 2 promotions cho HCM
 -- ============================================================================
 INSERT INTO promotions (
     id, branch_id, code, name, description,
@@ -709,11 +755,11 @@ INSERT INTO promotions (
     created_at, updated_at, version, deleted
 ) VALUES 
 (
-    'promo-summer-001',
-    'branch-hanoi-001',
-    'SUMMER2024',
-    'Summer Vacation 2024',
-    'Giảm 20% cho booking từ 3 đêm trở lên',
+    'promo-hcm-summer-001',
+    'branch-hcm-001',
+    'HCMSUMMER2024',
+    'Summer Vacation HCM 2024',
+    'Giảm 20% cho booking từ 3 đêm trở lên tại HCM',
     'PERCENTAGE',
     20.0,
     NULL,
@@ -728,11 +774,11 @@ INSERT INTO promotions (
     NOW(), NOW(), 0, false
 ),
 (
-    'promo-welcome-001',
-    'branch-hanoi-001',
-    'WELCOME50',
-    'Welcome New Customer',
-    'Giảm 500k cho khách hàng mới',
+    'promo-hcm-welcome-001',
+    'branch-hcm-001',
+    'HCMWELCOME50',
+    'Welcome New Customer HCM',
+    'Giảm 500k cho khách hàng mới tại HCM',
     'FIXED_AMOUNT',
     NULL,
     500000.00,
@@ -749,8 +795,8 @@ INSERT INTO promotions (
 ON CONFLICT (code) DO NOTHING;
 
 -- ============================================================================
--- 9. BOOKINGS (Đặt phòng)
--- Tạo 2 bookings
+-- 10. BOOKINGS (Đặt phòng)
+-- Tạo 2 bookings cho HCM
 -- ============================================================================
 INSERT INTO bookings (
     id, booking_code, branch_id, customer_id, applied_promotion_id,
@@ -760,30 +806,30 @@ INSERT INTO bookings (
     email_sent, sms_sent,
     created_at, updated_at, version, deleted
 ) VALUES 
--- Booking 1: CONFIRMED với promotion
+-- Booking 1: CONFIRMED - Standard Couple Sea View
 (
-    'booking-001',
-    'BK-HN-2024-001',
-    'branch-hanoi-001',
+    'booking-hcm-001',
+    'BK-HCM-2024-001',
+    'branch-hcm-001',
     (SELECT id FROM users WHERE username = 'customer' LIMIT 1),
-    'promo-summer-001',
+    NULL,
     CURRENT_DATE + INTERVAL '5 days',
     CURRENT_DATE + INTERVAL '8 days',
     'Phòng tầng cao, view đẹp. Early check-in nếu có thể',
     'CONFIRMED',
     'DEPOSIT_PAID',
-    9000000.00,
-    1800000.00,
-    7200000.00,
-    3600000.00,
+    4500000.00,
+    0.00,
+    4500000.00,
+    2250000.00,
     true, false,
     NOW(), NOW(), 0, false
 ),
--- Booking 2: CHECKED_IN
+-- Booking 2: CHECKED_IN - Deluxe Couple Sea View
 (
-    'booking-002',
-    'BK-HN-2024-002',
-    'branch-hanoi-001',
+    'booking-hcm-002',
+    'BK-HCM-2024-002',
+    'branch-hcm-001',
     (SELECT id FROM users WHERE username = 'customer' LIMIT 1),
     NULL,
     CURRENT_DATE - INTERVAL '2 days',
@@ -791,9 +837,9 @@ INSERT INTO bookings (
     NULL,
     'CHECKED_IN',
     'PAID',
-    12500000.00,
+    11000000.00,
     0.00,
-    12500000.00,
+    11000000.00,
     NULL,
     true, true,
     NOW(), NOW(), 0, false
@@ -801,8 +847,8 @@ INSERT INTO bookings (
 ON CONFLICT (booking_code) DO NOTHING;
 
 -- ============================================================================
--- 10. BOOKING ROOMS (Chi tiết phòng đặt)
--- Tạo 2 booking rooms
+-- 11. BOOKING ROOMS (Chi tiết phòng đặt)
+-- Tạo 2 booking rooms cho HCM
 -- ============================================================================
 INSERT INTO booking_rooms (
     id, booking_id, room_id,
@@ -810,35 +856,35 @@ INSERT INTO booking_rooms (
     total_amount, guest_names,
     created_at, updated_at, version, deleted
 ) VALUES 
--- Booking 1: 1 phòng Deluxe
+-- Booking 1: Standard Couple Sea View (room 502 - đang OCCUPIED)
 (
-    'bookingroom-001',
-    'booking-001',
-    'room-hn-1001',
+    'bookingroom-hcm-001',
+    'booking-hcm-001',
+    'room-hcm-502',
     1500000.00,
     3,
-    2, 1,
+    2, 0,
     4500000.00,
     'Nguyen Van A, Nguyen Thi B',
     NOW(), NOW(), 0, false
 ),
--- Booking 2: 1 phòng Executive
+-- Booking 2: Deluxe Couple Sea View (room 1001)
 (
-    'bookingroom-002',
-    'booking-002',
-    'room-hn-1501',
-    2500000.00,
+    'bookingroom-hcm-002',
+    'booking-hcm-002',
+    'room-hcm-1001',
+    2200000.00,
     5,
     2, 0,
-    12500000.00,
+    11000000.00,
     'Tran Van C, Tran Thi D',
     NOW(), NOW(), 0, false
 )
 ON CONFLICT DO NOTHING;
 
 -- ============================================================================
--- 11. SERVICE BOOKINGS (Đặt dịch vụ)
--- Tạo 2 service bookings
+-- 12. SERVICE BOOKINGS (Đặt dịch vụ)
+-- Tạo 2 service bookings cho HCM
 -- ============================================================================
 INSERT INTO service_bookings (
     id, booking_id, service_id, customer_id,
@@ -846,25 +892,25 @@ INSERT INTO service_bookings (
     status, special_instructions,
     created_at, updated_at, version, deleted
 ) VALUES 
--- Service booking 1: Airport transfer
+-- Service booking 1: Airport transfer cho booking HCM 1
 (
-    'servicebooking-001',
-    'booking-001',
-    'service-airport-001',
+    'servicebooking-hcm-001',
+    'booking-hcm-001',
+    'service-hcm-airport-001',
     (SELECT id FROM users WHERE username = 'customer' LIMIT 1),
     (CURRENT_DATE + INTERVAL '5 days')::timestamp + TIME '14:00:00',
     1,
     500000.00,
     500000.00,
     'CONFIRMED',
-    'Pickup at airport terminal 1',
+    'Pickup at Tan Son Nhat airport',
     NOW(), NOW(), 0, false
 ),
--- Service booking 2: Spa
+-- Service booking 2: Spa cho booking HCM 1
 (
-    'servicebooking-002',
-    'booking-001',
-    'service-spa-001',
+    'servicebooking-hcm-002',
+    'booking-hcm-001',
+    'service-hcm-spa-001',
     (SELECT id FROM users WHERE username = 'customer' LIMIT 1),
     (CURRENT_DATE + INTERVAL '6 days')::timestamp + TIME '15:00:00',
     2,
@@ -877,8 +923,8 @@ INSERT INTO service_bookings (
 ON CONFLICT DO NOTHING;
 
 -- ============================================================================
--- 12. PAYMENTS (Thanh toán)
--- Tạo 2 payments
+-- 13. PAYMENTS (Thanh toán)
+-- Tạo 2 payments cho HCM
 -- ============================================================================
 INSERT INTO payments (
     id, booking_id, method, status,
@@ -886,29 +932,29 @@ INSERT INTO payments (
     provider_txn_id, paid_at, notes, processed_by,
     created_at, updated_at, version, deleted
 ) VALUES 
--- Payment 1: Deposit cho Booking 1
+-- Payment 1: Deposit cho Booking HCM 1
 (
-    'payment-001',
-    'booking-001',
+    'payment-hcm-001',
+    'booking-hcm-001',
     'BANK_TRANSFER',
     'SUCCESS',
-    3600000.00,
+    2250000.00,
     'VND',
-    'TXN-AURORA-2024-001',
+    'TXN-AURORA-HCM-2024-001',
     NOW() - INTERVAL '3 days',
-    'Deposit 50% for booking BK-HN-2024-001',
+    'Deposit 50% for booking BK-HCM-2024-001',
     'staff',
     NOW(), NOW(), 0, false
 ),
--- Payment 2: Full payment cho Booking 2
+-- Payment 2: Full payment cho Booking HCM 2
 (
-    'payment-002',
-    'booking-002',
+    'payment-hcm-002',
+    'booking-hcm-002',
     'CARD',
     'SUCCESS',
-    12500000.00,
+    11000000.00,
     'VND',
-    'TXN-AURORA-2024-002',
+    'TXN-AURORA-HCM-2024-002',
     NOW() - INTERVAL '2 days',
     'Full payment at check-in',
     'staff',

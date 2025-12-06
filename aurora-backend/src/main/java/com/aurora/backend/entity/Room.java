@@ -2,6 +2,9 @@ package com.aurora.backend.entity;
 
 import com.aurora.backend.converter.StringListConverter;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.DecimalMax;
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
@@ -48,8 +51,20 @@ public class Room extends BaseEntity {
     @Column(length = 50)
     String viewType; // CITY, SEA, MOUNTAIN, GARDEN
     
-    @Column(precision = 10, scale = 2)
-    BigDecimal priceOverride;
+    // Price management - Dynamic pricing with sale support
+    @NotNull(message = "Base price is required")
+    @DecimalMin(value = "0.0", inclusive = false, message = "Base price must be greater than 0")
+    @Column(name = "base_price", nullable = false, precision = 10, scale = 2)
+    BigDecimal basePrice; // Giá gốc của phòng (có thể thay đổi qua cron job)
+    
+    @DecimalMin(value = "0.0", message = "Sale percent cannot be negative")
+    @DecimalMax(value = "100.0", message = "Sale percent cannot exceed 100")
+    @Column(name = "sale_percent", precision = 5, scale = 2)
+    @Builder.Default
+    BigDecimal salePercent = BigDecimal.ZERO; // % giảm giá (0-100), hệ thống tự tính giá hiển thị
+    
+    // Calculated display price (not stored, calculated dynamically)
+    // displayPrice = basePrice * (100 - salePercent) / 100
     
     @Column(length = 1000)
     String maintenanceNotes;

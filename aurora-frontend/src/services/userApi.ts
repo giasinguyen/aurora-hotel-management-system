@@ -169,13 +169,25 @@ export const getUserPermissions = async (userId: string): Promise<ApiResponse<st
   const response = await axiosClient.get(`${BASE_URL}/${userId}/permissions`);
   return response.data;
 };
+export const uploadAvatar = async (file: File): Promise<ApiResponse<User>> => {
+  const formData = new FormData();
+  formData.append('file', file); // Key 'file' phải khớp với @RequestParam bên Java
 
+  // Giả định endpoint là POST /api/v1/users/avatar
+  const response = await axiosClient.post(`${BASE_URL}/avatar`, formData, {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+    },
+  });
+  return response.data;
+};
 export const userApi = {
   getUsers,
   getUsersPaginated,
   getUserById,
   getUserByUsername,
   getMyInfo,
+  updateMyInfo,
   createUser,
   registerUser,
   updateUser,
@@ -186,6 +198,7 @@ export const userApi = {
   removeRoleFromUser,
   updateUserPermissions,
   getUserPermissions,
+  uploadAvatar,
 };
 
 export default userApi;

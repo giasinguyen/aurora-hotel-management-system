@@ -20,13 +20,6 @@ import java.time.temporal.ChronoUnit;
 @Transactional(readOnly = true)
 public class PriceCalculationServiceImpl implements PriceCalculationService {
     
-    private static final LocalDate[] HOLIDAYS_2025 = {
-        LocalDate.of(2025, 1, 1),   // New Year
-        LocalDate.of(2025, 4, 30),  // Reunification Day
-        LocalDate.of(2025, 5, 1),   // Labor Day
-        LocalDate.of(2025, 9, 2),   // National Day
-    };
-    
     @Override
     public BigDecimal calculateBookingTotal(Booking booking) {
         log.debug("Calculating total for booking: {}", booking.getId());
@@ -88,31 +81,19 @@ public class PriceCalculationServiceImpl implements PriceCalculationService {
     
     @Override
     public BigDecimal getDailyRate(Room room, LocalDate date) {
-        RoomType roomType = room.getRoomType();
+        // Calculate display price from room's basePrice and salePercent
+        BigDecimal basePrice = room.getBasePrice();
+        BigDecimal salePercent = room.getSalePercent() != null ? room.getSalePercent() : BigDecimal.ZERO;
         
-        // Priority 1: Room-specific override price
-        if (room.getPriceOverride() != null) {
-            log.debug("Using price override for room {}: {}", room.getRoomNumber(), room.getPriceOverride());
-            return room.getPriceOverride();
-        }
+        // displayPrice = basePrice * (100 - salePercent) / 100
+        BigDecimal displayPrice = basePrice
+            .multiply(new BigDecimal("100").subtract(salePercent))
+            .divide(new BigDecimal("100"), 2, RoundingMode.HALF_UP);
         
-        // Priority 2: Holiday price
-        if (isHoliday(date) && roomType.getHolidayPrice() != null) {
-            log.debug("Using holiday price for date {}: {}", date, roomType.getHolidayPrice());
-            return roomType.getHolidayPrice();
-        }
+        log.debug("Daily rate for room {}: basePrice={}, salePercent={}%, displayPrice={}", 
+            room.getRoomNumber(), basePrice, salePercent, displayPrice);
         
-        // Priority 3: Weekend price (Saturday or Sunday)
-        DayOfWeek dayOfWeek = date.getDayOfWeek();
-        if ((dayOfWeek == DayOfWeek.SATURDAY || dayOfWeek == DayOfWeek.SUNDAY) 
-            && roomType.getWeekendPrice() != null) {
-            log.debug("Using weekend price for date {}: {}", date, roomType.getWeekendPrice());
-            return roomType.getWeekendPrice();
-        }
-        
-        // Priority 4: Base price (weekday)
-        log.debug("Using base price for date {}: {}", date, roomType.getBasePrice());
-        return roomType.getBasePrice();
+        return displayPrice;
     }
     
     @Override
@@ -195,18 +176,5 @@ public class PriceCalculationServiceImpl implements PriceCalculationService {
         
         log.debug("Price validation passed: calculated={}, expected={}", 
             calculatedTotal, expectedTotal);
-    }
-    
-    /**
-     * Check if date is a public holiday
-     * TODO: Should be loaded from database for flexibility
-     */
-    private boolean isHoliday(LocalDate date) {
-        for (LocalDate holiday : HOLIDAYS_2025) {
-            if (date.equals(holiday)) {
-                return true;
-            }
-        }
-        return false;
     }
 }

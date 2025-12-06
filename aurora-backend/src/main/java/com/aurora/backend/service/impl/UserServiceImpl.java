@@ -1,8 +1,10 @@
 package com.aurora.backend.service.impl;
 
 
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import com.aurora.backend.dto.request.ProfileUpdateRequest;
@@ -17,6 +19,7 @@ import com.aurora.backend.exception.AppException;
 import com.aurora.backend.mapper.UserMapper;
 import com.aurora.backend.repository.RoleRepository;
 import com.aurora.backend.repository.UserRepository;
+import com.aurora.backend.service.CloudinaryService;
 import com.aurora.backend.service.UserService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -28,6 +31,7 @@ import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @RequiredArgsConstructor
@@ -39,6 +43,7 @@ public class UserServiceImpl implements UserService {
     RoleRepository roleRepository;
     UserMapper userMapper;
     PasswordEncoder passwordEncoder;
+    CloudinaryService cloudinaryService;
 
     @Override
     public UserResponse registerUser(UserRegistrationRequest request) {
@@ -358,5 +363,42 @@ public class UserServiceImpl implements UserService {
         
         log.info("Successfully updated permissions for user {}", userId);
         return userMapper.toUserResponse(savedUser);
+    }
+    @Override
+    @Transactional
+    public UserResponse uploadAvatar(String username, MultipartFile file) {
+        log.info("Request to upload avatar for user: {}", username);
+        if (file == null || file.isEmpty()) {
+            throw new AppException(ErrorCode.INVALID_KEY);
+        }
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+        try {
+            // 3. Xử lý xóa ảnh cũ (Nếu đã có)
+            String oldAvatarUrl = user.getAvatarUrl();
+            if (oldAvatarUrl != null && !oldAvatarUrl.isEmpty()) {
+                String publicId = cloudinaryService.extractPublicId(oldAvatarUrl);
+                if (publicId != null) {
+                    try {
+                        cloudinaryService.deleteFile(publicId);
+                        log.info("Deleted old avatar with public_id: {}", publicId);
+                    } catch (Exception e) {
+                        log.warn("Failed to delete old avatar: {}", e.getMessage());
+                    }
+                }
+            }
+            // 4. Upload ảnh mới
+            Map<String, Object> uploadResult = cloudinaryService.uploadFile(file, "aurora/avatars");
+            // Lấy secure_url từ kết quả trả về
+            String newAvatarUrl = (String) uploadResult.get("secure_url");
+            // 5. Cập nhật User
+            user.setAvatarUrl(newAvatarUrl);
+            User savedUser = userRepository.save(user);
+            log.info("Avatar updated successfully for user: {}", username);
+            return userMapper.toUserResponse(savedUser);
+        } catch (IOException e) {
+            log.error("Error uploading avatar to Cloudinary", e);
+            throw new AppException(ErrorCode.UNCATEGORIZED_EXCEPTION);
+        }
     }
 }
