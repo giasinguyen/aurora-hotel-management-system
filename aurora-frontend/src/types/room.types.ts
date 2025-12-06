@@ -21,6 +21,8 @@ export interface Room {
   branchName: string;
   roomTypeId: string;
   roomTypeName: string;
+  categoryId: string; // Category ID from roomType.category
+  categoryName: string; // Category name from roomType.category
   roomNumber: string;
   floor: number;
   status: RoomStatus;

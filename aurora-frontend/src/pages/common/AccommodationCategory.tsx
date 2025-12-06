@@ -210,7 +210,7 @@ export default function AccommodationCategoryPage() {
                           onClick={() => handleBookRoom(roomType.id)}
                           className="bg-amber-600 hover:bg-amber-700"
                         >
-                          Đặt phòng
+                          Chọn phòng
                         </Button>
                       </div>
                     </div>

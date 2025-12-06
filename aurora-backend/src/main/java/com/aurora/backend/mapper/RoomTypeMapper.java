@@ -11,6 +11,7 @@ import org.mapstruct.MappingTarget;
 @Mapper(componentModel = "spring", uses = {AmenityMapper.class})
 public interface RoomTypeMapper {
     @Mapping(target = "branch.id", source = "branchId")
+    @Mapping(target = "category", ignore = true)
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "rooms", ignore = true)
     @Mapping(target = "amenities", ignore = true)
@@ -23,6 +24,7 @@ public interface RoomTypeMapper {
     @Mapping(target = "availableRooms", constant = "0") // Calculate based on room status
     RoomTypeResponse toRoomTypeResponse(RoomType roomType);
     
+    @Mapping(target = "category", ignore = true)
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "branch", ignore = true)
     @Mapping(target = "rooms", ignore = true)

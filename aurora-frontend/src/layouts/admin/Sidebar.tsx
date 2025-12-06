@@ -47,8 +47,8 @@ const menuItems = [
     href: '/admin/rooms',
     children: [
       { title: 'Room Categories', href: '/admin/room-categories' },
-      { title: 'Room List', href: '/admin/rooms' },
       { title: 'Room Types', href: '/admin/room-types' },
+      { title: 'Room List', href: '/admin/rooms' },
     ],
   },
   {

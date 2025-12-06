@@ -24,9 +24,9 @@ import {
   type Column 
 } from '@/components/custom';
 
-import { roomApi, roomTypeApi } from '@/services/roomApi';
+import { roomApi, roomTypeApi, roomCategoryApi } from '@/services/roomApi';
 import { branchApi } from '@/services/branchApi';
-import type { Room, RoomStatus, RoomType } from '@/types/room.types';
+import type { Room, RoomStatus, RoomType, RoomCategory } from '@/types/room.types';
 import type { Branch } from '@/types/branch.types';
 
 // Status configurations
@@ -43,7 +43,9 @@ export default function RoomList() {
   // State
   const [rooms, setRooms] = useState<Room[]>([]);
   const [branches, setBranches] = useState<Branch[]>([]);
+  const [categories, setCategories] = useState<RoomCategory[]>([]);
   const [roomTypes, setRoomTypes] = useState<RoomType[]>([]);
+  const [filteredRoomTypes, setFilteredRoomTypes] = useState<RoomType[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   
   // Pagination
@@ -54,9 +56,11 @@ export default function RoomList() {
   
   // Filters
   const [searchKeyword, setSearchKeyword] = useState('');
+  const [debouncedSearch, setDebouncedSearch] = useState('');
   const [selectedBranch, setSelectedBranch] = useState('');
-  const [selectedStatus, setSelectedStatus] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('');
   const [selectedRoomType, setSelectedRoomType] = useState('');
+  const [selectedStatus, setSelectedStatus] = useState('');
   
   // Sorting
   const [sortColumn, setSortColumn] = useState('roomNumber');
@@ -66,15 +70,15 @@ export default function RoomList() {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [selectedRoomId, setSelectedRoomId] = useState<string | null>(null);
 
-  // Fetch branches for filter
+  // Fetch branches, categories, room types for filter
   useEffect(() => {
     const fetchFiltersData = async () => {
       try {
-        const [branchesRes, roomTypesRes] = await Promise.all([
-          branchApi.getAll({ page: 0, size: 100 }),
-          roomTypeApi.getAll(),
-        ]);
+        const branchesRes = await branchApi.getAll({ page: 0, size: 100 });
         setBranches(branchesRes.result.content);
+        
+        // Fetch all room types
+        const roomTypesRes = await roomTypeApi.getAll();
         setRoomTypes(roomTypesRes.result);
       } catch (error) {
         console.error('Failed to fetch filter data:', error);
@@ -82,6 +86,48 @@ export default function RoomList() {
     };
     fetchFiltersData();
   }, []);
+
+  // Fetch categories when branch changes
+  useEffect(() => {
+    const fetchCategories = async () => {
+      if (selectedBranch) {
+        try {
+          const categoryRes = await roomCategoryApi.getByBranch(selectedBranch);
+          setCategories(categoryRes.result || []);
+        } catch (error) {
+          console.error('Failed to fetch categories:', error);
+          setCategories([]);
+        }
+      } else {
+        setCategories([]);
+      }
+    };
+    fetchCategories();
+  }, [selectedBranch]);
+
+  // Filter room types by category
+  useEffect(() => {
+    if (!selectedCategory || selectedCategory === 'all') {
+      // No category selected - show room types from selected branch
+      if (selectedBranch && selectedBranch !== 'all') {
+        setFilteredRoomTypes(roomTypes.filter(rt => rt.branchId === selectedBranch));
+      } else {
+        setFilteredRoomTypes(roomTypes);
+      }
+    } else {
+      // Category selected - filter by categoryId
+      setFilteredRoomTypes(roomTypes.filter(rt => rt.categoryId === selectedCategory));
+    }
+  }, [selectedCategory, selectedBranch, roomTypes]);
+
+  // Debounce search keyword
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearch(searchKeyword);
+      setCurrentPage(0);
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [searchKeyword]);
 
   // Fetch rooms
   const fetchRooms = useCallback(async () => {
@@ -114,10 +160,29 @@ export default function RoomList() {
       
       const pageData = response.result;
       
-      // Filter by status client-side if needed
+      // Filter by category, status and search client-side if needed
       let filteredRooms = pageData.content;
+      
+      // Filter by category first (if selected)
+      if (selectedCategory && selectedCategory !== 'all') {
+        filteredRooms = filteredRooms.filter(room => room.categoryId === selectedCategory);
+      }
+      
+      // Then filter by room type (if selected)
+      if (selectedRoomType && selectedRoomType !== 'all') {
+        filteredRooms = filteredRooms.filter(room => room.roomTypeId === selectedRoomType);
+      }
+      
+      // Filter by status
       if (selectedStatus) {
         filteredRooms = filteredRooms.filter(room => room.status === selectedStatus);
+      }
+      
+      // Filter by search keyword
+      if (debouncedSearch) {
+        filteredRooms = filteredRooms.filter(room => 
+          room.roomNumber.toLowerCase().includes(debouncedSearch.toLowerCase())
+        );
       }
       
       setRooms(filteredRooms);
@@ -129,7 +194,7 @@ export default function RoomList() {
     } finally {
       setIsLoading(false);
     }
-  }, [currentPage, pageSize, selectedBranch, selectedRoomType, selectedStatus, sortColumn, sortDirection]);
+  }, [currentPage, pageSize, selectedBranch, selectedCategory, selectedRoomType, selectedStatus, debouncedSearch, sortColumn, sortDirection]);
 
   useEffect(() => {
     fetchRooms();
@@ -166,6 +231,7 @@ export default function RoomList() {
   const handleClearFilters = () => {
     setSearchKeyword('');
     setSelectedBranch('');
+    setSelectedCategory('');
     setSelectedStatus('');
     setSelectedRoomType('');
     setCurrentPage(0);
@@ -283,7 +349,12 @@ export default function RoomList() {
     label: branch.name,
   }));
 
-  const roomTypeOptions = roomTypes.map((type) => ({
+  const categoryOptions = categories.map((category) => ({
+    value: category.id,
+    label: category.name,
+  }));
+
+  const roomTypeOptions = filteredRoomTypes.map((type) => ({
     value: type.id,
     label: type.name,
   }));
@@ -316,8 +387,23 @@ export default function RoomList() {
                 options: branchOptions,
                 onChange: (value) => {
                   setSelectedBranch(value === 'all' ? '' : value);
+                  setSelectedCategory('');
+                  setSelectedRoomType('');
                   setCurrentPage(0);
                 },
+              },
+              {
+                key: 'category',
+                label: 'Hạng phòng',
+                value: selectedCategory,
+                options: categoryOptions,
+                onChange: (value) => {
+                  setSelectedCategory(value === 'all' ? '' : value);
+                  setSelectedRoomType(''); // Reset type when category changes
+                  setCurrentPage(0);
+                },
+                disabled: !selectedBranch || selectedBranch === 'all',
+                placeholder: (selectedBranch && selectedBranch !== 'all') ? 'Chọn hạng phòng' : 'Chọn chi nhánh trước',
               },
               {
                 key: 'roomType',
@@ -328,6 +414,8 @@ export default function RoomList() {
                   setSelectedRoomType(value === 'all' ? '' : value);
                   setCurrentPage(0);
                 },
+                disabled: !selectedCategory || selectedCategory === 'all',
+                placeholder: (selectedCategory && selectedCategory !== 'all') ? 'Chọn loại phòng' : 'Chọn hạng phòng trước',
               },
               {
                 key: 'status',

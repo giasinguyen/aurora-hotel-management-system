@@ -25,6 +25,8 @@ interface SearchFilterProps {
     value: string;
     options: FilterOption[];
     onChange: (value: string) => void;
+    disabled?: boolean;
+    placeholder?: string;
   }[];
   onClear?: () => void;
   className?: string;
@@ -59,9 +61,10 @@ export function SearchFilter({
           key={filter.key}
           value={filter.value}
           onValueChange={filter.onChange}
+          disabled={filter.disabled}
         >
           <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder={filter.label} />
+            <SelectValue placeholder={filter.placeholder || filter.label} />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">Tất cả</SelectItem>

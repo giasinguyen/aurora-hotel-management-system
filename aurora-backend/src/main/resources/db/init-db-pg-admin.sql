@@ -349,13 +349,47 @@ ON CONFLICT DO NOTHING;
 
 -- ============================================================================
 -- 4. ROOM CATEGORIES (Hạng phòng)
--- Tạo 3 categories: Standard Room, Deluxe Room, Presidential Suite
--- CHỈ TẠO CHO HCM BRANCH
+-- Tạo 3 categories cho mỗi branch: Standard Room, Deluxe Room, Presidential Suite
 -- ============================================================================
 INSERT INTO room_categories (
     id, branch_id, name, code, description, display_order, active, image_url,
     created_at, updated_at, version, deleted
 ) VALUES 
+-- ===== HANOI CATEGORIES =====
+(
+    'category-hn-std-001',
+    'branch-hanoi-001',
+    'Standard Room',
+    'STD',
+    'Phòng tiêu chuẩn với đầy đủ tiện nghi cơ bản, phù hợp cho khách du lịch và công tác',
+    1,
+    true,
+    'https://images.unsplash.com/photo-1566665797739-1674de7a421a?w=800&h=600&fit=crop',
+    NOW(), NOW(), 0, false
+),
+(
+    'category-hn-dlx-001',
+    'branch-hanoi-001',
+    'Deluxe Room',
+    'DLX',
+    'Phòng cao cấp với không gian rộng rãi và view đẹp, dịch vụ hoàn hảo',
+    2,
+    true,
+    'https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=800&h=600&fit=crop',
+    NOW(), NOW(), 0, false
+),
+(
+    'category-hn-pre-001',
+    'branch-hanoi-001',
+    'Presidential Suite',
+    'PRE',
+    'Phòng tổng thống sang trọng bậc nhất với đầy đủ tiện nghi 5 sao và dịch vụ butler riêng',
+    3,
+    true,
+    'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=800&h=600&fit=crop',
+    NOW(), NOW(), 0, false
+),
+-- ===== HCM CATEGORIES =====
 -- Standard Room Category
 (
     'category-hcm-std-001',
