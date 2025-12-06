@@ -7,11 +7,16 @@ import com.aurora.backend.entity.Room;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
+import org.mapstruct.Named;
+
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 @Mapper(componentModel = "spring")
 public interface RoomMapper {
     @Mapping(target = "branch.id", source = "branchId")
     @Mapping(target = "roomType.id", source = "roomTypeId")
+    @Mapping(target = "salePercent", expression = "java(request.getSalePercent() != null ? request.getSalePercent() : java.math.BigDecimal.ZERO)")
     @Mapping(target = "id", ignore = true)
     Room toRoom(RoomCreationRequest request);
     
@@ -22,10 +27,27 @@ public interface RoomMapper {
     @Mapping(target = "capacityAdults", source = "roomType.capacityAdults")
     @Mapping(target = "capacityChildren", source = "roomType.capacityChildren")
     @Mapping(target = "sizeM2", source = "roomType.sizeM2")
+    @Mapping(target = "displayPrice", expression = "java(calculateDisplayPrice(room.getBasePrice(), room.getSalePercent()))")
     RoomResponse toRoomResponse(Room room);
     
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "branch", ignore = true)
     @Mapping(target = "roomType", ignore = true)
     void updateRoom(@MappingTarget Room room, RoomUpdateRequest request);
+    
+    /**
+     * Calculate display price from base price and sale percent
+     * displayPrice = basePrice * (100 - salePercent) / 100
+     */
+    default BigDecimal calculateDisplayPrice(BigDecimal basePrice, BigDecimal salePercent) {
+        if (basePrice == null) {
+            return BigDecimal.ZERO;
+        }
+        if (salePercent == null || salePercent.compareTo(BigDecimal.ZERO) == 0) {
+            return basePrice;
+        }
+        BigDecimal discount = BigDecimal.valueOf(100).subtract(salePercent);
+        return basePrice.multiply(discount)
+                .divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
+    }
 }

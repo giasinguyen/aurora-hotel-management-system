@@ -188,7 +188,7 @@ export default function AccommodationCategoryPage() {
                         <div>
                           <p className="text-sm text-gray-500">Giá từ</p>
                           <p className="text-3xl font-bold text-amber-600">
-                            {formatCurrency(roomType.basePrice)}
+                            {formatCurrency(roomType.priceFrom)}
                             <span className="text-base text-gray-500 font-normal">/đêm</span>
                           </p>
                         </div>

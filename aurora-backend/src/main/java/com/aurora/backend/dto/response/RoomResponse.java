@@ -3,6 +3,7 @@ package com.aurora.backend.dto.response;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Getter
@@ -24,5 +25,11 @@ public class RoomResponse {
     Integer capacityChildren;
     Double sizeM2;
     String viewType;
+    
+    // Price management
+    BigDecimal basePrice; // Giá gốc
+    BigDecimal salePercent; // % giảm giá
+    BigDecimal displayPrice; // Giá hiển thị (calculated)
+    
     List<String> images;
 }

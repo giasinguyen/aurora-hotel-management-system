@@ -18,6 +18,7 @@ public interface RoomTypeMapper {
     
     @Mapping(target = "branchId", source = "branch.id")
     @Mapping(target = "branchName", source = "branch.name")
+    @Mapping(target = "categoryId", source = "category.id")
     @Mapping(target = "totalRooms", expression = "java(roomType.getRooms() != null ? roomType.getRooms().size() : 0)")
     @Mapping(target = "availableRooms", constant = "0") // Calculate based on room status
     RoomTypeResponse toRoomTypeResponse(RoomType roomType);

@@ -45,6 +45,7 @@ const menuItems = [
     icon: BedDouble,
     href: '/admin/rooms',
     children: [
+      { title: 'Room Categories', href: '/admin/room-categories' },
       { title: 'Room List', href: '/admin/rooms' },
       { title: 'Room Types', href: '/admin/room-types' },
     ],
@@ -283,3 +284,5 @@ export default function Sidebar({ className }: SidebarProps) {
     </div>
   );
 }
+
+

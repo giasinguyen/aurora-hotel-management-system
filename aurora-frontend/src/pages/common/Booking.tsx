@@ -81,10 +81,10 @@ export default function BookingPage() {
     checkIn: new Date().toISOString().split('T')[0],
     checkOut: new Date(Date.now() + 86400000).toISOString().split('T')[0],
     guests: 2,
-    category: categoryId || '',
-    roomType: '',
-    priceRange: '',
-    viewType: '',
+    category: 'all',
+    roomType: 'all',
+    priceRange: 'all',
+    viewType: 'all',
   });
 
   // Save to localStorage whenever bookingRooms changes
@@ -115,59 +115,59 @@ export default function BookingPage() {
     fetchInitialData();
   }, [branchId]);
 
-  // Set initial filter from URL params
+  // Set initial filter from URL params (only if provided)
   useEffect(() => {
-    if (categoryId) {
-      setFilter(prev => ({ ...prev, category: categoryId }));
-    }
-    if (roomTypeId) {
-      setFilter(prev => ({ ...prev, roomType: roomTypeId }));
+    if (categoryId || roomTypeId) {
+      setFilter(prev => ({
+        ...prev,
+        category: categoryId || 'all',
+        roomType: roomTypeId || 'all',
+      }));
     }
   }, [categoryId, roomTypeId]);
 
-  // Fetch ALL room types and rooms for the branch, then filter
+  // Fetch rooms based on cascading filter
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
         
-        // Step 1: Determine which room types to fetch
+        // Step 1: Determine which room types to fetch based on filter
         let targetRoomTypes: RoomType[] = [];
         
         if (filter.category && filter.category !== 'all') {
-          // Fetch room types for selected category
-          const categoryRes = await roomCategoryApi.getByIdWithRoomTypes(filter.category);
-          if (categoryRes.result?.roomTypes) {
-            targetRoomTypes = categoryRes.result.roomTypes;
+          // If category is selected, only get room types from that category
+          targetRoomTypes = roomTypes.filter(rt => rt.categoryId === filter.category);
+          
+          // If specific room type is selected, filter further
+          if (filter.roomType && filter.roomType !== 'all') {
+            targetRoomTypes = targetRoomTypes.filter(rt => rt.id === filter.roomType);
           }
         } else {
-          // Fetch ALL room types for the branch
-          const allRoomTypesRes = await roomTypeApi.getByBranch(branchId);
-          if (allRoomTypesRes.result) {
-            targetRoomTypes = allRoomTypesRes.result;
+          // If no category selected (all), get all room types
+          targetRoomTypes = roomTypes;
+          
+          // Even with all categories, if specific room type is selected, use it
+          if (filter.roomType && filter.roomType !== 'all') {
+            targetRoomTypes = targetRoomTypes.filter(rt => rt.id === filter.roomType);
           }
         }
         
-        // Step 2: Filter by specific room type if selected
-        if (filter.roomType && filter.roomType !== 'all') {
-          targetRoomTypes = targetRoomTypes.filter(rt => rt.id === filter.roomType);
-        }
-        
-        // Step 3: Filter by price range
+        // Step 2: Filter by price range
         if (filter.priceRange && filter.priceRange !== 'all') {
           const [minStr, maxStr] = filter.priceRange.split('-');
           const min = parseInt(minStr);
           const max = maxStr.includes('+') ? Infinity : parseInt(maxStr);
-          targetRoomTypes = targetRoomTypes.filter(rt => rt.basePrice >= min && rt.basePrice <= max);
+          targetRoomTypes = targetRoomTypes.filter(rt => rt.priceFrom >= min && rt.priceFrom <= max);
         }
         
-        // Step 4: Fetch rooms for each room type
+        // Step 3: Fetch rooms for each room type
         const allRoomsPromises = targetRoomTypes.map(rt => 
           roomApi.getByRoomType(rt.id, { size: 100 })
         );
         const allRoomsResponses = await Promise.all(allRoomsPromises);
         
-        // Step 5: Collect all available rooms with their room type info
+        // Step 4: Collect all available rooms with their room type info
         const roomsWithTypes: Array<{ room: Room; roomType: RoomType }> = [];
         allRoomsResponses.forEach((roomsRes, index) => {
           if (roomsRes.result?.content) {
@@ -178,7 +178,7 @@ export default function BookingPage() {
           }
         });
         
-        // Step 6: Filter by view type
+        // Step 5: Filter by view type
         let filteredRoomsWithTypes = roomsWithTypes;
         if (filter.viewType && filter.viewType !== 'all') {
           filteredRoomsWithTypes = filteredRoomsWithTypes.filter(
@@ -186,7 +186,7 @@ export default function BookingPage() {
           );
         }
         
-        // Step 7: Group by room type and take one representative room per type
+        // Step 6: Group by room type and take one representative room per type
         const roomTypeMap = new Map<string, { room: Room; roomType: RoomType }>();
         filteredRoomsWithTypes.forEach(item => {
           if (!roomTypeMap.has(item.roomType.id)) {
@@ -214,7 +214,7 @@ export default function BookingPage() {
     };
     
     fetchData();
-  }, [filter.category, filter.roomType, filter.viewType, filter.priceRange, branchId]);
+  }, [filter.category, filter.roomType, filter.viewType, filter.priceRange, roomTypes]);
 
   const handleViewImages = (room: Room) => {
     setSelectedRoom(room);
@@ -240,7 +240,7 @@ export default function BookingPage() {
       roomNumber: room.roomNumber || typeToUse.name,
       roomTypeId: typeToUse.id,
       roomTypeName: typeToUse.name,
-      basePrice: typeToUse.basePrice,
+      basePrice: typeToUse.priceFrom,
       imageUrl: room.images?.[0] || typeToUse.images?.[0],
     };
 
@@ -353,12 +353,13 @@ export default function BookingPage() {
               <div>
                 <Label htmlFor="category">Hạng phòng</Label>
                 <Select
-                  value={filter.category || "all"}
+                  value={filter.category}
                   onValueChange={(value) => {
+                    // When category changes, reset room type to 'all'
                     setFilter(prev => ({ 
                       ...prev, 
-                      category: value === "all" ? "" : value,
-                      roomType: '' // Reset room type when category changes
+                      category: value,
+                      roomType: 'all' // Reset room type when category changes
                     }));
                   }}
                 >
@@ -378,16 +379,17 @@ export default function BookingPage() {
               <div>
                 <Label htmlFor="roomType">Loại phòng</Label>
                 <Select
-                  value={filter.roomType || "all"}
-                  onValueChange={(value) => setFilter(prev => ({ ...prev, roomType: value === "all" ? "" : value }))}
+                  value={filter.roomType}
+                  onValueChange={(value) => setFilter(prev => ({ ...prev, roomType: value }))}
+                  disabled={filter.category === 'all'}
                 >
-                  <SelectTrigger id="roomType">
+                  <SelectTrigger id="roomType" className={filter.category === 'all' ? 'opacity-50 cursor-not-allowed' : ''}>
                     <SelectValue placeholder="Tất cả" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">Tất cả</SelectItem>
                     {roomTypes
-                      .filter(rt => !filter.category || filter.category === 'all' || rt.categoryId === filter.category)
+                      .filter(rt => rt.categoryId === filter.category)
                       .map((rt) => (
                         <SelectItem key={rt.id} value={rt.id}>
                           {rt.name}
@@ -395,12 +397,15 @@ export default function BookingPage() {
                       ))}
                   </SelectContent>
                 </Select>
+                {filter.category === 'all' && (
+                  <p className="text-xs text-gray-500 mt-1">Chọn hạng phòng trước</p>
+                )}
               </div>
               <div>
                 <Label htmlFor="viewType">View</Label>
                 <Select
                   value={filter.viewType || "all"}
-                  onValueChange={(value) => setFilter(prev => ({ ...prev, viewType: value === "all" ? "" : value }))}
+                  onValueChange={(value) => setFilter(prev => ({ ...prev, viewType: value }))}
                 >
                   <SelectTrigger id="viewType">
                     <SelectValue placeholder="Tất cả" />
@@ -436,7 +441,7 @@ export default function BookingPage() {
                 <Label htmlFor="priceRange">Giá</Label>
                 <Select
                   value={filter.priceRange || "all"}
-                  onValueChange={(value) => setFilter(prev => ({ ...prev, priceRange: value === "all" ? "" : value }))}
+                  onValueChange={(value) => setFilter(prev => ({ ...prev, priceRange: value }))}
                 >
                   <SelectTrigger id="priceRange">
                     <SelectValue placeholder="Tất cả" />
@@ -533,7 +538,7 @@ export default function BookingPage() {
                               <div>
                                 <p className="text-sm text-gray-500">Giá</p>
                                 <p className="text-2xl font-bold text-amber-600">
-                                  {formatCurrency(currentRoomType.basePrice)}
+                                  {formatCurrency(currentRoomType.priceFrom)}
                                   <span className="text-sm text-gray-500 font-normal">/đêm</span>
                                 </p>
                               </div>
@@ -798,7 +803,7 @@ export default function BookingPage() {
                   <div>
                     <p className="text-sm text-gray-500">Giá phòng</p>
                     <p className="text-2xl font-bold text-amber-600">
-                      {formatCurrency(roomType.basePrice)}
+                      {formatCurrency(roomType.priceFrom)}
                       <span className="text-sm text-gray-500 font-normal">/đêm</span>
                     </p>
                   </div>

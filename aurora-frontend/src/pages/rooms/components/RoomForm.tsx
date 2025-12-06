@@ -3,7 +3,7 @@
 // ============================================
 
 import { useEffect, useState } from 'react';
-import { Loader2, Building2, DoorOpen, Users, Maximize, Layers } from 'lucide-react';
+import { Loader2, Building2, DoorOpen, Users, Maximize, Layers, DollarSign, Eye, Percent } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -34,9 +34,9 @@ interface FormState {
   roomNumber: string;
   floor: number;
   status: RoomStatus;
-  capacityAdults: number;
-  capacityChildren: number;
-  sizeM2: number;
+  viewType: string;
+  basePrice: number;
+  salePercent: number;
 }
 
 interface FormErrors {
@@ -44,9 +44,9 @@ interface FormErrors {
   roomTypeId?: string;
   roomNumber?: string;
   floor?: string;
-  capacityAdults?: string;
-  capacityChildren?: string;
-  sizeM2?: string;
+  viewType?: string;
+  basePrice?: string;
+  salePercent?: string;
 }
 
 // ============================================
@@ -85,9 +85,9 @@ export default function RoomForm({
     roomNumber: room?.roomNumber || '',
     floor: room?.floor || 1,
     status: room?.status || 'AVAILABLE',
-    capacityAdults: room?.capacityAdults || 2,
-    capacityChildren: room?.capacityChildren || 0,
-    sizeM2: room?.sizeM2 || 25,
+    viewType: room?.viewType || 'CITY',
+    basePrice: room?.basePrice || 500000,
+    salePercent: room?.salePercent || 0,
   });
 
   // ========== Effects ==========
@@ -101,9 +101,9 @@ export default function RoomForm({
         roomNumber: room.roomNumber || '',
         floor: room.floor || 1,
         status: room.status || 'AVAILABLE',
-        capacityAdults: room.capacityAdults || 2,
-        capacityChildren: room.capacityChildren || 0,
-        sizeM2: room.sizeM2 || 25,
+        viewType: room.viewType || 'CITY',
+        basePrice: room.basePrice || 500000,
+        salePercent: room.salePercent || 0,
       });
       setErrors({});
     }
@@ -179,14 +179,11 @@ export default function RoomForm({
     if (formState.floor < -5 || formState.floor > 200) {
       newErrors.floor = 'Tầng phải từ -5 đến 200';
     }
-    if (formState.capacityAdults < 1 || formState.capacityAdults > 20) {
-      newErrors.capacityAdults = 'Số người lớn từ 1-20';
+    if (!formState.basePrice || formState.basePrice <= 0) {
+      newErrors.basePrice = 'Giá gốc phải lớn hơn 0';
     }
-    if (formState.capacityChildren < 0 || formState.capacityChildren > 10) {
-      newErrors.capacityChildren = 'Số trẻ em từ 0-10';
-    }
-    if (formState.sizeM2 < 10 || formState.sizeM2 > 1000) {
-      newErrors.sizeM2 = 'Diện tích từ 10-1000m²';
+    if (formState.salePercent < 0 || formState.salePercent > 100) {
+      newErrors.salePercent = '% giảm giá từ 0-100';
     }
 
     setErrors(newErrors);
@@ -204,9 +201,9 @@ export default function RoomForm({
         roomNumber: formState.roomNumber,
         floor: formState.floor,
         status: formState.status,
-        capacityAdults: formState.capacityAdults,
-        capacityChildren: formState.capacityChildren,
-        sizeM2: formState.sizeM2,
+        viewType: formState.viewType,
+        basePrice: formState.basePrice,
+        salePercent: formState.salePercent,
       };
       await onSubmit(updateData);
     } else {
@@ -216,9 +213,9 @@ export default function RoomForm({
         roomNumber: formState.roomNumber,
         floor: formState.floor,
         status: formState.status,
-        capacityAdults: formState.capacityAdults,
-        capacityChildren: formState.capacityChildren,
-        sizeM2: formState.sizeM2,
+        viewType: formState.viewType,
+        basePrice: formState.basePrice,
+        salePercent: formState.salePercent,
       };
       await onSubmit(createData);
     }
@@ -388,72 +385,82 @@ export default function RoomForm({
         </CardContent>
       </Card>
 
-      {/* Capacity & Size Section */}
+      {/* Price & View Section */}
       <Card className="border-0 shadow-lg bg-gradient-to-br from-white to-slate-50">
         <CardHeader className="pb-4">
           <div className="flex items-center gap-3">
-            <div className="p-2 rounded-xl bg-purple-100 text-purple-600">
-              <Users className="h-5 w-5" />
+            <div className="p-2 rounded-xl bg-green-100 text-green-600">
+              <DollarSign className="h-5 w-5" />
             </div>
             <div>
-              <CardTitle className="text-lg">Sức chứa & Diện tích</CardTitle>
-              <CardDescription>Thông tin về sức chứa và kích thước phòng</CardDescription>
+              <CardTitle className="text-lg">Giá & Khuyến mãi</CardTitle>
+              <CardDescription>Quản lý giá phòng và giảm giá linh hoạt</CardDescription>
             </div>
           </div>
         </CardHeader>
         <CardContent className="grid gap-6 md:grid-cols-3">
-          {/* Capacity Adults */}
+          {/* View Type */}
           <div className="space-y-2">
             <Label className="flex items-center gap-2">
-              <Users className="h-4 w-4 text-muted-foreground" />
-              Số người lớn <span className="text-destructive">*</span>
+              <Eye className="h-4 w-4 text-muted-foreground" />
+              Hướng view <span className="text-destructive">*</span>
             </Label>
-            <Input
-              type="number"
-              value={formState.capacityAdults}
-              onChange={(e) => updateField('capacityAdults', parseInt(e.target.value) || 1)}
-              min={1}
-              max={20}
-              className={`h-11 ${errors.capacityAdults ? 'border-destructive' : ''}`}
-            />
-            <p className="text-sm text-muted-foreground">Từ 1-20 người</p>
-            {errors.capacityAdults && <p className="text-sm text-destructive">{errors.capacityAdults}</p>}
+            <Select
+              value={formState.viewType}
+              onValueChange={(value) => updateField('viewType', value)}
+            >
+              <SelectTrigger className="h-11">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="CITY">Thành phố</SelectItem>
+                <SelectItem value="SEA">Biển/Sông</SelectItem>
+                <SelectItem value="MOUNTAIN">Núi</SelectItem>
+                <SelectItem value="GARDEN">Vườn</SelectItem>
+              </SelectContent>
+            </Select>
+            {errors.viewType && <p className="text-sm text-destructive">{errors.viewType}</p>}
           </div>
 
-          {/* Capacity Children */}
+          {/* Base Price */}
           <div className="space-y-2">
             <Label className="flex items-center gap-2">
-              <Users className="h-4 w-4 text-muted-foreground" />
-              Số trẻ em
+              <DollarSign className="h-4 w-4 text-muted-foreground" />
+              Giá gốc (VNĐ/đêm) <span className="text-destructive">*</span>
             </Label>
             <Input
               type="number"
-              value={formState.capacityChildren}
-              onChange={(e) => updateField('capacityChildren', parseInt(e.target.value) || 0)}
+              value={formState.basePrice}
+              onChange={(e) => updateField('basePrice', parseFloat(e.target.value) || 0)}
               min={0}
-              max={10}
-              className={`h-11 ${errors.capacityChildren ? 'border-destructive' : ''}`}
+              step={10000}
+              placeholder="500000"
+              className={`h-11 ${errors.basePrice ? 'border-destructive' : ''}`}
             />
-            <p className="text-sm text-muted-foreground">Từ 0-10 trẻ em</p>
-            {errors.capacityChildren && <p className="text-sm text-destructive">{errors.capacityChildren}</p>}
+            <p className="text-sm text-muted-foreground">Giá gốc của phòng (có thể thay đổi)</p>
+            {errors.basePrice && <p className="text-sm text-destructive">{errors.basePrice}</p>}
           </div>
 
-          {/* Size */}
+          {/* Sale Percent */}
           <div className="space-y-2">
             <Label className="flex items-center gap-2">
-              <Maximize className="h-4 w-4 text-muted-foreground" />
-              Diện tích (m²) <span className="text-destructive">*</span>
+              <Percent className="h-4 w-4 text-muted-foreground" />
+              % Giảm giá
             </Label>
             <Input
               type="number"
-              value={formState.sizeM2}
-              onChange={(e) => updateField('sizeM2', parseInt(e.target.value) || 10)}
-              min={10}
-              max={1000}
-              className={`h-11 ${errors.sizeM2 ? 'border-destructive' : ''}`}
+              value={formState.salePercent}
+              onChange={(e) => updateField('salePercent', parseFloat(e.target.value) || 0)}
+              min={0}
+              max={100}
+              step={1}
+              placeholder="0"
+              className={`h-11 ${errors.salePercent ? 'border-destructive' : ''}`}
             />
-            <p className="text-sm text-muted-foreground">Từ 10-1000 m²</p>
-            {errors.sizeM2 && <p className="text-sm text-destructive">{errors.sizeM2}</p>}
+            <p className="text-sm text-muted-foreground">
+              Giá hiển thị: {formState.basePrice ? (formState.basePrice * (100 - formState.salePercent) / 100).toLocaleString('vi-VN') : '0'} VNĐ
+            </p>
+            {errors.salePercent && <p className="text-sm text-destructive">{errors.salePercent}</p>}
           </div>
         </CardContent>
       </Card>
