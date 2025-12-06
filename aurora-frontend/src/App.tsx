@@ -6,6 +6,7 @@ import { Toaster } from '@/components/ui/sonner';
 import { PersistGate } from 'redux-persist/integration/react';
 import LoadingScreen from '@/components/custom/LoadingScreen';
 import SelectionModal from '@/components/custom/SelectionModal';
+import BranchInitializer from '@/features/slices/branch/BranchInitializer';
 import ChatWidget from './components/custom/chat/ChatWidget';
 import router from './router';
 
@@ -16,6 +17,7 @@ function App() {
   return (
     <Provider store={store}>
       <PersistGate persistor={persistor}>
+        <BranchInitializer />
         <SelectionModal />
         <LoadingScreen />
         <RouterProvider router={router} />

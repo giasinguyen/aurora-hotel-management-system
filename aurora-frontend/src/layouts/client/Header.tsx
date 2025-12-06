@@ -3,7 +3,9 @@ import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { useAppDispatch, useAppSelector } from "@/hooks/useRedux";
 import { setLanguage } from "@/features/slices/languageSlice";
-import { setBranch, BRANCHES } from "@/features/slices/branchSlice";
+import { setBranchDetails } from "@/features/slices/branchSlice";
+import { branchApi } from "@/services/branchApi";
+import type { Branch } from "@/types/branch.types";
 import UserMenu from "@/pages/common/components/UserMenu";
 import {
   Sheet,
@@ -16,7 +18,9 @@ import {
 import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
+  SelectLabel,
   SelectTrigger,
 } from "@/components/ui/select";
 import { Search, Menu } from "lucide-react";
@@ -50,6 +54,24 @@ export default function Header() {
   const isLogin = useAppSelector((state) => state.auth.isLogin);
   const [isScrolled, setIsScrolled] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [branches, setBranches] = useState<Branch[]>([]);
+
+  // Fetch branches from database
+  useEffect(() => {
+    const fetchBranches = async () => {
+      try {
+        // Use public endpoint - no authentication required
+        const response = await branchApi.getActivePublic({ page: 0, size: 100 });
+        
+        if (response.result && response.result.content) {
+          setBranches(response.result.content);
+        }
+      } catch (error) {
+        console.error('Failed to fetch branches:', error);
+      }
+    };
+    fetchBranches();
+  }, []);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -83,7 +105,14 @@ export default function Header() {
   };
 
   const handleBranchChange = (value: string) => {
-    dispatch(setBranch(value));
+    // Find and set full branch details
+    const selectedBranch = branches.find(b => b.id === value);
+    if (selectedBranch) {
+      dispatch(setBranchDetails(selectedBranch));
+      
+      // Reload page to apply new branch
+      window.location.reload();
+    }
   };
 
   const handleNavClick = () => {
@@ -148,7 +177,7 @@ export default function Header() {
 
             {/* Branch Select - Desktop */}
             <Select
-              value={currentBranch.id}
+              value={currentBranch?.id || ''}
               onValueChange={handleBranchChange}
             >
               <SelectTrigger
@@ -160,21 +189,34 @@ export default function Header() {
                 }
               >
                 <span className="text-sm font-medium">
-                  {currentBranch.code}
+                  {currentBranch?.city || branches.find(b => b.id === currentBranch?.id)?.city || 'Select Branch'}
                 </span>
               </SelectTrigger>
-              <SelectContent>
-                {Object.values(BRANCHES).map((branch) => (
-                  <SelectItem key={branch.id} value={branch.id}>
-                    <div className="flex flex-col">
-                      <span className="font-medium">
-                        {branch.name} ({branch.code})
-                      </span>
-                      <span className="text-xs font-medium">
-                        {branch.address}
-                      </span>
-                    </div>
-                  </SelectItem>
+              <SelectContent className="bg-white shadow-lg border border-gray-200">
+                {/* Group branches by city */}
+                {Array.from(new Set(branches.map(b => b.city))).map((city) => (
+                  <SelectGroup key={city}>
+                    <SelectLabel className="px-2 py-1.5 text-xs font-semibold text-gray-600 bg-gray-50">{city}</SelectLabel>
+                    {branches
+                      .filter(branch => branch.city === city)
+                      .map((branch) => (
+                        <SelectItem 
+                          key={branch.id} 
+                          value={branch.id}
+                          className="cursor-pointer hover:bg-blue-600 hover:text-white py-2 px-2 my-1"
+                        >
+                          <div className="flex flex-col gap-0.5">
+                            <span className="font-semibold">
+                              {branch.name} ({branch.code})
+                            </span>
+                            <span className="text-xs opacity-80">
+                              {branch.address}
+                            </span>
+                          </div>
+                        </SelectItem>
+                      ))
+                    }
+                  </SelectGroup>
                 ))}
               </SelectContent>
             </Select>
@@ -276,26 +318,35 @@ export default function Header() {
                 <div className="absolute bottom-6 left-6 right-6 space-y-3">
                   {/* Branch Select - Mobile */}
                   <Select
-                    value={currentBranch.id}
+                    value={currentBranch?.id || ''}
                     onValueChange={handleBranchChange}
                   >
                     <SelectTrigger className="w-full bg-gray-100 text-gray-700 hover:bg-gray-200 border-gray-300">
                       <span className="text-sm font-medium">
-                        {currentBranch.name} ({currentBranch.code})
+                        {currentBranch?.name || currentBranch?.code || 'Select Branch'}
                       </span>
                     </SelectTrigger>
                     <SelectContent className="border-gray-200 shadow-lg">
-                      {Object.values(BRANCHES).map((branch) => (
-                        <SelectItem key={branch.id} value={branch.id}>
-                          <div className="flex flex-col">
-                            <span className="font-medium">
-                              {branch.name} ({branch.code})
-                            </span>
-                            <span className="text-xs font-medium">
-                              {branch.address}
-                            </span>
-                          </div>
-                        </SelectItem>
+                      {/* Group branches by city */}
+                      {Array.from(new Set(branches.map(b => b.city))).map((city) => (
+                        <SelectGroup key={city}>
+                          <SelectLabel>{city}</SelectLabel>
+                          {branches
+                            .filter(branch => branch.city === city)
+                            .map((branch) => (
+                              <SelectItem key={branch.id} value={branch.id}>
+                                <div className="flex flex-col">
+                                  <span className="font-medium">
+                                    {branch.name} ({branch.code})
+                                  </span>
+                                  <span className="text-xs text-gray-500">
+                                    {branch.address}
+                                  </span>
+                                </div>
+                              </SelectItem>
+                            ))
+                          }
+                        </SelectGroup>
                       ))}
                     </SelectContent>
                   </Select>

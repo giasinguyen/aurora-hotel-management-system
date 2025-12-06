@@ -46,7 +46,7 @@ public class Room extends BaseEntity {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     @Builder.Default
-    RoomStatus status = RoomStatus.AVAILABLE;
+    RoomStatus status = RoomStatus.READY;
     
     @Column(length = 50)
     String viewType; // CITY, SEA, MOUNTAIN, GARDEN
@@ -79,11 +79,9 @@ public class Room extends BaseEntity {
 
     // Room Status Enum
     public enum RoomStatus {
-        AVAILABLE,      // Phòng trống, sẵn sàng đặt
-        OCCUPIED,       // Đang có khách
+        READY,          // Sẵn sàng sử dụng (có thể đặt)
         CLEANING,       // Đang dọn dẹp
         MAINTENANCE,    // Đang bảo trì
-        OUT_OF_ORDER,   // Hỏng hóc, không sử dụng được
-        RESERVED        // Đã được đặt nhưng chưa check-in
+        LOCKED          // Khoá phòng (không sử dụng được)
     }
 }

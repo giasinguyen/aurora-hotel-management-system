@@ -44,8 +44,8 @@ const menuItems = [
     icon: BedDouble,
     href: '/manager/rooms',
     children: [
-      { title: 'Room List', href: '/manager/rooms' },
       { title: 'Room Types', href: '/manager/room-types' },
+      { title: 'Room List', href: '/manager/rooms' },
     ],
   },
   {

@@ -17,6 +17,8 @@ public class RoomTypeCreationRequest {
     @NotBlank(message = "BRANCH_ID_REQUIRED")
     String branchId;
     
+    String categoryId; // Room category: Standard, Deluxe, Presidential Suite
+    
     @NotBlank(message = "ROOM_TYPE_NAME_REQUIRED")
     String name;
     

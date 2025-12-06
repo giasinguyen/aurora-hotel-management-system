@@ -21,6 +21,8 @@ export interface Room {
   branchName: string;
   roomTypeId: string;
   roomTypeName: string;
+  categoryId: string; // Category ID from roomType.category
+  categoryName: string; // Category name from roomType.category
   roomNumber: string;
   floor: number;
   status: RoomStatus;
@@ -35,12 +37,10 @@ export interface Room {
 }
 
 export type RoomStatus = 
-  | 'AVAILABLE' 
-  | 'OCCUPIED' 
-  | 'RESERVED' 
-  | 'MAINTENANCE' 
+  | 'READY' 
   | 'CLEANING' 
-  | 'OUT_OF_ORDER';
+  | 'MAINTENANCE' 
+  | 'LOCKED';
 
 export interface RoomCreationRequest {
   branchId: string;
@@ -142,10 +142,8 @@ export interface RoomTypeSearchParams {
 
 // Status badge configurations
 export const ROOM_STATUS_CONFIG: Record<RoomStatus, { label: string; variant: 'default' | 'secondary' | 'destructive' | 'outline' | 'success' | 'warning'; color: string }> = {
-  AVAILABLE: { label: 'Trống', variant: 'success', color: 'bg-green-500' },
-  OCCUPIED: { label: 'Có khách', variant: 'default', color: 'bg-blue-500' },
-  RESERVED: { label: 'Đã đặt', variant: 'warning', color: 'bg-yellow-500' },
-  MAINTENANCE: { label: 'Bảo trì', variant: 'secondary', color: 'bg-gray-500' },
+  READY: { label: 'Sẵn sàng', variant: 'success', color: 'bg-green-500' },
   CLEANING: { label: 'Đang dọn', variant: 'outline', color: 'bg-purple-500' },
-  OUT_OF_ORDER: { label: 'Hỏng', variant: 'destructive', color: 'bg-red-500' },
+  MAINTENANCE: { label: 'Bảo trì', variant: 'secondary', color: 'bg-gray-500' },
+  LOCKED: { label: 'Khoá phòng', variant: 'destructive', color: 'bg-red-500' },
 };

@@ -91,6 +91,19 @@ export const branchApi = {
     return response.data;
   },
 
+  // Get active branches (public endpoint - no auth required)
+  getActivePublic: async (params: {
+    page?: number;
+    size?: number;
+  } = {}) => {
+    const { page = 0, size = 100 } = params;
+    const response = await axiosClient.get<ApiResponse<SpringPage<Branch>>>(
+      `${BRANCH_BASE_URL}/public/active`,
+      { params: { page, size } }
+    );
+    return response.data;
+  },
+
   // Create branch
   create: async (data: BranchCreationRequest) => {
     const response = await axiosClient.post<ApiResponse<Branch>>(

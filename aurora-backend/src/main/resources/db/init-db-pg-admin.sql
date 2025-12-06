@@ -349,13 +349,47 @@ ON CONFLICT DO NOTHING;
 
 -- ============================================================================
 -- 4. ROOM CATEGORIES (Hạng phòng)
--- Tạo 3 categories: Standard Room, Deluxe Room, Presidential Suite
--- CHỈ TẠO CHO HCM BRANCH
+-- Tạo 3 categories cho mỗi branch: Standard Room, Deluxe Room, Presidential Suite
 -- ============================================================================
 INSERT INTO room_categories (
     id, branch_id, name, code, description, display_order, active, image_url,
     created_at, updated_at, version, deleted
 ) VALUES 
+-- ===== HANOI CATEGORIES =====
+(
+    'category-hn-std-001',
+    'branch-hanoi-001',
+    'Standard Room',
+    'STD',
+    'Phòng tiêu chuẩn với đầy đủ tiện nghi cơ bản, phù hợp cho khách du lịch và công tác',
+    1,
+    true,
+    'https://images.unsplash.com/photo-1566665797739-1674de7a421a?w=800&h=600&fit=crop',
+    NOW(), NOW(), 0, false
+),
+(
+    'category-hn-dlx-001',
+    'branch-hanoi-001',
+    'Deluxe Room',
+    'DLX',
+    'Phòng cao cấp với không gian rộng rãi và view đẹp, dịch vụ hoàn hảo',
+    2,
+    true,
+    'https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=800&h=600&fit=crop',
+    NOW(), NOW(), 0, false
+),
+(
+    'category-hn-pre-001',
+    'branch-hanoi-001',
+    'Presidential Suite',
+    'PRE',
+    'Phòng tổng thống sang trọng bậc nhất với đầy đủ tiện nghi 5 sao và dịch vụ butler riêng',
+    3,
+    true,
+    'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=800&h=600&fit=crop',
+    NOW(), NOW(), 0, false
+),
+-- ===== HCM CATEGORIES =====
 -- Standard Room Category
 (
     'category-hcm-std-001',
@@ -570,11 +604,11 @@ INSERT INTO rooms (
     'roomtype-hcm-std-single-city-001',
     '301',
     3,
-    'AVAILABLE',
+    'READY',
     'CITY',
     1200000.00,
     0.00,
-    '["https://images.unsplash.com/photo-1566665797739-1674de7a421a?w=1200&h=800&fit=crop"]',
+    '["https://images.unsplash.com/photo-1566665797739-1674de7a421a?w=1200&h=800&fit=crop","https://images.unsplash.com/photo-1611892440504-42a792e24d32?w=1200&h=800&fit=crop","https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=1200&h=800&fit=crop","https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?w=1200&h=800&fit=crop","https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?w=1200&h=800&fit=crop"]',
     NOW(), NOW(), 0, false
 ),
 (
@@ -583,11 +617,11 @@ INSERT INTO rooms (
     'roomtype-hcm-std-single-city-001',
     '302',
     3,
-    'AVAILABLE',
+    'READY',
     'CITY',
     1200000.00,
     10.00,
-    '["https://images.unsplash.com/photo-1566665797739-1674de7a421a?w=1200&h=800&fit=crop"]',
+    '["https://images.unsplash.com/photo-1566665797739-1674de7a421a?w=1200&h=800&fit=crop","https://images.unsplash.com/photo-1540518614846-7eded433c457?w=1200&h=800&fit=crop","https://images.unsplash.com/photo-1631049421450-348ccd7f8949?w=1200&h=800&fit=crop","https://images.unsplash.com/photo-1598928506311-c55ded91a20c?w=1200&h=800&fit=crop","https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?w=1200&h=800&fit=crop"]',
     NOW(), NOW(), 0, false
 ),
 -- Standard Couple Bedroom Sea View (2 phòng)
@@ -597,11 +631,11 @@ INSERT INTO rooms (
     'roomtype-hcm-std-couple-sea-001',
     '501',
     5,
-    'AVAILABLE',
+    'READY',
     'SEA',
     1500000.00,
     0.00,
-    '["https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=1200&h=800&fit=crop"]',
+    '["https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=1200&h=800&fit=crop","https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=1200&h=800&fit=crop","https://images.unsplash.com/photo-1578683010236-d716f9a3f461?w=1200&h=800&fit=crop","https://images.unsplash.com/photo-1590490360182-c33d57733427?w=1200&h=800&fit=crop","https://images.unsplash.com/photo-1587985064135-0366536eab42?w=1200&h=800&fit=crop"]',
     NOW(), NOW(), 0, false
 ),
 (
@@ -610,11 +644,11 @@ INSERT INTO rooms (
     'roomtype-hcm-std-couple-sea-001',
     '502',
     5,
-    'OCCUPIED',
+    'READY',
     'SEA',
     1500000.00,
     0.00,
-    '["https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=1200&h=800&fit=crop"]',
+    '["https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=1200&h=800&fit=crop","https://images.unsplash.com/photo-1596394516093-501ba68a0ba6?w=1200&h=800&fit=crop","https://images.unsplash.com/photo-1591088398332-8a7791972843?w=1200&h=800&fit=crop","https://images.unsplash.com/photo-1618773928121-c32242e63f39?w=1200&h=800&fit=crop","https://images.unsplash.com/photo-1512918728675-ed5a9ecdebfd?w=1200&h=800&fit=crop"]',
     NOW(), NOW(), 0, false
 ),
 -- Deluxe Single Bedroom City View (2 phòng)
@@ -624,11 +658,11 @@ INSERT INTO rooms (
     'roomtype-hcm-dlx-single-city-001',
     '801',
     8,
-    'AVAILABLE',
+    'READY',
     'CITY',
     1800000.00,
     15.00,
-    '["https://images.unsplash.com/photo-1596394516093-501ba68a0ba6?w=1200&h=800&fit=crop"]',
+    '["https://images.unsplash.com/photo-1596394516093-501ba68a0ba6?w=1200&h=800&fit=crop","https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=1200&h=800&fit=crop","https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=1200&h=800&fit=crop","https://images.unsplash.com/photo-1590381105924-c72589b9ef3f?w=1200&h=800&fit=crop","https://images.unsplash.com/photo-1616594039964-ae9021a400a0?w=1200&h=800&fit=crop"]',
     NOW(), NOW(), 0, false
 ),
 (
@@ -641,7 +675,7 @@ INSERT INTO rooms (
     'CITY',
     1800000.00,
     0.00,
-    '["https://images.unsplash.com/photo-1596394516093-501ba68a0ba6?w=1200&h=800&fit=crop"]',
+    '["https://images.unsplash.com/photo-1596394516093-501ba68a0ba6?w=1200&h=800&fit=crop","https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?w=1200&h=800&fit=crop","https://images.unsplash.com/photo-1455587734955-081b22074882?w=1200&h=800&fit=crop","https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=1200&h=800&fit=crop","https://images.unsplash.com/photo-1559508551-44bff1de756b?w=1200&h=800&fit=crop"]',
     NOW(), NOW(), 0, false
 ),
 -- Deluxe Couple Bedroom Sea View (2 phòng)
@@ -651,11 +685,11 @@ INSERT INTO rooms (
     'roomtype-hcm-dlx-couple-sea-001',
     '1001',
     10,
-    'AVAILABLE',
+    'READY',
     'SEA',
     2200000.00,
     20.00,
-    '["https://images.unsplash.com/photo-1568605117037-4d9c780fac89?w=1200&h=800&fit=crop"]',
+    '["https://images.unsplash.com/photo-1568605117037-4d9c780fac89?w=1200&h=800&fit=crop","https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=1200&h=800&fit=crop","https://images.unsplash.com/photo-1582719508461-905c673771fd?w=1200&h=800&fit=crop","https://images.unsplash.com/photo-1590490360182-c33d57733427?w=1200&h=800&fit=crop","https://images.unsplash.com/photo-1611048267451-e6ed903d4a38?w=1200&h=800&fit=crop"]',
     NOW(), NOW(), 0, false
 ),
 (
@@ -664,11 +698,11 @@ INSERT INTO rooms (
     'roomtype-hcm-dlx-couple-sea-001',
     '1002',
     10,
-    'AVAILABLE',
+    'READY',
     'SEA',
     2200000.00,
     0.00,
-    '["https://images.unsplash.com/photo-1568605117037-4d9c780fac89?w=1200&h=800&fit=crop"]',
+    '["https://images.unsplash.com/photo-1568605117037-4d9c780fac89?w=1200&h=800&fit=crop","https://images.unsplash.com/photo-1566665797739-1674de7a421a?w=1200&h=800&fit=crop","https://images.unsplash.com/photo-1591088398332-8a7791972843?w=1200&h=800&fit=crop","https://images.unsplash.com/photo-1631049421450-348ccd7f8949?w=1200&h=800&fit=crop","https://images.unsplash.com/photo-1615873968403-89e068629265?w=1200&h=800&fit=crop"]',
     NOW(), NOW(), 0, false
 ),
 -- Presidential Two Bedroom City View (1 phòng)
@@ -678,11 +712,11 @@ INSERT INTO rooms (
     'roomtype-hcm-pre-two-city-001',
     '1501',
     15,
-    'AVAILABLE',
+    'READY',
     'CITY',
     4500000.00,
     0.00,
-    '["https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=1200&h=800&fit=crop"]',
+    '["https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=1200&h=800&fit=crop","https://images.unsplash.com/photo-1596394516093-501ba68a0ba6?w=1200&h=800&fit=crop","https://images.unsplash.com/photo-1618773928121-c32242e63f39?w=1200&h=800&fit=crop","https://images.unsplash.com/photo-1611892440504-42a792e24d32?w=1200&h=800&fit=crop","https://images.unsplash.com/photo-1590490360182-c33d57733427?w=1200&h=800&fit=crop"]',
     NOW(), NOW(), 0, false
 ),
 -- Presidential Three Bedroom Sea View (1 phòng)
@@ -692,11 +726,11 @@ INSERT INTO rooms (
     'roomtype-hcm-pre-three-sea-001',
     '2001',
     20,
-    'AVAILABLE',
+    'READY',
     'SEA',
     6500000.00,
     5.00,
-    '["https://images.unsplash.com/photo-1618773928121-c32242e63f39?w=1200&h=800&fit=crop"]',
+    '["https://images.unsplash.com/photo-1618773928121-c32242e63f39?w=1200&h=800&fit=crop","https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=1200&h=800&fit=crop","https://images.unsplash.com/photo-1568605117037-4d9c780fac89?w=1200&h=800&fit=crop","https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=1200&h=800&fit=crop","https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=1200&h=800&fit=crop"]',
     NOW(), NOW(), 0, false
 )
 ON CONFLICT DO NOTHING;

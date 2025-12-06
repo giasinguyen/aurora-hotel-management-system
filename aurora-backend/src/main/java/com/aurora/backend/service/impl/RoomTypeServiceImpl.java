@@ -5,12 +5,14 @@ import com.aurora.backend.dto.request.RoomTypeUpdateRequest;
 import com.aurora.backend.dto.response.RoomTypeResponse;
 import com.aurora.backend.entity.Amenity;
 import com.aurora.backend.entity.Branch;
+import com.aurora.backend.entity.RoomCategory;
 import com.aurora.backend.entity.RoomType;
 import com.aurora.backend.enums.ErrorCode;
 import com.aurora.backend.exception.AppException;
 import com.aurora.backend.mapper.RoomTypeMapper;
 import com.aurora.backend.repository.AmenityRepository;
 import com.aurora.backend.repository.BranchRepository;
+import com.aurora.backend.repository.RoomCategoryRepository;
 import com.aurora.backend.repository.RoomTypeRepository;
 import com.aurora.backend.service.RoomTypeService;
 import lombok.AccessLevel;
@@ -35,6 +37,7 @@ public class RoomTypeServiceImpl implements RoomTypeService {
 
     RoomTypeRepository roomTypeRepository;
     BranchRepository branchRepository;
+    RoomCategoryRepository roomCategoryRepository;
     AmenityRepository amenityRepository;
     RoomTypeMapper roomTypeMapper;
 
@@ -55,6 +58,13 @@ public class RoomTypeServiceImpl implements RoomTypeService {
 
         RoomType roomType = roomTypeMapper.toRoomType(request);
         roomType.setBranch(branch);
+
+        // Set category if provided
+        if (request.getCategoryId() != null && !request.getCategoryId().isBlank()) {
+            RoomCategory category = roomCategoryRepository.findById(request.getCategoryId())
+                    .orElseThrow(() -> new AppException(ErrorCode.CATEGORY_NOT_EXISTED));
+            roomType.setCategory(category);
+        }
 
         if (request.getAmenityIds() != null && !request.getAmenityIds().isEmpty()) {
             Set<Amenity> amenities = new HashSet<>(amenityRepository.findAllById(request.getAmenityIds()));
@@ -124,6 +134,13 @@ public class RoomTypeServiceImpl implements RoomTypeService {
         }
 
         roomTypeMapper.updateRoomTypeFromRequest(request, roomType);
+
+        // Update category if provided
+        if (request.getCategoryId() != null && !request.getCategoryId().isBlank()) {
+            RoomCategory category = roomCategoryRepository.findById(request.getCategoryId())
+                    .orElseThrow(() -> new AppException(ErrorCode.CATEGORY_NOT_EXISTED));
+            roomType.setCategory(category);
+        }
 
         if (request.getAmenityIds() != null) {
             Set<Amenity> amenities = new HashSet<>(amenityRepository.findAllById(request.getAmenityIds()));

@@ -49,7 +49,7 @@ public interface RoomRepository extends JpaRepository<Room, String> {
 
     @Query("SELECT DISTINCT r FROM Room r " +
             "WHERE r.branch.id = :branchId " +
-            "AND r.status = 'AVAILABLE' " +
+            "AND r.status = 'READY' " +
             "AND r.id NOT IN (" +
             "    SELECT br.room.id FROM BookingRoom br " +
             "    WHERE br.booking.status IN ('CONFIRMED', 'CHECKED_IN', 'CHECKED_OUT') " +
@@ -66,7 +66,7 @@ public interface RoomRepository extends JpaRepository<Room, String> {
     @Query("SELECT DISTINCT r FROM Room r " +
             "WHERE r.branch.id = :branchId " +
             "AND r.roomType.id = :roomTypeId " +
-            "AND r.status = 'AVAILABLE' " +
+            "AND r.status = 'READY' " +
             "AND r.id NOT IN (" +
             "    SELECT br.room.id FROM BookingRoom br " +
             "    WHERE br.booking.status IN ('CONFIRMED', 'CHECKED_IN', 'CHECKED_OUT') " +

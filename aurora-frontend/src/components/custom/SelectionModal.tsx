@@ -1,7 +1,9 @@
 import { useState, useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "@/hooks/useRedux";
 import { setLanguage } from "@/features/slices/languageSlice";
-import { setBranch, setSelectionCompleted, BRANCHES } from "@/features/slices/branchSlice";
+import { setBranchDetails } from "@/features/slices/branchSlice";
+import { branchApi } from "@/services/branchApi";
+import type { Branch } from "@/types/branch.types";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -11,7 +13,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { X } from "lucide-react";
+import { X, Loader2 } from "lucide-react";
 
 // Language option component
 const LanguageOption = ({ value }: { value: string }) => {
@@ -30,9 +32,6 @@ const LanguageOption = ({ value }: { value: string }) => {
 
 export default function SelectionModal() {
   const dispatch = useAppDispatch();
-  const isSelectionCompleted = useAppSelector(
-    (state) => state.branch.isSelectionCompleted
-  );
   const currentLanguage = useAppSelector(
     (state) => state.language.currentLanguage
   );
@@ -41,41 +40,64 @@ export default function SelectionModal() {
   );
 
   const [selectedLanguage, setSelectedLanguage] = useState(currentLanguage);
-  const [selectedBranch, setSelectedBranch] = useState(currentBranch.id);
+  const [selectedBranch, setSelectedBranch] = useState(currentBranch?.id || '');
+  const [branches, setBranches] = useState<Branch[]>([]);
+  const [isLoadingBranches, setIsLoadingBranches] = useState(true);
+  
+  // Show modal if no branchId in localStorage
+  const shouldShowModal = !localStorage.getItem('branchId');
+
+  // Fetch branches from database
+  useEffect(() => {
+    const fetchBranches = async () => {
+      try {
+        setIsLoadingBranches(true);
+        const response = await branchApi.getActivePublic({ page: 0, size: 100 });
+        
+        if (response.result && response.result.content) {
+          setBranches(response.result.content);
+          
+          // Auto-set first branch if no branch in localStorage
+          if (!localStorage.getItem('branchId') && response.result.content.length > 0) {
+            const firstBranch = response.result.content[0];
+            setSelectedBranch(firstBranch.id);
+          }
+        }
+      } catch (error) {
+        console.error('Failed to fetch branches:', error);
+      } finally {
+        setIsLoadingBranches(false);
+      }
+    };
+    fetchBranches();
+  }, []);
 
   useEffect(() => {
     setSelectedLanguage(currentLanguage);
-    setSelectedBranch(currentBranch.id);
+    if (currentBranch?.id) {
+      setSelectedBranch(currentBranch.id);
+    }
   }, [currentLanguage, currentBranch]);
 
   const handleClose = () => {
-    // Set default: en and hcm
+    // Set default: en and first active branch
     dispatch(setLanguage("en"));
-    dispatch(setBranch("hcm"));
-    dispatch(setSelectionCompleted(true));
-    
-    // Lưu default branch vào localStorage
-    const defaultBranch = BRANCHES.find(b => b.id === "hcm");
-    if (defaultBranch) {
-      localStorage.setItem('selectedBranchId', defaultBranch.apiId);
-      localStorage.setItem('selectedBranchName', defaultBranch.name);
+    if (branches.length > 0) {
+      dispatch(setBranchDetails(branches[0]));
     }
   };
 
   const handleConfirm = () => {
     dispatch(setLanguage(selectedLanguage));
-    dispatch(setBranch(selectedBranch));
-    dispatch(setSelectionCompleted(true));
     
-    // Lưu branchId vào localStorage để sử dụng trong accommodation
-    const branch = BRANCHES.find(b => b.id === selectedBranch);
-    if (branch) {
-      localStorage.setItem('selectedBranchId', branch.apiId);
-      localStorage.setItem('selectedBranchName', branch.name);
+    // Find and set full branch details
+    const selectedBranchData = branches.find(b => b.id === selectedBranch);
+    if (selectedBranchData) {
+      dispatch(setBranchDetails(selectedBranchData));
     }
   };
 
-  if (isSelectionCompleted) {
+  if (!shouldShowModal) {
     return null;
   }
 
@@ -126,34 +148,44 @@ export default function SelectionModal() {
             <label className="text-sm font-medium text-gray-700">
               Chi nhánh / Branch
             </label>
-            <Select value={selectedBranch} onValueChange={setSelectedBranch}>
-              <SelectTrigger className="w-full justify-start text-left">
-                <SelectValue placeholder="Chọn chi nhánh" />
-              </SelectTrigger>
-              <SelectContent className="!z-[10001]">
-                {Object.values(BRANCHES).map((branch) => (
-                  <SelectItem 
-                    key={branch.id} 
-                    value={branch.id}
-                    className="group"
-                  >
-                    <span className="sr-only">{branch.name} ({branch.code})</span>
-                    <div className="flex flex-col">
-                      <span className="font-medium">
-                        {branch.name} ({branch.code})
-                      </span>
-                      <span className="text-xs text-gray-500 group-data-[highlighted]:text-white group-data-[state=checked]:text-white">
-                        {branch.address}
-                      </span>
-                    </div>
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            {isLoadingBranches ? (
+              <div className="flex items-center justify-center py-8">
+                <Loader2 className="w-6 h-6 animate-spin text-gray-400" />
+              </div>
+            ) : (
+              <Select value={selectedBranch} onValueChange={setSelectedBranch}>
+                <SelectTrigger className="w-full justify-start text-left">
+                  <SelectValue placeholder="Chọn chi nhánh" />
+                </SelectTrigger>
+                <SelectContent className="!z-[10001]">
+                  {branches.map((branch) => (
+                    <SelectItem 
+                      key={branch.id} 
+                      value={branch.id}
+                      className="group"
+                    >
+                      <div className="flex flex-col">
+                        <span className="font-medium">
+                          {branch.name} ({branch.code})
+                        </span>
+                        <span className="text-xs text-gray-500 group-data-[highlighted]:text-white group-data-[state=checked]:text-white">
+                          {branch.address}
+                        </span>
+                      </div>
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
           </div>
 
           {/* Confirm Button */}
-          <Button onClick={handleConfirm} className="w-full" size="lg">
+          <Button 
+            onClick={handleConfirm} 
+            className="w-full" 
+            size="lg"
+            disabled={isLoadingBranches || !selectedBranch}
+          >
             Xác nhận / Confirm
           </Button>
         </CardContent>

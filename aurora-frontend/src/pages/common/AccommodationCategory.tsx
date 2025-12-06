@@ -3,6 +3,7 @@ import { useParams, useNavigate, Link } from 'react-router-dom';
 import VideoHero from "@/components/custom/VideoHero";
 import { roomCategoryApi } from '@/services/roomApi';
 import type { RoomCategory, RoomType } from '@/types/room.types';
+import fallbackImage from '@/assets/images/commons/fallback.png';
 import { toast } from 'sonner';
 import { Loader2, ChevronLeft, Users, Maximize, Bed } from 'lucide-react';
 import { Card } from '@/components/ui/card';
@@ -16,6 +17,9 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb';
+
+// Fallback image for broken image URLs
+const FALLBACK_IMAGE = fallbackImage;
 
 export default function AccommodationCategoryPage() {
   const { categoryId } = useParams<{ categoryId: string }>();
@@ -62,6 +66,14 @@ export default function AccommodationCategoryPage() {
       style: 'currency',
       currency: 'VND',
     }).format(value);
+  };
+
+  // Handle image load errors with fallback
+  const handleImageError = (e: React.SyntheticEvent<HTMLImageElement>) => {
+    const img = e.currentTarget;
+    if (img.src !== FALLBACK_IMAGE) {
+      img.src = FALLBACK_IMAGE;
+    }
   };
 
   if (loading) {
@@ -145,6 +157,7 @@ export default function AccommodationCategoryPage() {
                           src={roomType.images[0]} 
                           alt={roomType.name}
                           className="w-full h-full object-cover"
+                          onError={handleImageError}
                         />
                       </div>
                     )}
@@ -197,7 +210,7 @@ export default function AccommodationCategoryPage() {
                           onClick={() => handleBookRoom(roomType.id)}
                           className="bg-amber-600 hover:bg-amber-700"
                         >
-                          Đặt phòng
+                          Chọn phòng
                         </Button>
                       </div>
                     </div>

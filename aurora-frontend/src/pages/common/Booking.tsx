@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import { roomTypeApi, roomApi, roomCategoryApi } from '@/services/roomApi';
 import type { RoomType, Room, RoomCategory } from '@/types/room.types';
-import { useAppSelector } from '@/hooks/useRedux';
 import { toast } from 'sonner';
 import { Loader2, ChevronLeft, Users, Maximize, Bed, Eye, X, Trash2, Calendar } from 'lucide-react';
 import VideoHero from '@/components/custom/VideoHero';
@@ -25,6 +24,10 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { formatCurrency } from '@/utils/exportUtils';
+import fallbackImage from '@/assets/images/commons/fallback.png';
+
+// Fallback image for broken image URLs
+const FALLBACK_IMAGE = fallbackImage;
 
 interface BookingRoom {
   roomId: string;
@@ -57,11 +60,12 @@ export default function BookingPage() {
   const [rooms, setRooms] = useState<Room[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedRoom, setSelectedRoom] = useState<Room | null>(null);
+  const [currentRoomType, setCurrentRoomType] = useState<RoomType | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   
-  const currentBranch = useAppSelector((state) => state.branch.currentBranch);
-  const branchId = currentBranch?.apiId || 'branch-hcm-001';
+  // Get branchId from localStorage
+  const branchId = localStorage.getItem('branchId') || 'branch-hcm-001';
   
   // Booking state - Initialize from localStorage
   const [bookingRooms, setBookingRooms] = useState<BookingRoom[]>(() => {
@@ -171,7 +175,7 @@ export default function BookingPage() {
         const roomsWithTypes: Array<{ room: Room; roomType: RoomType }> = [];
         allRoomsResponses.forEach((roomsRes, index) => {
           if (roomsRes.result?.content) {
-            const availableRooms = roomsRes.result.content.filter(r => r.status === 'AVAILABLE');
+            const availableRooms = roomsRes.result.content.filter(r => r.status === 'READY');
             availableRooms.forEach(room => {
               roomsWithTypes.push({ room, roomType: targetRoomTypes[index] });
             });
@@ -217,9 +221,21 @@ export default function BookingPage() {
   }, [filter.category, filter.roomType, filter.viewType, filter.priceRange, roomTypes]);
 
   const handleViewImages = (room: Room) => {
+    // Find the roomType for this specific room
+    const roomTypeForRoom = roomTypes.find(rt => rt.id === room.roomTypeId);
+    
     setSelectedRoom(room);
+    setCurrentRoomType(roomTypeForRoom || null);
     setCurrentImageIndex(0);
     setIsModalOpen(true);
+  };
+
+  // Handle image load errors with fallback
+  const handleImageError = (e: React.SyntheticEvent<HTMLImageElement>) => {
+    const img = e.currentTarget;
+    if (img.src !== FALLBACK_IMAGE) {
+      img.src = FALLBACK_IMAGE;
+    }
   };
 
   const handleAddRoom = (room: Room, currentRoomType?: RoomType) => {
@@ -328,8 +344,8 @@ export default function BookingPage() {
               Quay lại
             </Button>
           </div>
-          <div className="max-w-6xl mx-auto">
-            <div className="grid grid-cols-1 md:grid-cols-7 gap-4">
+          <div className="max-w-full mx-auto">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-3">
               <div>
                 <Label htmlFor="checkIn">Check-in</Label>
                 <Input
@@ -350,8 +366,8 @@ export default function BookingPage() {
                   min={filter.checkIn}
                 />
               </div>
-              <div>
-                <Label htmlFor="category">Hạng phòng</Label>
+              <div className="min-w-0">
+                <Label htmlFor="category" className="truncate block">Hạng phòng</Label>
                 <Select
                   value={filter.category}
                   onValueChange={(value) => {
@@ -363,8 +379,8 @@ export default function BookingPage() {
                     }));
                   }}
                 >
-                  <SelectTrigger id="category">
-                    <SelectValue placeholder="Tất cả" />
+                  <SelectTrigger id="category" className="truncate">
+                    <SelectValue placeholder="Tất cả" className="truncate" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">Tất cả</SelectItem>
@@ -376,15 +392,15 @@ export default function BookingPage() {
                   </SelectContent>
                 </Select>
               </div>
-              <div>
-                <Label htmlFor="roomType">Loại phòng</Label>
+              <div className="min-w-0">
+                <Label htmlFor="roomType" className="truncate block">Loại phòng</Label>
                 <Select
                   value={filter.roomType}
                   onValueChange={(value) => setFilter(prev => ({ ...prev, roomType: value }))}
                   disabled={filter.category === 'all'}
                 >
-                  <SelectTrigger id="roomType" className={filter.category === 'all' ? 'opacity-50 cursor-not-allowed' : ''}>
-                    <SelectValue placeholder="Tất cả" />
+                  <SelectTrigger id="roomType" className={`truncate ${filter.category === 'all' ? 'opacity-50 cursor-not-allowed' : ''}`}>
+                    <SelectValue placeholder="Tất cả" className="truncate" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">Tất cả</SelectItem>
@@ -401,14 +417,14 @@ export default function BookingPage() {
                   <p className="text-xs text-gray-500 mt-1">Chọn hạng phòng trước</p>
                 )}
               </div>
-              <div>
-                <Label htmlFor="viewType">View</Label>
+              <div className="min-w-0">
+                <Label htmlFor="viewType" className="truncate block">View</Label>
                 <Select
                   value={filter.viewType || "all"}
                   onValueChange={(value) => setFilter(prev => ({ ...prev, viewType: value }))}
                 >
-                  <SelectTrigger id="viewType">
-                    <SelectValue placeholder="Tất cả" />
+                  <SelectTrigger id="viewType" className="truncate">
+                    <SelectValue placeholder="Tất cả" className="truncate" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">Tất cả</SelectItem>
@@ -419,14 +435,14 @@ export default function BookingPage() {
                   </SelectContent>
                 </Select>
               </div>
-              <div>
-                <Label htmlFor="guests">Guest</Label>
+              <div className="min-w-0">
+                <Label htmlFor="guests" className="truncate block">Guest</Label>
                 <Select
                   value={filter.guests.toString()}
                   onValueChange={(value) => setFilter(prev => ({ ...prev, guests: parseInt(value) }))}
                 >
-                  <SelectTrigger id="guests">
-                    <SelectValue placeholder="Số khách" />
+                  <SelectTrigger id="guests" className="truncate">
+                    <SelectValue placeholder="Số khách" className="truncate" />
                   </SelectTrigger>
                   <SelectContent>
                     {Array.from({ length: 10 }, (_, i) => i + 1).map((num) => (
@@ -437,14 +453,14 @@ export default function BookingPage() {
                   </SelectContent>
                 </Select>
               </div>
-              <div>
-                <Label htmlFor="priceRange">Giá</Label>
+              <div className="min-w-0">
+                <Label htmlFor="priceRange" className="truncate block">Giá</Label>
                 <Select
                   value={filter.priceRange || "all"}
                   onValueChange={(value) => setFilter(prev => ({ ...prev, priceRange: value }))}
                 >
-                  <SelectTrigger id="priceRange">
-                    <SelectValue placeholder="Tất cả" />
+                  <SelectTrigger id="priceRange" className="truncate">
+                    <SelectValue placeholder="Tất cả" className="truncate" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">Tất cả</SelectItem>
@@ -489,9 +505,10 @@ export default function BookingPage() {
                           {/* Image */}
                           <div className="md:w-64 flex-shrink-0 relative group">
                             <img
-                              src={room.images?.[0] || currentRoomType.images?.[0] || "https://images.unsplash.com/photo-1566665797739-1674de7a421a?w=800&h=600&fit=crop"}
+                              src={room.images?.[0] || currentRoomType.images?.[0] || FALLBACK_IMAGE}
                               alt={currentRoomType.name}
                               className="w-full h-48 md:h-full object-cover"
+                              onError={handleImageError}
                             />
                             <Button
                               variant="secondary"
@@ -618,6 +635,7 @@ export default function BookingPage() {
                               src={room.imageUrl} 
                               alt={room.roomTypeName}
                               className="w-12 h-12 object-cover rounded"
+                              onError={handleImageError}
                             />
                           )}
                           <div className="flex-grow">
@@ -675,37 +693,38 @@ export default function BookingPage() {
 
       {/* Image Gallery Modal */}
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
-        <DialogContent className="max-w-4xl max-h-[90vh] p-0">
-          <DialogHeader className="p-6 pb-0">
-            <DialogTitle className="text-2xl">
-              {roomType?.name || 'Chi tiết phòng'}
+        <DialogContent className="w-[95vw] max-w-2xl lg:max-w-4xl max-h-[95vh] p-0 overflow-y-auto">
+          <DialogHeader className="sticky top-0 p-6 pb-3 bg-white border-b">
+            <DialogTitle className="text-xl lg:text-2xl">
+              {currentRoomType?.name || 'Chi tiết phòng'}
             </DialogTitle>
           </DialogHeader>
           
-          {selectedRoom && roomType && (
-            <div className="space-y-4 p-6">
+          {selectedRoom && currentRoomType && (
+            <div className="space-y-4 p-4 lg:p-6">
               {/* Image Gallery */}
-              <div className="relative">
+              <div className="relative w-full">
                 <img
                   src={
                     (selectedRoom.images?.[currentImageIndex] || 
-                    roomType.images?.[currentImageIndex] || 
+                    currentRoomType.images?.[currentImageIndex] || 
                     selectedRoom.images?.[0] || 
-                    roomType.images?.[0] || 
-                    "https://images.unsplash.com/photo-1566665797739-1674de7a421a?w=1200&h=800&fit=crop")
+                    currentRoomType.images?.[0] || 
+                    FALLBACK_IMAGE)
                   }
-                  alt={`${roomType.name} - Ảnh ${currentImageIndex + 1}`}
-                  className="w-full h-96 object-cover rounded-lg"
+                  alt={`${currentRoomType.name} - Ảnh ${currentImageIndex + 1}`}
+                  className="w-full h-64 md:h-96 object-cover rounded-lg"
+                  onError={handleImageError}
                 />
                 
                 {/* Image Navigation */}
-                {((selectedRoom.images?.length || 0) > 1 || (roomType.images?.length || 0) > 1) && (
+                {((selectedRoom.images?.length || 0) > 1 || (currentRoomType.images?.length || 0) > 1) && (
                   <div className="absolute inset-0 flex items-center justify-between p-4">
                     <Button
                       variant="secondary"
                       size="icon"
                       onClick={() => setCurrentImageIndex(prev => 
-                        prev === 0 ? ((selectedRoom.images?.length || roomType.images?.length || 1) - 1) : prev - 1
+                        prev === 0 ? ((selectedRoom.images?.length || currentRoomType.images?.length || 1) - 1) : prev - 1
                       )}
                       className="bg-black/50 hover:bg-black/70 text-white"
                     >
@@ -715,7 +734,7 @@ export default function BookingPage() {
                       variant="secondary"
                       size="icon"
                       onClick={() => setCurrentImageIndex(prev => 
-                        prev === ((selectedRoom.images?.length || roomType.images?.length || 1) - 1) ? 0 : prev + 1
+                        prev === ((selectedRoom.images?.length || currentRoomType.images?.length || 1) - 1) ? 0 : prev + 1
                       )}
                       className="bg-black/50 hover:bg-black/70 text-white"
                     >
@@ -725,18 +744,18 @@ export default function BookingPage() {
                 )}
                 
                 <Badge className="absolute bottom-4 right-4 bg-black/70 text-white">
-                  {currentImageIndex + 1} / {selectedRoom.images?.length || roomType.images?.length || 1}
+                  {currentImageIndex + 1} / {selectedRoom.images?.length || currentRoomType.images?.length || 1}
                 </Badge>
               </div>
 
               {/* Thumbnail Gallery */}
-              {((selectedRoom.images?.length || 0) > 1 || (roomType.images?.length || 0) > 1) && (
-                <div className="flex gap-2 overflow-x-auto pb-2">
-                  {(selectedRoom.images || roomType.images || []).map((img: string, idx: number) => (
+              {((selectedRoom.images?.length || 0) > 1 || (currentRoomType.images?.length || 0) > 1) && (
+                <div className="flex gap-2 md:gap-3 overflow-x-auto pb-2 px-1">
+                  {(selectedRoom.images || currentRoomType.images || []).map((img: string, idx: number) => (
                     <button
                       key={idx}
                       onClick={() => setCurrentImageIndex(idx)}
-                      className={`flex-shrink-0 w-20 h-20 rounded-lg overflow-hidden border-2 transition-all ${
+                      className={`flex-shrink-0 w-16 h-16 md:w-20 md:h-20 rounded-lg overflow-hidden border-2 transition-all ${
                         currentImageIndex === idx ? 'border-amber-500 scale-105' : 'border-gray-300'
                       }`}
                     >
@@ -751,46 +770,46 @@ export default function BookingPage() {
               )}
               
               <div className="border-t pt-4">
-                <h4 className="font-semibold mb-3">Thông tin phòng</h4>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="flex items-center">
-                    <Maximize className="h-5 w-5 mr-2 text-amber-600" />
+                <h4 className="font-semibold mb-3 text-lg">Thông tin phòng</h4>
+                <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 lg:gap-4 text-sm lg:text-base">
+                  <div className="flex items-center gap-2">
+                    <Maximize className="h-4 lg:h-5 w-4 lg:w-5 text-amber-600 flex-shrink-0" />
                     <div>
-                      <p className="text-sm text-gray-500">Diện tích</p>
-                      <p className="font-semibold">{roomType.sizeM2}m²</p>
+                      <p className="text-xs lg:text-sm text-gray-500">Diện tích</p>
+                      <p className="font-semibold">{currentRoomType.sizeM2}m²</p>
                     </div>
                   </div>
-                  <div className="flex items-center">
-                    <Users className="h-5 w-5 mr-2 text-amber-600" />
+                  <div className="flex items-center gap-2">
+                    <Users className="h-4 lg:h-5 w-4 lg:w-5 text-amber-600 flex-shrink-0" />
                     <div>
-                      <p className="text-sm text-gray-500">Sức chứa</p>
-                      <p className="font-semibold">{roomType.maxOccupancy} người</p>
+                      <p className="text-xs lg:text-sm text-gray-500">Sức chứa</p>
+                      <p className="font-semibold">{currentRoomType.maxOccupancy} người</p>
                     </div>
                   </div>
-                  {roomType.bedType && (
-                    <div className="flex items-center">
-                      <Bed className="h-5 w-5 mr-2 text-amber-600" />
+                  {currentRoomType.bedType && (
+                    <div className="flex items-center gap-2">
+                      <Bed className="h-4 lg:h-5 w-4 lg:w-5 text-amber-600 flex-shrink-0" />
                       <div>
-                        <p className="text-sm text-gray-500">Giường</p>
-                        <p className="font-semibold">{roomType.bedType} x{roomType.numberOfBeds || 1}</p>
+                        <p className="text-xs lg:text-sm text-gray-500">Giường</p>
+                        <p className="font-semibold">{currentRoomType.bedType} x{currentRoomType.numberOfBeds || 1}</p>
                       </div>
                     </div>
                   )}
-                  <div className="flex items-center">
+                  <div className="flex items-center gap-2">
                     <div>
-                      <p className="text-sm text-gray-500">View</p>
+                      <p className="text-xs lg:text-sm text-gray-500">View</p>
                       <p className="font-semibold">{selectedRoom.viewType || 'City View'}</p>
                     </div>
                   </div>
                 </div>
               </div>
               
-              {roomType.amenities && roomType.amenities.length > 0 && (
+              {currentRoomType.amenities && currentRoomType.amenities.length > 0 && (
                 <div className="border-t pt-4">
-                  <h4 className="font-semibold mb-3">Tiện nghi</h4>
+                  <h4 className="font-semibold mb-3 text-lg">Tiện nghi</h4>
                   <div className="flex flex-wrap gap-2">
-                    {roomType.amenities.map((amenity) => (
-                      <Badge key={amenity.id} variant="outline" className="px-3 py-1">
+                    {currentRoomType.amenities.map((amenity) => (
+                      <Badge key={amenity.id} variant="outline" className="px-2 lg:px-3 py-1 text-xs lg:text-sm">
                         {amenity.name}
                       </Badge>
                     ))}
@@ -799,21 +818,21 @@ export default function BookingPage() {
               )}
               
               <div className="border-t pt-4">
-                <div className="flex items-center justify-between mb-4">
+                <div className="flex items-center justify-between mb-4 flex-col md:flex-row gap-3 md:gap-0">
                   <div>
-                    <p className="text-sm text-gray-500">Giá phòng</p>
-                    <p className="text-2xl font-bold text-amber-600">
-                      {formatCurrency(roomType.priceFrom)}
-                      <span className="text-sm text-gray-500 font-normal">/đêm</span>
+                    <p className="text-xs lg:text-sm text-gray-500">Giá phòng</p>
+                    <p className="text-xl md:text-2xl font-bold text-amber-600">
+                      {formatCurrency(currentRoomType.priceFrom)}
+                      <span className="text-xs lg:text-sm text-gray-500 font-normal">/đêm</span>
                     </p>
                   </div>
                   {getRoomStatusBadge(selectedRoom.status)}
                 </div>
                 
                 <Button 
-                  className="w-full bg-amber-600 hover:bg-amber-700"
+                  className="w-full bg-amber-600 hover:bg-amber-700 text-sm lg:text-base py-2 lg:py-3"
                   onClick={() => {
-                    handleAddRoom(selectedRoom);
+                    handleAddRoom(selectedRoom, currentRoomType);
                     setIsModalOpen(false);
                   }}
                   disabled={bookingRooms.some(br => br.roomId === selectedRoom.id)}

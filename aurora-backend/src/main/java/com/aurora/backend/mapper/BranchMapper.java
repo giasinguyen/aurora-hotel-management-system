@@ -60,7 +60,7 @@ public interface BranchMapper {
     default Integer getAvailableRooms(Branch branch) {
         if (branch.getRooms() == null) return 0;
         return (int) branch.getRooms().stream()
-            .filter(room -> Room.RoomStatus.AVAILABLE.equals(room.getStatus()))
+            .filter(room -> Room.RoomStatus.READY.equals(room.getStatus()))
             .count();
     }
 }

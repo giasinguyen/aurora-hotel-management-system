@@ -58,7 +58,7 @@ public class RoomServiceImpl implements RoomService {
         room.setRoomType(roomType);
         
         if (request.getStatus() == null || request.getStatus().trim().isEmpty()) {
-            room.setStatus(Room.RoomStatus.AVAILABLE);
+            room.setStatus(Room.RoomStatus.READY);
         }
         
         Room savedRoom = roomRepository.save(room);

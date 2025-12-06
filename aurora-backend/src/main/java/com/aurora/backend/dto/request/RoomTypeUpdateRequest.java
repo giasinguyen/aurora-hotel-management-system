@@ -14,6 +14,8 @@ import java.util.Set;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class RoomTypeUpdateRequest {
+    String categoryId; // Room category: Standard, Deluxe, Presidential Suite
+    
     String name;
     
     @Pattern(regexp = "^[A-Z]{3,5}$", message = "CODE_PATTERN_INVALID")

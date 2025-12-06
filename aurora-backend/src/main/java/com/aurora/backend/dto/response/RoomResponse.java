@@ -18,6 +18,8 @@ public class RoomResponse {
     String branchName;
     String roomTypeId;
     String roomTypeName;
+    String categoryId;
+    String categoryName;
     String roomNumber;
     Integer floor;
     String status;

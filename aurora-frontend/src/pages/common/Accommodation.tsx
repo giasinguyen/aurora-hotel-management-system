@@ -7,18 +7,15 @@ import { toast } from 'sonner';
 import { Loader2, ChevronRight } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { useAppSelector } from '@/hooks/useRedux';
 
 export default function AccommodationPage() {
   const navigate = useNavigate();
   const [categories, setCategories] = useState<RoomCategory[]>([]);
   const [loading, setLoading] = useState(true);
-  const currentBranch = useAppSelector((state) => state.branch.currentBranch);
   
-  // Get branchId from Redux (which syncs with localStorage)
-  const branchId = currentBranch?.apiId || 'branch-hcm-001';
+  // Get branchId from localStorage
+  const branchId = localStorage.getItem('branchId') || 'branch-hcm-001';
   
-  console.log('Current branch:', currentBranch);
   console.log('Branch ID:', branchId);
 
   useEffect(() => {

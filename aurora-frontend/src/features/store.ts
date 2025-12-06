@@ -12,7 +12,7 @@ import {
 import storage from "redux-persist/lib/storage";
 import languageReducer from "./slices/languageSlice";
 import authReducer from "./slices/auth/authSlice";
-import branchReducer from "./slices/branchSlice";
+import branchReducer from "./slices/branch/branchSlice";
 import ragReducer from "./slices/ragSlice";
 import shiftReducer from "./slices/shiftSlice";
 
@@ -27,7 +27,7 @@ const rootReducer = combineReducers({
 const persistConfig = {
   key: "root",
   storage,
-  whitelist: ["auth"], // Only persist auth state
+  whitelist: ["auth", "branch"], // Persist auth and branch state
 };
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

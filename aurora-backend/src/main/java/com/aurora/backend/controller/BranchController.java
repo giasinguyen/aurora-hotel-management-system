@@ -42,6 +42,19 @@ public class BranchController {
                 .build();
     }
 
+    // Public endpoint - No authentication required
+    @GetMapping("/public/active")
+    public ApiResponse<Page<BranchResponse>> getActiveBranches(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "100") int size) {
+        log.info("Fetching active branches (public) - page: {}, size: {}", page, size);
+        Pageable pageable = PageRequest.of(page, size, Sort.by("name").ascending());
+        return ApiResponse.<Page<BranchResponse>>builder()
+                .code(HttpStatus.OK.value())
+                .result(branchService.getBranchesByStatus(BranchStatus.ACTIVE, pageable))
+                .build();
+    }
+
     @GetMapping
     @RequirePermission(PermissionConstants.Manager.BRANCH_VIEW)
     public ApiResponse<Page<BranchResponse>> getAllBranches(

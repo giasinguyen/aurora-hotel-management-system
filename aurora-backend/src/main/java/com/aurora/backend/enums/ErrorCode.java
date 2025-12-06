@@ -119,6 +119,7 @@ public enum ErrorCode {
     CAPACITY_ADULTS_POSITIVE(2004, "Capacity adults must be positive", HttpStatus.BAD_REQUEST),
     CAPACITY_CHILDREN_POSITIVE(2005, "Capacity children must be positive", HttpStatus.BAD_REQUEST),
     SIZE_POSITIVE(2006, "Room size must be positive", HttpStatus.BAD_REQUEST),
+    CATEGORY_NOT_EXISTED(2007, "Room category not found", HttpStatus.NOT_FOUND),
     
     // Room errors  
     ROOM_NOT_FOUND(2100, "Room not found", HttpStatus.NOT_FOUND),

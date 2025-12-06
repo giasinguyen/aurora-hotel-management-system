@@ -13,33 +13,12 @@ export interface RoomStatusConfig {
 }
 
 export const ROOM_STATUS_CONFIG: Record<RoomStatus, RoomStatusConfig> = {
-  AVAILABLE: {
-    label: 'Trống',
+  READY: {
+    label: 'Sẵn sàng',
     variant: 'default',
     className: 'bg-emerald-100 text-emerald-700 border-emerald-200 hover:bg-emerald-100',
     iconName: 'CheckCircle2',
-    description: 'Phòng có thể đặt ngay',
-  },
-  OCCUPIED: {
-    label: 'Có khách',
-    variant: 'default',
-    className: 'bg-blue-100 text-blue-700 border-blue-200 hover:bg-blue-100',
-    iconName: 'UserCheck',
-    description: 'Phòng đang có khách ở',
-  },
-  RESERVED: {
-    label: 'Đã đặt',
-    variant: 'default',
-    className: 'bg-amber-100 text-amber-700 border-amber-200 hover:bg-amber-100',
-    iconName: 'Clock',
-    description: 'Phòng đã được đặt trước',
-  },
-  MAINTENANCE: {
-    label: 'Bảo trì',
-    variant: 'secondary',
-    className: 'bg-gray-100 text-gray-700 border-gray-200 hover:bg-gray-100',
-    iconName: 'Wrench',
-    description: 'Phòng đang bảo trì',
+    description: 'Phòng sẵn sàng sử dụng',
   },
   CLEANING: {
     label: 'Đang dọn',
@@ -48,12 +27,19 @@ export const ROOM_STATUS_CONFIG: Record<RoomStatus, RoomStatusConfig> = {
     iconName: 'Sparkles',
     description: 'Phòng đang được dọn dẹp',
   },
-  OUT_OF_ORDER: {
-    label: 'Tạm ngưng',
+  MAINTENANCE: {
+    label: 'Bảo trì',
+    variant: 'secondary',
+    className: 'bg-gray-100 text-gray-700 border-gray-200 hover:bg-gray-100',
+    iconName: 'Wrench',
+    description: 'Phòng đang bảo trì',
+  },
+  LOCKED: {
+    label: 'Khoá phòng',
     variant: 'destructive',
     className: 'bg-rose-100 text-rose-700 border-rose-200 hover:bg-rose-100',
     iconName: 'XCircle',
-    description: 'Phòng tạm ngưng hoạt động',
+    description: 'Phòng bị khoá',
   },
 };
 
@@ -72,7 +58,7 @@ export const FLOOR_OPTIONS = Array.from({ length: 50 }, (_, i) => ({
 export const DEFAULT_ROOM_VALUES = {
   roomNumber: '',
   floor: 1,
-  status: 'AVAILABLE' as RoomStatus,
+  status: 'READY' as RoomStatus,
   capacityAdults: 2,
   capacityChildren: 0,
   sizeM2: 25,
