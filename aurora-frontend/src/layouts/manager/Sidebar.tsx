@@ -11,6 +11,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Hotel,
+  Home,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -128,7 +129,7 @@ export default function Sidebar({ className }: SidebarProps) {
       </Button>
 
       {/* Menu Items */}
-      <ScrollArea className="h-[calc(100vh-4rem)] px-3 py-4">
+      <ScrollArea className="h-[calc(100vh-4rem-3.5rem)] px-3 py-4">
         <div className="space-y-1">
           {menuItems.map((item) => {
             const isActive = location.pathname === item.href;
@@ -233,6 +234,32 @@ export default function Sidebar({ className }: SidebarProps) {
           </div>
         )}
       </ScrollArea>
+
+      {/* Home Button - Fixed at bottom */}
+      <div className="absolute bottom-0 left-0 right-0 border-t px-3 py-3" style={{ backgroundColor: `${APP_COLOR.MANAGER}10` }}>
+        <Link
+          to="/"
+          className={cn(
+            'flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-all',
+            collapsed && 'justify-center px-2'
+          )}
+          style={{
+            backgroundColor: 'transparent',
+            color: '#374151',
+          }}
+          onMouseEnter={(e) => {
+            e.currentTarget.style.backgroundColor = `${APP_COLOR.MANAGER}20`;
+            e.currentTarget.style.color = APP_COLOR.MANAGER;
+          }}
+          onMouseLeave={(e) => {
+            e.currentTarget.style.backgroundColor = 'transparent';
+            e.currentTarget.style.color = '#374151';
+          }}
+        >
+          <Home className="h-5 w-5 flex-shrink-0" />
+          {!collapsed && <span className="flex-1">Back to Home</span>}
+        </Link>
+      </div>
     </div>
   );
 }

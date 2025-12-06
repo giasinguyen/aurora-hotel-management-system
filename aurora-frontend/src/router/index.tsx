@@ -85,6 +85,8 @@ import RoleDetailPage from "@/pages/role/RoleDetail";
 
 // Rooms
 import RoomListPage from "@/pages/rooms/RoomList";
+import RoomCategoryListPage from "@/pages/rooms/RoomCategoryList";
+import RoomCategoryUpsertPage from "@/pages/rooms/RoomCategoryUpsert";
 import RoomTypeListPage from "@/pages/rooms/RoomTypeList";
 import RoomTypeUpsertPage from "@/pages/rooms/RoomTypeUpsert";
 import RoomUpsertPage from "@/pages/rooms/RoomUpsert";
@@ -195,6 +197,8 @@ const router = createBrowserRouter([
       { path: "rooms/upsert", element: <RoomUpsertPage /> },
       { path: "room-types", element: <RoomTypeListPage /> },
       { path: "room-types/upsert", element: <RoomTypeUpsertPage /> },
+      { path: "room-categories", element: <RoomCategoryListPage /> },
+      { path: "room-categories/upsert", element: <RoomCategoryUpsertPage /> },
       { path: "services", element: <ServiceListPage /> },
       { path: "services/upsert", element: <ServiceUpsertPage /> },
       { path: "promotions", element: <PromotionListPage /> },

@@ -211,6 +211,32 @@ export const roomCategoryApi = {
     );
     return response.data;
   },
+
+  // Create category
+  create: async (data: Omit<RoomCategory, 'id' | 'createdAt' | 'updatedAt'>) => {
+    const response = await axiosClient.post<ApiResponse<RoomCategory>>(
+      ROOM_CATEGORY_BASE_URL,
+      data
+    );
+    return response.data;
+  },
+
+  // Update category
+  update: async (id: string, data: Omit<RoomCategory, 'id' | 'createdAt' | 'updatedAt'>) => {
+    const response = await axiosClient.put<ApiResponse<RoomCategory>>(
+      `${ROOM_CATEGORY_BASE_URL}/${id}`,
+      data
+    );
+    return response.data;
+  },
+
+  // Delete category
+  delete: async (id: string) => {
+    const response = await axiosClient.delete<ApiResponse<void>>(
+      `${ROOM_CATEGORY_BASE_URL}/${id}`
+    );
+    return response.data;
+  },
 };
 
 export default { roomApi, roomTypeApi, roomCategoryApi };

@@ -164,7 +164,7 @@ export default function RoomTypeList() {
         <div className="flex items-center gap-1.5">
           <DollarSign className="h-4 w-4 text-green-600" />
           <span className="font-medium text-green-700">
-            {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(roomType.basePrice)}
+            {new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(roomType.priceFrom)}
           </span>
         </div>
       ),
