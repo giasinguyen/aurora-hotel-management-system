@@ -104,4 +104,20 @@ public interface StaffShiftAssignmentRepository extends JpaRepository<StaffShift
             "ORDER BY ssa.shiftDate, ssa.workShift.startTime")
     List<StaffShiftAssignment> findByShiftDateBetween(@Param("startDate") LocalDate startDate,
                                                       @Param("endDate") LocalDate endDate);
+
+    /**
+     * Find all shift assignments in date range with optional filters
+     * Used for dashboard shift reports
+     */
+    @Query("SELECT ssa FROM StaffShiftAssignment ssa " +
+            "JOIN FETCH ssa.staff " +
+            "JOIN FETCH ssa.workShift " +
+            "WHERE ssa.shiftDate BETWEEN :startDate AND :endDate " +
+            "AND (:branchId IS NULL OR ssa.branch.id = :branchId) " +
+            "AND (:staffId IS NULL OR ssa.staff.id = :staffId) " +
+            "ORDER BY ssa.shiftDate DESC, ssa.workShift.startTime")
+    List<StaffShiftAssignment> findAllInRange(@Param("startDate") LocalDate startDate,
+                                              @Param("endDate") LocalDate endDate,
+                                              @Param("branchId") String branchId,
+                                              @Param("staffId") String staffId);
 }

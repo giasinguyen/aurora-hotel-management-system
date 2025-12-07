@@ -63,7 +63,7 @@ public class StaffShiftAssignment extends BaseEntity {
     public boolean isActiveNow() {
         LocalDate today = LocalDate.now();
         return shiftDate.equals(today) 
-            && status == ShiftAssignmentStatus.SCHEDULED 
+            && (status == ShiftAssignmentStatus.SCHEDULED || status == ShiftAssignmentStatus.IN_PROGRESS)
             && workShift.getActive()
             && workShift.isWithinShiftTime(java.time.LocalTime.now());
     }

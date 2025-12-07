@@ -69,7 +69,13 @@ public class ShiftCheckInServiceImpl implements ShiftCheckInService {
             .findByAssignmentAndCheckOutTimeIsNull(assignment);
         
         if (existingCheckIn.isPresent()) {
-            throw new AppException(ErrorCode.ALREADY_CHECKED_IN);
+            // Auto check-out previous check-in to allow new check-in
+            ShiftCheckIn oldCheckIn = existingCheckIn.get();
+            log.warn("Found existing check-in for assignment {}. Auto checking out old check-in.", assignment.getId());
+            oldCheckIn.setCheckOutTime(LocalDateTime.now());
+            oldCheckIn.setNotes((oldCheckIn.getNotes() != null ? oldCheckIn.getNotes() + " | " : "") 
+                + "Auto checked out due to new check-in");
+            checkInRepository.save(oldCheckIn);
         }
         
         // Validate time is within reasonable range (not too early, can be late)
@@ -214,7 +220,11 @@ public class ShiftCheckInServiceImpl implements ShiftCheckInService {
     @Transactional(readOnly = true)
     public boolean isStaffCheckedIn(String staffId) {
         User staff = userRepository.findById(staffId)
-            .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+            .orElse(null);
+        
+        if (staff == null) {
+            return false;
+        }
         
         return checkInRepository.findCurrentCheckIn(staff, LocalDate.now()).isPresent();
     }
@@ -223,7 +233,11 @@ public class ShiftCheckInServiceImpl implements ShiftCheckInService {
     @Transactional(readOnly = true)
     public ShiftCheckInResponse getCurrentCheckIn(String staffId) {
         User staff = userRepository.findById(staffId)
-            .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+            .orElse(null);
+        
+        if (staff == null) {
+            return null;
+        }
         
         return checkInRepository.findCurrentCheckIn(staff, LocalDate.now())
             .map(shiftCheckInMapper::toResponse)

@@ -13,7 +13,9 @@ import {
 } from '@/components/ui/dialog';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Clock, User, MapPin, AlertCircle } from 'lucide-react';
+import { Clock, User, MapPin, AlertCircle, Trash2 } from 'lucide-react';
+import { staffShiftApi } from '@/services/shiftApi';
+import { toast } from 'sonner';
 
 interface ShiftCalendarEvent {
   id: string;
@@ -29,10 +31,30 @@ interface ShiftCalendarViewProps {
   onRefresh: () => void;
 }
 
-export function ShiftCalendarView({ assignments }: ShiftCalendarViewProps) {
+export function ShiftCalendarView({ assignments, onRefresh }: ShiftCalendarViewProps) {
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [events, setEvents] = useState<ShiftCalendarEvent[]>([]);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+
+  const handleCancelAssignment = async (assignmentId: string, staffName: string) => {
+    if (!confirm(`Bạn có chắc chắn muốn huỷ ca làm việc của ${staffName}?`)) {
+      return;
+    }
+
+    try {
+      setDeletingId(assignmentId);
+      await staffShiftApi.cancelAssignment(assignmentId, 'Huỷ bởi quản lý');
+      toast.success('Đã huỷ ca làm việc thành công');
+      onRefresh();
+      setSelectedDate(null);
+    } catch (error: any) {
+      console.error('Failed to cancel assignment:', error);
+      toast.error(error?.response?.data?.message || 'Không thể huỷ ca làm việc');
+    } finally {
+      setDeletingId(null);
+    }
+  };
 
   // Convert assignments to calendar events
   useEffect(() => {
@@ -234,13 +256,26 @@ export function ShiftCalendarView({ assignments }: ShiftCalendarViewProps) {
                         style={{ borderLeftWidth: '4px', borderLeftColor: event.color }}
                       >
                         <div className="flex items-start justify-between mb-3">
-                          <div>
+                          <div className="flex-1">
                             <h3 className="font-semibold text-lg">{event.title}</h3>
                             <p className="text-sm text-gray-500">
                               {event.assignment.workShift.description || 'Không có mô tả'}
                             </p>
                           </div>
-                          <Badge variant={statusConfig.variant}>{statusConfig.label}</Badge>
+                          <div className="flex items-center gap-2">
+                            <Badge variant={statusConfig.variant}>{statusConfig.label}</Badge>
+                            {event.assignment.status === 'SCHEDULED' && (
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => handleCancelAssignment(event.assignment.id, event.assignment.staffName)}
+                                disabled={deletingId === event.assignment.id}
+                                className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            )}
+                          </div>
                         </div>
 
                         <div className="grid grid-cols-2 gap-4 text-sm">

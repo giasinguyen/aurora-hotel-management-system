@@ -142,18 +142,28 @@ export default function ShiftManagement() {
 
   const loadUsers = async () => {
     try {
+      // Lấy tất cả users, sau đó filter chỉ lấy STAFF role
       const response = await getUsers();
       if (response.result) {
-        // Chỉ lấy nhân viên (không phải admin)
+        // Debug: Log all users and their roles
+        console.log('All users with roles:');
+        response.result.forEach((u: User) => {
+          console.log(`- ${u.username}:`, u.roles?.map(r => r.name).join(', ') || 'No roles');
+        });
+        
+        // Chỉ lấy nhân viên có role STAFF, loại bỏ các role khác (MANAGER, ADMIN, CUSTOMER)
         const staffUsers = response.result.filter((user: User) => 
-          user.roles && user.roles.length > 0 && 
-          !user.roles.some(role => role.name === 'ROLE_ADMIN') && 
+          user.roles && 
+          user.roles.length > 0 && 
+          user.roles.some(role => role.name === 'ROLE_STAFF' || role.name === 'STAFF') &&
           user.active
         );
         setUsers(staffUsers);
+        console.log('Loaded STAFF users:', staffUsers.length, 'from total:', response.result.length);
       }
     } catch (error) {
       console.error('Không thể tải danh sách nhân viên:', error);
+      toast.error('Không thể tải danh sách nhân viên');
     }
   };
 
@@ -665,7 +675,10 @@ export default function ShiftManagement() {
                 </TabsContent>
                 
                 <TabsContent value="list" className="mt-0">
-                  <AssignmentListView assignments={assignments} />
+                  <AssignmentListView 
+                    assignments={assignments}
+                    onRefresh={loadAssignments}
+                  />
                 </TabsContent>
               </Tabs>
             </CardContent>

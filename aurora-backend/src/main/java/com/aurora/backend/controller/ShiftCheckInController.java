@@ -83,7 +83,7 @@ public class ShiftCheckInController {
     }
     
     @GetMapping("/staff/{staffId}")
-    @PreAuthorize("hasAnyAuthority('SHIFT_VIEW', 'ADMIN', 'MANAGER') or #staffId == authentication.principal.id")
+    @PreAuthorize("hasAnyAuthority('SHIFT_VIEW', 'SHIFT_VIEW_OWN', 'ADMIN', 'MANAGER') or (#staffId == authentication.principal.claims['userId'])")
     public ResponseEntity<ApiResponse<List<ShiftCheckInResponse>>> getStaffCheckIns(
             @PathVariable String staffId,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
@@ -119,7 +119,7 @@ public class ShiftCheckInController {
     }
     
     @GetMapping("/staff/{staffId}/is-checked-in")
-    @PreAuthorize("hasAnyAuthority('SHIFT_VIEW_OWN', 'SHIFT_VIEW', 'ADMIN', 'MANAGER') or #staffId == authentication.principal.id")
+    @PreAuthorize("hasAnyAuthority('SHIFT_VIEW', 'SHIFT_VIEW_OWN', 'ADMIN', 'MANAGER') or (#staffId == authentication.principal.claims['userId'])")
     public ResponseEntity<ApiResponse<Boolean>> isStaffCheckedIn(@PathVariable String staffId) {
         boolean isCheckedIn = shiftCheckInService.isStaffCheckedIn(staffId);
         return ResponseEntity.ok(
@@ -131,7 +131,7 @@ public class ShiftCheckInController {
     }
     
     @GetMapping("/staff/{staffId}/current")
-    @PreAuthorize("hasAnyAuthority('SHIFT_VIEW_OWN', 'SHIFT_VIEW', 'ADMIN', 'MANAGER') or #staffId == authentication.principal.id")
+    @PreAuthorize("hasAnyAuthority('SHIFT_VIEW', 'SHIFT_VIEW_OWN', 'ADMIN', 'MANAGER') or (#staffId == authentication.principal.claims['userId'])")
     public ResponseEntity<ApiResponse<ShiftCheckInResponse>> getCurrentCheckIn(
             @PathVariable String staffId) {
         
@@ -145,7 +145,7 @@ public class ShiftCheckInController {
     }
     
     @GetMapping("/staff/{staffId}/total-hours")
-    @PreAuthorize("hasAnyAuthority('SHIFT_VIEW', 'ADMIN', 'MANAGER') or #staffId == authentication.principal.id")
+    @PreAuthorize("hasAnyAuthority('SHIFT_VIEW', 'SHIFT_VIEW_OWN', 'ADMIN', 'MANAGER') or (#staffId == authentication.principal.claims['userId'])")
     public ResponseEntity<ApiResponse<Double>> getTotalWorkingHours(
             @PathVariable String staffId,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,

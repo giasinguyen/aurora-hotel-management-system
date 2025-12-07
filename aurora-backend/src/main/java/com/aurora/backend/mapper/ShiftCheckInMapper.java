@@ -16,5 +16,6 @@ public interface ShiftCheckInMapper {
     @Mapping(target = "shiftDate", source = "assignment.shiftDate")
     @Mapping(target = "shiftStartTime", source = "assignment.workShift.startTime")
     @Mapping(target = "shiftEndTime", source = "assignment.workShift.endTime")
+    @Mapping(target = "isCurrentlyCheckedIn", expression = "java(checkIn.isCurrentlyCheckedIn())")
     ShiftCheckInResponse toResponse(ShiftCheckIn checkIn);
 }

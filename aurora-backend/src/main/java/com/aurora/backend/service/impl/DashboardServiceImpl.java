@@ -11,6 +11,8 @@
     import com.aurora.backend.entity.Booking;
     import com.aurora.backend.entity.Branch;
     import com.aurora.backend.entity.Payment;
+    import com.aurora.backend.entity.StaffShiftAssignment;
+    import com.aurora.backend.entity.ShiftCheckIn;
     import com.aurora.backend.enums.DashboardGroupBy;
     import com.aurora.backend.enums.ErrorCode;
     import com.aurora.backend.exception.AppException;
@@ -20,6 +22,8 @@
     import com.aurora.backend.repository.PaymentRepository;
     import com.aurora.backend.repository.RoomRepository;
     import com.aurora.backend.repository.UserRepository;
+    import com.aurora.backend.repository.StaffShiftAssignmentRepository;
+    import com.aurora.backend.repository.ShiftCheckInRepository;
     import com.aurora.backend.repository.projection.PaymentMethodRevenueProjection;
     import com.aurora.backend.repository.projection.TopRoomTypeProjection;
     import com.aurora.backend.service.DashboardService;
@@ -60,6 +64,8 @@
         private final BookingRoomRepository bookingRoomRepository;
         private final UserRepository userRepository;
         private final BranchRepository branchRepository;
+        private final StaffShiftAssignmentRepository shiftAssignmentRepository;
+        private final ShiftCheckInRepository shiftCheckInRepository;
 
         @Override
         public DashboardOverviewResponse getAdminOverview(LocalDate dateFrom, LocalDate dateTo) {
@@ -276,72 +282,74 @@
             DateRange range = normalizeRange(dateFrom, dateTo);
             String normalizedBranchId = normalizeBranchId(branchId);
             
-            List<Booking> bookings = bookingRepository.findAllWithinDateRange(range.start(), range.end(), normalizedBranchId);
+            // Get all shift assignments in date range
+            List<StaffShiftAssignment> assignments = shiftAssignmentRepository.findAllInRange(
+                    range.start(), range.end(), normalizedBranchId, staffId);
             
-            // Group bookings by date
-            Map<LocalDate, List<Booking>> bookingsByDate = bookings.stream()
-                    .filter(b -> b.getCheckin() != null)
-                    .collect(Collectors.groupingBy(Booking::getCheckin));
+            // Get all check-ins for these assignments
+            List<String> assignmentIds = assignments.stream()
+                    .map(StaffShiftAssignment::getId)
+                    .collect(Collectors.toList());
             
-            List<ShiftReportResponse> shifts = new ArrayList<>();
-            String[] shiftTypes = {"MORNING", "AFTERNOON", "NIGHT"};
-            String[][] shiftTimes = {{"06:00", "14:00"}, {"14:00", "22:00"}, {"22:00", "06:00"}};
-            
-            LocalDate currentDate = range.start();
-            while (!currentDate.isAfter(range.end())) {
-                List<Booking> dayBookings = bookingsByDate.getOrDefault(currentDate, List.of());
-                
-                for (int i = 0; i < shiftTypes.length; i++) {
-                    // Calculate metrics based on actual booking data
-                    int shiftBookings = dayBookings.size() / 3; // Distribute across shifts
-                    if (i == 0) {
-                        shiftBookings += dayBookings.size() % 3; // Give remainder to morning shift
-                    }
-                    
-                    BigDecimal shiftRevenue = BigDecimal.ZERO;
-                    if (!dayBookings.isEmpty()) {
-                        BigDecimal dailyRevenue = dayBookings.stream()
-                                .map(b -> b.getTotalPrice() != null ? b.getTotalPrice() : BigDecimal.ZERO)
-                                .reduce(BigDecimal.ZERO, BigDecimal::add);
-                        shiftRevenue = dailyRevenue.divide(BigDecimal.valueOf(3), 2, RoundingMode.HALF_UP);
-                    }
-                    
-                    // Count check-ins and check-outs based on actual data
-                    final LocalDate checkDate = currentDate;
-                    long checkIns = dayBookings.stream()
-                            .filter(b -> b.getActualCheckinTime() != null 
-                                    && b.getActualCheckinTime().toLocalDate().equals(checkDate))
-                            .count() / 3;
-                    long checkOuts = dayBookings.stream()
-                            .filter(b -> b.getActualCheckoutTime() != null 
-                                    && b.getActualCheckoutTime().toLocalDate().equals(checkDate))
-                            .count() / 3;
-                    
-                    shifts.add(ShiftReportResponse.builder()
-                            .shiftId(UUID.randomUUID().toString())
-                            .staffId("staff-" + (i + 1))
-                            .staffName(getShiftStaffName(i))
-                            .shiftDate(currentDate)
-                            .shiftType(shiftTypes[i])
-                            .startTime(shiftTimes[i][0])
-                            .endTime(shiftTimes[i][1])
-                            .checkIns(Math.max(checkIns, shiftBookings / 2))
-                            .checkOuts(Math.max(checkOuts, shiftBookings / 3))
-                            .bookingsCreated(shiftBookings)
-                            .revenue(shiftRevenue)
-                            .build());
-                }
-                currentDate = currentDate.plusDays(1);
+            Map<String, ShiftCheckIn> checkInMap = new java.util.HashMap<>();
+            if (!assignmentIds.isEmpty()) {
+                List<ShiftCheckIn> checkIns = shiftCheckInRepository.findByAssignmentIdIn(assignmentIds);
+                checkInMap = checkIns.stream()
+                        .collect(Collectors.toMap(
+                                ci -> ci.getAssignment().getId(),
+                                ci -> ci,
+                                (existing, replacement) -> existing
+                        ));
             }
             
-            // Filter by staffId if provided
-            if (staffId != null && !staffId.isBlank()) {
-                shifts = shifts.stream()
-                        .filter(s -> s.getStaffId().equals(staffId))
-                        .collect(Collectors.toList());
+            // Build report responses
+            List<ShiftReportResponse> shifts = new ArrayList<>();
+            for (StaffShiftAssignment assignment : assignments) {
+                ShiftCheckIn checkIn = checkInMap.get(assignment.getId());
+                
+                // Determine shift type based on start time
+                String shiftType = determineShiftType(assignment.getWorkShift().getStartTime().toString());
+                
+                // Count check-ins/check-outs (1 if checked in/out, 0 otherwise)
+                long checkIns = (checkIn != null && checkIn.getCheckInTime() != null) ? 1 : 0;
+                long checkOuts = (checkIn != null && checkIn.getCheckOutTime() != null) ? 1 : 0;
+                
+                // For now, we don't have direct booking-to-shift tracking
+                // So we'll report 0 for bookingsCreated and revenue
+                // This can be enhanced later by tracking which staff created which bookings
+                long bookingsCreated = 0;
+                BigDecimal revenue = BigDecimal.ZERO;
+                
+                shifts.add(ShiftReportResponse.builder()
+                        .shiftId(assignment.getId())
+                        .staffId(assignment.getStaff().getId())
+                        .staffName(assignment.getStaff().getFirstName() + " " + assignment.getStaff().getLastName())
+                        .shiftDate(assignment.getShiftDate())
+                        .shiftType(shiftType)
+                        .startTime(assignment.getWorkShift().getStartTime().toString())
+                        .endTime(assignment.getWorkShift().getEndTime().toString())
+                        .checkIns(checkIns)
+                        .checkOuts(checkOuts)
+                        .bookingsCreated(bookingsCreated)
+                        .revenue(revenue)
+                        .build());
             }
             
             return shifts;
+        }
+        
+        private String determineShiftType(String startTime) {
+            if (startTime == null) return "MORNING";
+            
+            int hour = Integer.parseInt(startTime.split(":")[0]);
+            
+            if (hour >= 6 && hour < 14) {
+                return "MORNING";
+            } else if (hour >= 14 && hour < 22) {
+                return "AFTERNOON";
+            } else {
+                return "NIGHT";
+            }
         }
 
         @Override
@@ -363,11 +371,6 @@
                     .totalRevenue(totalRevenue)
                     .averageShiftRevenue(averageRevenue)
                     .build();
-        }
-
-        private String getShiftStaffName(int shiftIndex) {
-            String[] names = {"Nguyễn Văn A", "Trần Thị B", "Lê Văn C"};
-            return names[shiftIndex % names.length];
         }
 
         private DashboardOverviewResponse buildOverview(DateRange range, String branchId) {

@@ -102,4 +102,12 @@ public interface ShiftCheckInRepository extends JpaRepository<ShiftCheckIn, Stri
     List<ShiftCheckIn> findLateCheckIns(@Param("startDate") LocalDate startDate,
                                         @Param("endDate") LocalDate endDate,
                                         @Param("branch") Branch branch);
+
+    /**
+     * Find all check-ins by assignment IDs
+     * Used for dashboard shift reports
+     */
+    @Query("SELECT sci FROM ShiftCheckIn sci " +
+            "WHERE sci.assignment.id IN :assignmentIds")
+    List<ShiftCheckIn> findByAssignmentIdIn(@Param("assignmentIds") List<String> assignmentIds);
 }

@@ -196,6 +196,10 @@ export const fetchCurrentCheckIn = createAsyncThunk(
       const response = await shiftCheckInApi.getCurrentCheckIn(staffId);
       return response.data.result;
     } catch (error: any) {
+      // If 400 error, likely no active check-in, return null instead of rejecting
+      if (error.response?.status === 400) {
+        return null;
+      }
       return rejectWithValue(error.response?.data?.message || 'Failed to fetch check-in');
     }
   }
@@ -208,6 +212,10 @@ export const checkIsCheckedIn = createAsyncThunk(
       const response = await shiftCheckInApi.isStaffCheckedIn(staffId);
       return response.data.result;
     } catch (error: any) {
+      // If 400 error, likely no active shift, return false instead of rejecting
+      if (error.response?.status === 400) {
+        return false;
+      }
       return rejectWithValue(error.response?.data?.message || 'Failed to check status');
     }
   }

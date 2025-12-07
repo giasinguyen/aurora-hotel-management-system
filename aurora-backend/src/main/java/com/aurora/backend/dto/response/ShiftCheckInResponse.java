@@ -34,4 +34,7 @@ public class ShiftCheckInResponse {
     String shiftEndTime;
     
     String createdAt;
+    
+    // Check if currently checked in (checkOutTime is null)
+    Boolean isCurrentlyCheckedIn;
 }
