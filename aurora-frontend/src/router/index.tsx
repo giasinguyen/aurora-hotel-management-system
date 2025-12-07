@@ -33,6 +33,7 @@ import AboutPage from "@/pages/landing/About";
 import AccommodationPage from "@/pages/landing/Accommodation";
 import AccommodationCategoryPage from "@/pages/landing/AccommodationCategory";
 import BookingPage from "@/pages/landing/Booking";
+import CheckoutPage from "@/pages/landing/checkout";
 // Common - Customer Area
 import ProfilePage from "@/pages/common/customer/account/Profile";
 import ProfileUpsertPage from "@/pages/common/customer/account/ProfileUpsert";
@@ -108,6 +109,7 @@ const router = createBrowserRouter([
       { path: "accommodation", element: <AccommodationPage /> }, // temp complete
       { path: "accommodation/:categoryId", element: <AccommodationCategoryPage /> }, // temp complete
       { path: "booking", element: <BookingPage /> }, // temp complete
+      { path: "checkout", element: <CheckoutPage /> }, // temp complete
       { path: "service", element: <ServicePage /> }, // temp complete
       { path: "branches", element: <GuestBranchListPage /> }, //TODO: Giới thiệu chi nhánh => update later
       { path: "gallery", element: <GalleryPage /> }, //TODO: Giới thiệu album => update later
