@@ -171,7 +171,7 @@ export default function ServiceList() {
       cell: (service) => {
         const imageUrl = service.images && service.images.length > 0 ? service.images[0] : null;
         return (
-          <div className="w-16 h-16 rounded-lg overflow-hidden border border-gray-200 bg-gray-100">
+          <div className="w-32 h-32 rounded-lg overflow-hidden border border-gray-200 bg-gray-100">
             <img
               src={imageUrl || fallbackImage}
               alt={service.name}
@@ -183,7 +183,7 @@ export default function ServiceList() {
           </div>
         );
       },
-      className: 'w-[80px]',
+      className: 'w-[140px]',
     },
     {
       key: 'name',

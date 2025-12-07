@@ -14,7 +14,10 @@ import {
   CheckCircle2,
   XCircle,
   DollarSign,
-  Image as ImageIcon
+  Image as ImageIcon,
+  Bed,
+  Ban,
+  FileText
 } from 'lucide-react';
 import fallbackImage from '@/assets/images/commons/fallback.png';
 
@@ -55,7 +58,7 @@ interface InfoItemProps {
 function InfoItem({ icon, label, value }: InfoItemProps) {
   return (
     <div className="flex items-start gap-3">
-      <div className="p-2 rounded-lg bg-slate-100 text-slate-600 shrink-0">
+      <div className="p-2 rounded-lg bg-primary/10 text-primary shrink-0">
         {icon}
       </div>
       <div className="min-w-0 flex-1">
@@ -75,8 +78,8 @@ export default function RoomTypeDetailCard({ roomType }: RoomTypeDetailCardProps
     <div className="space-y-6">
       {/* Header Card */}
       <Card className="border-0 shadow-lg overflow-hidden">
-        <div className="bg-gradient-to-r from-emerald-600 via-emerald-700 to-teal-700 p-6 text-white">
-          <div className="flex items-center justify-between">
+        <div className="bg-gradient-to-r from-primary via-primary/90 to-primary/80 p-6 text-white">
+          <div className="flex items-center justify-between flex-wrap gap-4">
             <div className="flex items-center gap-4">
               {roomType.imageUrl ? (
                 <img
@@ -94,27 +97,48 @@ export default function RoomTypeDetailCard({ roomType }: RoomTypeDetailCardProps
                 <h2 className="text-3xl font-bold tracking-tight">
                   {roomType.name}
                 </h2>
-                <div className="flex items-center gap-2 mt-1">
+                <div className="flex items-center gap-2 mt-1 flex-wrap">
                   <Badge variant="secondary" className="bg-white/20 text-white border-0 font-mono">
                     {roomType.code}
                   </Badge>
-                  <span className="text-emerald-100">•</span>
-                  <span className="text-emerald-100">{roomType.branchName}</span>
+                  <span className="text-white/80">•</span>
+                  <span className="text-white/80">{roomType.branchName}</span>
                 </div>
               </div>
             </div>
             <div className="text-right">
               <div className="text-2xl font-bold">{formatCurrency(roomType.priceFrom)}</div>
-              <div className="text-emerald-100 text-sm">/đêm (giá cơ bản)</div>
-              {roomType.weekendPrice && roomType.weekendPrice > 0 && (
-                <div className="text-sm text-emerald-200 mt-1">
-                  Cuối tuần: {formatCurrency(roomType.weekendPrice)}
-                </div>
-              )}
+              <div className="text-white/80 text-sm">/đêm (giá cơ bản)</div>
             </div>
           </div>
         </div>
       </Card>
+
+      {/* Room Type Image */}
+      {roomType.imageUrl && (
+        <Card className="border-0 shadow-lg bg-gradient-to-br from-white to-slate-50 p-4">
+          <CardHeader className="pb-4">
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-xl bg-primary/10 text-primary">
+                <ImageIcon className="h-5 w-5" />
+              </div>
+              <div>
+                <CardTitle className="text-lg">Ảnh đại diện</CardTitle>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="w-full aspect-video rounded-lg overflow-hidden border">
+              <img
+                src={roomType.imageUrl}
+                alt={roomType.name}
+                className="w-full h-full object-cover"
+                onError={(e) => { e.currentTarget.src = fallbackImage; }}
+              />
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Information Cards */}
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -122,7 +146,7 @@ export default function RoomTypeDetailCard({ roomType }: RoomTypeDetailCardProps
         <Card className="border-0 shadow-lg bg-gradient-to-br from-white to-slate-50">
           <CardHeader className="pb-4">
             <CardTitle className="text-lg flex items-center gap-2">
-              <div className="p-2 rounded-lg bg-green-100 text-green-600">
+              <div className="p-2 rounded-lg bg-primary/10 text-primary">
                 <DollarSign className="h-4 w-4" />
               </div>
               Thông tin giá
@@ -133,23 +157,9 @@ export default function RoomTypeDetailCard({ roomType }: RoomTypeDetailCardProps
               icon={<DollarSign className="h-4 w-4" />}
               label="Giá cơ bản"
               value={
-                <span className="text-lg font-semibold text-green-600">
+                <span className="text-lg font-semibold text-primary">
                   {formatCurrency(roomType.priceFrom)}
                 </span>
-              }
-            />
-            <Separator />
-            <InfoItem
-              icon={<DollarSign className="h-4 w-4" />}
-              label="Giá cuối tuần"
-              value={
-                roomType.weekendPrice && roomType.weekendPrice > 0 ? (
-                  <span className="text-lg font-semibold text-amber-600">
-                    {formatCurrency(roomType.weekendPrice)}
-                  </span>
-                ) : (
-                  <span className="text-muted-foreground">Dùng giá cơ bản</span>
-                )
               }
             />
           </CardContent>
@@ -159,7 +169,7 @@ export default function RoomTypeDetailCard({ roomType }: RoomTypeDetailCardProps
         <Card className="border-0 shadow-lg bg-gradient-to-br from-white to-slate-50">
           <CardHeader className="pb-4">
             <CardTitle className="text-lg flex items-center gap-2">
-              <div className="p-2 rounded-lg bg-blue-100 text-blue-600">
+              <div className="p-2 rounded-lg bg-primary/10 text-primary">
                 <Tag className="h-4 w-4" />
               </div>
               Thông tin cơ bản
@@ -176,7 +186,7 @@ export default function RoomTypeDetailCard({ roomType }: RoomTypeDetailCardProps
               icon={<Code className="h-4 w-4" />}
               label="Mã loại phòng"
               value={
-                <span className="font-mono text-blue-600 font-bold">
+                <span className="font-mono text-primary font-bold">
                   {roomType.code}
                 </span>
               }
@@ -193,14 +203,32 @@ export default function RoomTypeDetailCard({ roomType }: RoomTypeDetailCardProps
               label="Hoàn tiền"
               value={
                 roomType.refundable ? (
-                  <div className="flex items-center gap-2 text-emerald-600">
+                  <div className="flex items-center gap-2 text-primary">
                     <CheckCircle2 className="h-4 w-4" />
                     <span>Cho phép hoàn tiền</span>
                   </div>
                 ) : (
-                  <div className="flex items-center gap-2 text-rose-600">
+                  <div className="flex items-center gap-2 text-destructive">
                     <XCircle className="h-4 w-4" />
                     <span>Không hoàn tiền</span>
+                  </div>
+                )
+              }
+            />
+            <Separator />
+            <InfoItem
+              icon={<Ban className="h-4 w-4" />}
+              label="Hút thuốc"
+              value={
+                roomType.smokingAllowed ? (
+                  <div className="flex items-center gap-2 text-primary">
+                    <CheckCircle2 className="h-4 w-4" />
+                    <span>Cho phép hút thuốc</span>
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2 text-destructive">
+                    <XCircle className="h-4 w-4" />
+                    <span>Không cho phép hút thuốc</span>
                   </div>
                 )
               }
@@ -212,7 +240,7 @@ export default function RoomTypeDetailCard({ roomType }: RoomTypeDetailCardProps
         <Card className="border-0 shadow-lg bg-gradient-to-br from-white to-slate-50">
           <CardHeader className="pb-4">
             <CardTitle className="text-lg flex items-center gap-2">
-              <div className="p-2 rounded-lg bg-purple-100 text-purple-600">
+              <div className="p-2 rounded-lg bg-primary/10 text-primary">
                 <Users className="h-4 w-4" />
               </div>
               Thông số kỹ thuật
@@ -223,7 +251,7 @@ export default function RoomTypeDetailCard({ roomType }: RoomTypeDetailCardProps
               icon={<Maximize className="h-4 w-4" />}
               label="Diện tích"
               value={
-                <span className="text-lg font-semibold text-purple-600">
+                <span className="text-lg font-semibold text-primary">
                   {roomType.sizeM2} m²
                 </span>
               }
@@ -245,18 +273,38 @@ export default function RoomTypeDetailCard({ roomType }: RoomTypeDetailCardProps
               icon={<Users className="h-4 w-4" />}
               label="Sức chứa tối đa"
               value={
-                <span className="text-lg font-semibold text-indigo-600">
+                <span className="text-lg font-semibold text-primary">
                   {roomType.maxOccupancy} người
                 </span>
               }
             />
+            {roomType.bedType && (
+              <>
+                <Separator />
+                <InfoItem
+                  icon={<Bed className="h-4 w-4" />}
+                  label="Loại giường"
+                  value={roomType.bedType}
+                />
+              </>
+            )}
+            {roomType.numberOfBeds && (
+              <>
+                <Separator />
+                <InfoItem
+                  icon={<Bed className="h-4 w-4" />}
+                  label="Số lượng giường"
+                  value={`${roomType.numberOfBeds} giường`}
+                />
+              </>
+            )}
             <Separator />
             <InfoItem
               icon={<DoorOpen className="h-4 w-4" />}
               label="Số phòng"
               value={
                 <div className="flex items-center gap-2">
-                  <span className="text-lg font-semibold text-emerald-600">
+                  <span className="text-lg font-semibold text-primary">
                     {roomType.availableRooms}
                   </span>
                   <span className="text-muted-foreground">
@@ -269,55 +317,86 @@ export default function RoomTypeDetailCard({ roomType }: RoomTypeDetailCardProps
         </Card>
       </div>
 
+      {/* Description */}
+      {(roomType.description || roomType.shortDescription) && (
+        <Card className="border-0 shadow-lg bg-gradient-to-br from-white to-slate-50">
+          <CardHeader className="pb-4">
+            <CardTitle className="text-lg flex items-center gap-2">
+              <div className="p-2 rounded-lg bg-primary/10 text-primary">
+                <FileText className="h-4 w-4" />
+              </div>
+              Mô tả
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {roomType.shortDescription && (
+              <div>
+                <p className="text-sm text-muted-foreground mb-1">Mô tả ngắn</p>
+                <p className="text-foreground">{roomType.shortDescription}</p>
+              </div>
+            )}
+            {roomType.description && (
+              <>
+                {roomType.shortDescription && <Separator />}
+                <div>
+                  <p className="text-sm text-muted-foreground mb-1">Mô tả chi tiết</p>
+                  <p className="text-foreground leading-relaxed">{roomType.description}</p>
+                </div>
+              </>
+            )}
+          </CardContent>
+        </Card>
+      )}
+
       {/* Quick Stats */}
       <div className="grid gap-4 md:grid-cols-5">
-        <Card className="border-0 shadow-md bg-gradient-to-br from-green-50 to-green-100 hover:shadow-lg transition-shadow">
+        <Card className="border-0 shadow-md bg-gradient-to-br from-primary/5 to-primary/10 hover:shadow-lg transition-shadow">
           <CardContent className="p-4 text-center">
-            <div className="mx-auto mb-2 p-3 rounded-full bg-green-500 text-white w-fit">
+            <div className="mx-auto mb-2 p-3 rounded-full bg-primary text-white w-fit">
               <DollarSign className="h-5 w-5" />
             </div>
-            <p className="text-lg font-bold text-green-700">{formatCurrency(roomType.priceFrom)}</p>
-            <p className="text-sm text-green-600">Giá/đêm</p>
+            <p className="text-lg font-bold text-primary">{formatCurrency(roomType.priceFrom)}</p>
+            <p className="text-sm text-primary/70">Giá/đêm</p>
           </CardContent>
         </Card>
 
-        <Card className="border-0 shadow-md bg-gradient-to-br from-blue-50 to-blue-100 hover:shadow-lg transition-shadow">
+        <Card className="border-0 shadow-md bg-gradient-to-br from-primary/5 to-primary/10 hover:shadow-lg transition-shadow">
           <CardContent className="p-4 text-center">
-            <div className="mx-auto mb-2 p-3 rounded-full bg-blue-500 text-white w-fit">
+            <div className="mx-auto mb-2 p-3 rounded-full bg-primary text-white w-fit">
               <Users className="h-5 w-5" />
             </div>
-            <p className="text-2xl font-bold text-blue-700">{roomType.maxOccupancy}</p>
-            <p className="text-sm text-blue-600">Sức chứa tối đa</p>
+            <p className="text-2xl font-bold text-primary">{roomType.maxOccupancy}</p>
+            <p className="text-sm text-primary/70">Sức chứa tối đa</p>
           </CardContent>
         </Card>
 
-        <Card className="border-0 shadow-md bg-gradient-to-br from-purple-50 to-purple-100 hover:shadow-lg transition-shadow">
+        <Card className="border-0 shadow-md bg-gradient-to-br from-primary/5 to-primary/10 hover:shadow-lg transition-shadow">
           <CardContent className="p-4 text-center">
-            <div className="mx-auto mb-2 p-3 rounded-full bg-purple-500 text-white w-fit">
+            <div className="mx-auto mb-2 p-3 rounded-full bg-primary text-white w-fit">
               <Maximize className="h-5 w-5" />
             </div>
-            <p className="text-2xl font-bold text-purple-700">{roomType.sizeM2}</p>
-            <p className="text-sm text-purple-600">m² diện tích</p>
+            <p className="text-2xl font-bold text-primary">{roomType.sizeM2}</p>
+            <p className="text-sm text-primary/70">m² diện tích</p>
           </CardContent>
         </Card>
 
-        <Card className="border-0 shadow-md bg-gradient-to-br from-emerald-50 to-emerald-100 hover:shadow-lg transition-shadow">
+        <Card className="border-0 shadow-md bg-gradient-to-br from-primary/5 to-primary/10 hover:shadow-lg transition-shadow">
           <CardContent className="p-4 text-center">
-            <div className="mx-auto mb-2 p-3 rounded-full bg-emerald-500 text-white w-fit">
+            <div className="mx-auto mb-2 p-3 rounded-full bg-primary text-white w-fit">
               <DoorOpen className="h-5 w-5" />
             </div>
-            <p className="text-2xl font-bold text-emerald-700">{roomType.totalRooms}</p>
-            <p className="text-sm text-emerald-600">Tổng phòng</p>
+            <p className="text-2xl font-bold text-primary">{roomType.totalRooms}</p>
+            <p className="text-sm text-primary/70">Tổng phòng</p>
           </CardContent>
         </Card>
 
-        <Card className="border-0 shadow-md bg-gradient-to-br from-amber-50 to-amber-100 hover:shadow-lg transition-shadow">
+        <Card className="border-0 shadow-md bg-gradient-to-br from-primary/5 to-primary/10 hover:shadow-lg transition-shadow">
           <CardContent className="p-4 text-center">
-            <div className="mx-auto mb-2 p-3 rounded-full bg-amber-500 text-white w-fit">
+            <div className="mx-auto mb-2 p-3 rounded-full bg-primary text-white w-fit">
               <CheckCircle2 className="h-5 w-5" />
             </div>
-            <p className="text-2xl font-bold text-amber-700">{roomType.availableRooms}</p>
-            <p className="text-sm text-amber-600">Phòng trống</p>
+            <p className="text-2xl font-bold text-primary">{roomType.availableRooms}</p>
+            <p className="text-sm text-primary/70">Phòng trống</p>
           </CardContent>
         </Card>
       </div>
@@ -327,7 +406,7 @@ export default function RoomTypeDetailCard({ roomType }: RoomTypeDetailCardProps
         <Card className="border-0 shadow-lg bg-gradient-to-br from-white to-slate-50">
           <CardHeader className="pb-4">
             <CardTitle className="text-lg flex items-center gap-2">
-              <div className="p-2 rounded-lg bg-indigo-100 text-indigo-600">
+              <div className="p-2 rounded-lg bg-primary/10 text-primary">
                 <Sparkles className="h-4 w-4" />
               </div>
               Tiện nghi ({roomType.amenities.length})
@@ -339,7 +418,7 @@ export default function RoomTypeDetailCard({ roomType }: RoomTypeDetailCardProps
                 <Badge
                   key={amenity.id}
                   variant="secondary"
-                  className="px-3 py-1.5 text-sm bg-indigo-50 text-indigo-700 border border-indigo-200"
+                  className="px-3 py-1.5 text-sm bg-primary/10 text-primary border border-primary/20"
                 >
                   <span className="mr-1.5">{amenity.icon || '✓'}</span>
                   {amenity.name}

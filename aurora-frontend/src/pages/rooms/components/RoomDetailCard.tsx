@@ -10,13 +10,33 @@ import {
   Layers,
   CalendarDays,
   Hash,
-  Info
+  Info,
+  DollarSign,
+  Percent,
+  Eye,
+  Tag,
+  Image as ImageIcon
 } from 'lucide-react';
+import fallbackImage from '@/assets/images/commons/fallback.png';
+import { Carousel, CarouselContent, CarouselItem, CarouselNext, CarouselPrevious } from '@/components/ui/carousel';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
+import { Badge } from '@/components/ui/badge';
 import type { Room } from '@/types/room.types';
 import RoomStatusBadge from './RoomStatusBadge';
+
+// ============================================
+// Helper Functions
+// ============================================
+
+function formatCurrency(amount: number): string {
+  return new Intl.NumberFormat('vi-VN', {
+    style: 'currency',
+    currency: 'VND'
+  }).format(amount);
+}
+
 
 // ============================================
 // Props Interface
@@ -41,7 +61,7 @@ interface InfoItemProps {
 function InfoItem({ icon, label, value, className = '' }: InfoItemProps) {
   return (
     <div className={`flex items-start gap-3 ${className}`}>
-      <div className="p-2 rounded-lg bg-slate-100 text-slate-600 shrink-0">
+      <div className="p-2 rounded-lg bg-primary/10 text-primary shrink-0">
         {icon}
       </div>
       <div className="min-w-0 flex-1">
@@ -57,12 +77,23 @@ function InfoItem({ icon, label, value, className = '' }: InfoItemProps) {
 // ============================================
 
 export default function RoomDetailCard({ room }: RoomDetailCardProps) {
+  const getViewTypeLabel = (viewType?: string) => {
+    const viewMap: Record<string, string> = {
+      'CITY': 'Thành phố',
+      'SEA': 'Biển/Sông',
+      'MOUNTAIN': 'Núi',
+      'GARDEN': 'Vườn',
+      'RIVER': 'Sông'
+    };
+    return viewType ? (viewMap[viewType] || viewType) : 'Chưa xác định';
+  };
+
   return (
     <div className="space-y-6">
       {/* Room Header Card */}
       <Card className="border-0 shadow-lg overflow-hidden">
-        <div className="bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-700 p-6 text-white">
-          <div className="flex items-center justify-between">
+        <div className="bg-gradient-to-r from-primary via-primary/90 to-primary/80 p-6 text-white">
+          <div className="flex items-center justify-between flex-wrap gap-4">
             <div className="flex items-center gap-4">
               <div className="p-4 rounded-2xl bg-white/20 backdrop-blur-sm">
                 <DoorOpen className="h-8 w-8" />
@@ -71,9 +102,14 @@ export default function RoomDetailCard({ room }: RoomDetailCardProps) {
                 <h2 className="text-3xl font-bold tracking-tight">
                   Phòng {room.roomNumber}
                 </h2>
-                <p className="text-blue-100 mt-1">
+                <p className="text-white/80 mt-1">
                   {room.roomTypeName} • {room.branchName}
                 </p>
+                {room.categoryName && (
+                  <p className="text-white/70 text-sm mt-1">
+                    {room.categoryName}
+                  </p>
+                )}
               </div>
             </div>
             <RoomStatusBadge status={room.status} size="lg" />
@@ -81,13 +117,51 @@ export default function RoomDetailCard({ room }: RoomDetailCardProps) {
         </div>
       </Card>
 
+      {/* Room Images */}
+      {room.images && room.images.length > 0 && (
+        <Card className="border-0 shadow-lg bg-gradient-to-br from-white to-slate-50 p-4">
+          <CardHeader className="pb-4">
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-xl bg-primary/10 text-primary">
+                <ImageIcon className="h-5 w-5" />
+              </div>
+              <div>
+                <CardTitle className="text-lg">Hình ảnh phòng</CardTitle>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <Carousel className="w-full">
+              <CarouselContent>
+                {room.images.map((image, index) => (
+                  <CarouselItem key={index}>
+                    <div className="p-1">
+                      <div className="w-full min-h-[500px] h-[600px] rounded-lg overflow-hidden">
+                        <img 
+                          src={image} 
+                          alt={`Room Image ${index + 1}`} 
+                          className="w-full h-full object-cover"
+                          onError={(e) => { e.currentTarget.src = fallbackImage; }}
+                        />
+                      </div>
+                    </div>
+                  </CarouselItem>
+                ))}
+              </CarouselContent>
+              <CarouselPrevious />
+              <CarouselNext />
+            </Carousel>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Room Information Cards */}
-      <div className="grid gap-6 md:grid-cols-2">
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
         {/* Location Info */}
         <Card className="border-0 shadow-lg bg-gradient-to-br from-white to-slate-50">
           <CardHeader className="pb-4">
             <CardTitle className="text-lg flex items-center gap-2">
-              <div className="p-2 rounded-lg bg-blue-100 text-blue-600">
+              <div className="p-2 rounded-lg bg-primary/10 text-primary">
                 <Building2 className="h-4 w-4" />
               </div>
               Thông tin vị trí
@@ -105,6 +179,16 @@ export default function RoomDetailCard({ room }: RoomDetailCardProps) {
               label="Loại phòng"
               value={room.roomTypeName}
             />
+            {room.categoryName && (
+              <>
+                <Separator />
+                <InfoItem
+                  icon={<Tag className="h-4 w-4" />}
+                  label="Hạng phòng"
+                  value={room.categoryName}
+                />
+              </>
+            )}
             <Separator />
             <InfoItem
               icon={<Layers className="h-4 w-4" />}
@@ -116,11 +200,25 @@ export default function RoomDetailCard({ room }: RoomDetailCardProps) {
               icon={<Hash className="h-4 w-4" />}
               label="Số phòng"
               value={
-                <span className="font-mono text-lg font-bold text-blue-600">
+                <span className="font-mono text-lg font-bold text-primary">
                   {room.roomNumber}
                 </span>
               }
             />
+            {room.viewType && (
+              <>
+                <Separator />
+                <InfoItem
+                  icon={<Eye className="h-4 w-4" />}
+                  label="Hướng view"
+                  value={
+                    <Badge variant="outline" className="bg-primary/10 text-primary border-primary/20">
+                      {getViewTypeLabel(room.viewType)}
+                    </Badge>
+                  }
+                />
+              </>
+            )}
           </CardContent>
         </Card>
 
@@ -128,7 +226,7 @@ export default function RoomDetailCard({ room }: RoomDetailCardProps) {
         <Card className="border-0 shadow-lg bg-gradient-to-br from-white to-slate-50">
           <CardHeader className="pb-4">
             <CardTitle className="text-lg flex items-center gap-2">
-              <div className="p-2 rounded-lg bg-emerald-100 text-emerald-600">
+              <div className="p-2 rounded-lg bg-primary/10 text-primary">
                 <Info className="h-4 w-4" />
               </div>
               Thông số phòng
@@ -139,7 +237,7 @@ export default function RoomDetailCard({ room }: RoomDetailCardProps) {
               icon={<Maximize className="h-4 w-4" />}
               label="Diện tích"
               value={
-                <span className="text-lg font-semibold text-emerald-600">
+                <span className="text-lg font-semibold text-primary">
                   {room.sizeM2} m²
                 </span>
               }
@@ -164,49 +262,116 @@ export default function RoomDetailCard({ room }: RoomDetailCardProps) {
             />
           </CardContent>
         </Card>
+
+        {/* Pricing Info */}
+        <Card className="border-0 shadow-lg bg-gradient-to-br from-white to-slate-50">
+          <CardHeader className="pb-4">
+            <CardTitle className="text-lg flex items-center gap-2">
+              <div className="p-2 rounded-lg bg-primary/10 text-primary">
+                <DollarSign className="h-4 w-4" />
+              </div>
+              Thông tin giá
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <InfoItem
+              icon={<DollarSign className="h-4 w-4" />}
+              label="Giá gốc"
+              value={
+                <span className="text-lg font-semibold text-primary">
+                  {formatCurrency(room.basePrice)}
+                </span>
+              }
+            />
+            <Separator />
+            <InfoItem
+              icon={<Percent className="h-4 w-4" />}
+              label="% Giảm giá"
+              value={
+                room.salePercent > 0 ? (
+                  <span className="text-lg font-semibold text-primary">
+                    {room.salePercent}%
+                  </span>
+                ) : (
+                  <span className="text-muted-foreground">Không có</span>
+                )
+              }
+            />
+            <Separator />
+            <InfoItem
+              icon={<DollarSign className="h-4 w-4" />}
+              label="Giá hiển thị"
+              value={
+                <span className="text-xl font-bold text-primary">
+                  {formatCurrency(room.displayPrice)}
+                </span>
+              }
+            />
+          </CardContent>
+        </Card>
       </div>
 
       {/* Quick Stats */}
-      <div className="grid gap-4 md:grid-cols-4">
-        <Card className="border-0 shadow-md bg-gradient-to-br from-blue-50 to-blue-100 hover:shadow-lg transition-shadow">
+      <div className="grid gap-4 md:grid-cols-4 lg:grid-cols-6">
+        <Card className="border-0 shadow-md bg-gradient-to-br from-primary/5 to-primary/10 hover:shadow-lg transition-shadow">
           <CardContent className="p-4 text-center">
-            <div className="mx-auto mb-2 p-3 rounded-full bg-blue-500 text-white w-fit">
-              <DoorOpen className="h-5 w-5" />
+            <div className="mx-auto mb-2 p-3 rounded-full bg-primary text-white w-fit">
+              <Hash className="h-5 w-5" />
             </div>
-            <p className="text-2xl font-bold text-blue-700">{room.roomNumber}</p>
-            <p className="text-sm text-blue-600">Số phòng</p>
+            <p className="text-xl font-bold text-primary">{room.roomNumber}</p>
+            <p className="text-sm text-primary/70">Số phòng</p>
           </CardContent>
         </Card>
 
-        <Card className="border-0 shadow-md bg-gradient-to-br from-emerald-50 to-emerald-100 hover:shadow-lg transition-shadow">
+        <Card className="border-0 shadow-md bg-gradient-to-br from-primary/5 to-primary/10 hover:shadow-lg transition-shadow">
           <CardContent className="p-4 text-center">
-            <div className="mx-auto mb-2 p-3 rounded-full bg-emerald-500 text-white w-fit">
+            <div className="mx-auto mb-2 p-3 rounded-full bg-primary text-white w-fit">
               <Layers className="h-5 w-5" />
             </div>
-            <p className="text-2xl font-bold text-emerald-700">{room.floor}</p>
-            <p className="text-sm text-emerald-600">Tầng</p>
+            <p className="text-2xl font-bold text-primary">{room.floor}</p>
+            <p className="text-sm text-primary/70">Tầng</p>
           </CardContent>
         </Card>
 
-        <Card className="border-0 shadow-md bg-gradient-to-br from-purple-50 to-purple-100 hover:shadow-lg transition-shadow">
+        <Card className="border-0 shadow-md bg-gradient-to-br from-primary/5 to-primary/10 hover:shadow-lg transition-shadow">
           <CardContent className="p-4 text-center">
-            <div className="mx-auto mb-2 p-3 rounded-full bg-purple-500 text-white w-fit">
+            <div className="mx-auto mb-2 p-3 rounded-full bg-primary text-white w-fit">
               <Users className="h-5 w-5" />
             </div>
-            <p className="text-2xl font-bold text-purple-700">
+            <p className="text-2xl font-bold text-primary">
               {room.capacityAdults + room.capacityChildren}
             </p>
-            <p className="text-sm text-purple-600">Tổng sức chứa</p>
+            <p className="text-sm text-primary/70">Tổng sức chứa</p>
           </CardContent>
         </Card>
 
-        <Card className="border-0 shadow-md bg-gradient-to-br from-amber-50 to-amber-100 hover:shadow-lg transition-shadow">
+        <Card className="border-0 shadow-md bg-gradient-to-br from-primary/5 to-primary/10 hover:shadow-lg transition-shadow">
           <CardContent className="p-4 text-center">
-            <div className="mx-auto mb-2 p-3 rounded-full bg-amber-500 text-white w-fit">
+            <div className="mx-auto mb-2 p-3 rounded-full bg-primary text-white w-fit">
               <Maximize className="h-5 w-5" />
             </div>
-            <p className="text-2xl font-bold text-amber-700">{room.sizeM2}</p>
-            <p className="text-sm text-amber-600">m² diện tích</p>
+            <p className="text-2xl font-bold text-primary">{room.sizeM2}</p>
+            <p className="text-sm text-primary/70">m² diện tích</p>
+          </CardContent>
+        </Card>
+
+        <Card className="border-0 shadow-md bg-gradient-to-br from-primary/5 to-primary/10 hover:shadow-lg transition-shadow">
+          <CardContent className="p-4 text-center">
+            <div className="mx-auto mb-2 p-3 rounded-full bg-primary text-white w-fit">
+              <DollarSign className="h-5 w-5" />
+            </div>
+            <p className="text-lg font-bold text-primary">{formatCurrency(room.displayPrice)}</p>
+            <p className="text-sm text-primary/70">Giá/đêm</p>
+          </CardContent>
+        </Card>
+
+        <Card className="border-0 shadow-md bg-gradient-to-br from-primary/5 to-primary/10 hover:shadow-lg transition-shadow">
+          <CardContent className="p-4 text-center">
+            <div className="mx-auto mb-2 p-3 rounded-full bg-primary text-white w-fit">
+              <Percent className="h-5 w-5" />
+            </div>
+            <p className="text-2xl font-bold text-primary">{room.salePercent}%</p>
+            <p className="text-sm text-primary/70">Giảm giá</p>
           </CardContent>
         </Card>
       </div>
