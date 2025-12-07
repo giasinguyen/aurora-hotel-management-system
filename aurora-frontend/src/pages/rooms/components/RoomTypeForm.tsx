@@ -15,9 +15,13 @@ import {
   Sparkles,
   Check,
   DollarSign,
-  Image as ImageIcon
+  Image as ImageIcon,
+  Upload,
+  X
 } from 'lucide-react';
 import fallbackImage from '@/assets/images/commons/fallback.png';
+import { uploadToCloudinary } from '@/config/cloudinary';
+import { toast } from 'sonner';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -101,6 +105,7 @@ export default function RoomTypeForm({
   const [isLoadingCategories, setIsLoadingCategories] = useState(false);
   const [isLoadingAmenities, setIsLoadingAmenities] = useState(true);
   const [errors, setErrors] = useState<FormErrors>({});
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
 
   const [formState, setFormState] = useState<FormState>({
     branchId: roomType?.branchId || '',
@@ -198,6 +203,36 @@ export default function RoomTypeForm({
 
   const updateField = <K extends keyof FormState>(field: K, value: FormState[K]) => {
     setFormState(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Validate file type
+    if (!file.type.startsWith('image/')) {
+      toast.error('Vui lòng chọn file ảnh');
+      return;
+    }
+
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error('Kích thước ảnh không được vượt quá 5MB');
+      return;
+    }
+
+    try {
+      setIsUploadingImage(true);
+      toast.info('Đang tải ảnh lên...');
+      const imageUrl = await uploadToCloudinary(file, 'room-types');
+      updateField('imageUrl', imageUrl);
+      toast.success('Tải ảnh lên thành công!');
+    } catch (error) {
+      console.error('Upload error:', error);
+      toast.error('Không thể tải ảnh lên. Vui lòng thử lại.');
+    } finally {
+      setIsUploadingImage(false);
+    }
     if (errors[field as keyof FormErrors]) {
       setErrors(prev => ({ ...prev, [field]: undefined }));
     }
@@ -597,28 +632,56 @@ export default function RoomTypeForm({
             </div>
             <div>
               <CardTitle className="text-lg">Ảnh đại diện</CardTitle>
-              <CardDescription>URL ảnh đại diện cho loại phòng</CardDescription>
+              <CardDescription>Tải lên ảnh đại diện cho loại phòng</CardDescription>
             </div>
           </div>
         </CardHeader>
         <CardContent>
-          <div className="space-y-2">
-            <Label htmlFor="imageUrl">URL ảnh</Label>
-            <Input
-              id="imageUrl"
-              type="url"
-              value={formState.imageUrl}
-              onChange={(e) => updateField('imageUrl', e.target.value)}
-              placeholder="https://..."
-            />
+          <div className="space-y-4">
+            <div className="flex items-center gap-4">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => document.getElementById('room-type-image-upload')?.click()}
+                disabled={isUploadingImage}
+                className="flex items-center gap-2"
+              >
+                {isUploadingImage ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Upload className="h-4 w-4" />
+                )}
+                {isUploadingImage ? 'Đang tải lên...' : 'Chọn ảnh'}
+              </Button>
+              <input
+                id="room-type-image-upload"
+                type="file"
+                accept="image/*"
+                onChange={handleImageUpload}
+                className="hidden"
+              />
+              <span className="text-sm text-muted-foreground">
+                JPG, PNG, GIF (tối đa 5MB)
+              </span>
+            </div>
+            
             {formState.imageUrl && (
-              <div className="mt-2">
+              <div className="relative inline-block">
                 <img
                   src={formState.imageUrl}
                   alt="Preview"
-                  className="w-32 h-32 object-cover rounded-md"
+                  className="w-full max-w-md h-48 object-cover rounded-lg border-2 border-slate-200"
                   onError={(e) => { e.currentTarget.src = fallbackImage; }}
                 />
+                <Button
+                  type="button"
+                  variant="destructive"
+                  size="icon"
+                  className="absolute top-2 right-2 h-8 w-8"
+                  onClick={() => updateField('imageUrl', '')}
+                >
+                  <X className="h-4 w-4" />
+                </Button>
               </div>
             )}
           </div>
