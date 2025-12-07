@@ -13,11 +13,17 @@ import java.util.Map;
 @Builder
 @FieldDefaults(level = AccessLevel.PRIVATE)
 public class NewsCreationRequest {
+    String id; // Optional: for updating existing news
+    
     @NotBlank(message = "NEWS_TITLE_REQUIRED")
     String title;
     
     @NotBlank(message = "NEWS_SLUG_REQUIRED")
     String slug;
+    
+    String description;
+    
+    String thumbnailUrl;
     
     @NotNull(message = "NEWS_CONTENT_REQUIRED")
     Map<String, Object> contentJson;

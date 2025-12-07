@@ -3087,7 +3087,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n    \"title\": \"Grand Opening - Aurora Rooftop\",\n    \"contentHtml\": \"<h1>Getting started</h1>\",\n    \"contentJson\": {\n        \"type\": \"doc\",\n        \"content\": [\n            {\n                \"type\": \"heading\",\n                \"attrs\": {\n                    \"textAlign\": null,\n                    \"level\": 1\n                },\n                \"content\": [\n                    {\n                        \"type\": \"text\",\n                        \"text\": \"Getting started\"\n                    }\n                ]\n            }\n        ]\n    },\n    \"slug\": \"grand-opening-rooftop-aurora\",\n    \"isPublic\": true\n}",
+							"raw": "{\n    \"title\": \"Grand Opening - Aurora Rooftop\",\n    \"description\": \"Join us for the grand opening of our new rooftop bar with stunning city views\",\n    \"thumbnailUrl\": \"https://example.com/images/rooftop-opening.jpg\",\n    \"contentHtml\": \"<h1>Getting started</h1>\",\n    \"contentJson\": {\n        \"type\": \"doc\",\n        \"content\": [\n            {\n                \"type\": \"heading\",\n                \"attrs\": {\n                    \"textAlign\": null,\n                    \"level\": 1\n                },\n                \"content\": [\n                    {\n                        \"type\": \"text\",\n                        \"text\": \"Getting started\"\n                    }\n                ]\n            }\n        ]\n    },\n    \"slug\": \"grand-opening-rooftop-aurora\",\n    \"isPublic\": true\n}",
 							"options": { "raw": { "language": "json" } }
 						},
 						"url": {
@@ -3095,7 +3095,7 @@
 							"host": ["{{baseUrl}}"],
 							"path": ["api","v1","news"]
 						},
-						"description": "Create a news item (Admin)"
+						"description": "Create a news item (Admin). Optional 'id' field can be provided to update existing news instead."
 					},
 					"response": []
 				},
@@ -3108,7 +3108,7 @@
 						],
 						"body": {
 							"mode": "raw",
-							"raw": "{\n  \"title\": \"Grand Opening - Aurora Rooftop (Updated)\",\n  \"summary\": \"Updated summary...\",\n  \"content\": \"Updated content...\",\n  \"slug\": \"grand-opening-rooftop-aurora\"\n}",
+							"raw": "{\n  \"title\": \"Grand Opening - Aurora Rooftop (Updated)\",\n  \"description\": \"Updated description for the grand opening event\",\n  \"thumbnailUrl\": \"https://example.com/images/rooftop-opening-updated.jpg\",\n  \"contentHtml\": \"<h1>Updated Content</h1>\",\n  \"contentJson\": {\n    \"type\": \"doc\",\n    \"content\": [\n      {\n        \"type\": \"heading\",\n        \"attrs\": { \"level\": 1 },\n        \"content\": [{ \"type\": \"text\", \"text\": \"Updated Content\" }]\n      }\n    ]\n  },\n  \"slug\": \"grand-opening-rooftop-aurora\",\n  \"isPublic\": true\n}",
 							"options": { "raw": { "language": "json" } }
 						},
 						"url": {

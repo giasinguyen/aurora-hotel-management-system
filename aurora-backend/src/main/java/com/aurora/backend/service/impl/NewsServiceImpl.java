@@ -66,24 +66,54 @@ public class NewsServiceImpl implements NewsService {
     @Override
     @Transactional
     public NewsResponse createNews(NewsCreationRequest request) {
-        log.info("Creating news: title={}, slug={}", request.getTitle(), request.getSlug());
+        log.info("Creating news: title={}, slug={}, id={}", request.getTitle(), request.getSlug(), request.getId());
 
-        // Check if slug already exists
-        if (newsRepository.existsBySlug(request.getSlug())) {
-            throw new AppException(ErrorCode.NEWS_SLUG_EXISTED);
+        News news;
+        
+        // If ID is provided, update existing news instead of creating new one
+        if (request.getId() != null && !request.getId().isEmpty()) {
+            news = newsRepository.findById(request.getId())
+                    .orElseThrow(() -> new AppException(ErrorCode.NEWS_NOT_FOUND));
+            
+            // Check slug uniqueness if slug is being changed
+            if (!request.getSlug().equals(news.getSlug()) && newsRepository.existsBySlug(request.getSlug())) {
+                throw new AppException(ErrorCode.NEWS_SLUG_EXISTED);
+            }
+            
+            // Update existing news
+            news.setTitle(request.getTitle());
+            news.setSlug(request.getSlug());
+            news.setDescription(request.getDescription());
+            news.setThumbnailUrl(request.getThumbnailUrl());
+            news.setContentJson(request.getContentJson());
+            news.setContentHtml(request.getContentHtml());
+            if (request.getIsPublic() != null) {
+                news.setIsPublic(request.getIsPublic());
+            }
+            
+            log.info("Updating existing news with id={}", request.getId());
+        } else {
+            // Check if slug already exists
+            if (newsRepository.existsBySlug(request.getSlug())) {
+                throw new AppException(ErrorCode.NEWS_SLUG_EXISTED);
+            }
+
+            news = newsMapper.toNews(request);
+            news.setStatus(NewsStatus.DRAFT);
+            
+            log.info("Creating new news");
         }
-
-        News news = newsMapper.toNews(request);
-        news.setStatus(NewsStatus.DRAFT);
         
         // Set publishedAt if isPublic is true
-        if (Boolean.TRUE.equals(request.getIsPublic())) {
-            news.setPublishedAt(LocalDateTime.now());
+        if (Boolean.TRUE.equals(news.getIsPublic())) {
+            if (news.getPublishedAt() == null) {
+                news.setPublishedAt(LocalDateTime.now());
+            }
             news.setStatus(NewsStatus.PUBLISHED);
         }
 
         news = newsRepository.save(news);
-        log.info("News created successfully: id={}, slug={}", news.getId(), news.getSlug());
+        log.info("News saved successfully: id={}, slug={}", news.getId(), news.getSlug());
 
         return newsMapper.toNewsResponse(news);
     }

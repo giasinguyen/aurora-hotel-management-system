@@ -17,6 +17,8 @@ public class NewsResponse {
     String id;
     String slug;
     String title;
+    String description;
+    String thumbnailUrl;
     Boolean isPublic;
     Map<String, Object> contentJson;
     String contentHtml;

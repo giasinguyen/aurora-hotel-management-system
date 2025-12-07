@@ -10,6 +10,7 @@ import org.mapstruct.MappingTarget;
 
 @Mapper(componentModel = "spring", uses = {ImageAssetMapper.class})
 public interface NewsMapper {
+    @Mapping(target = "id", ignore = true)
     News toNews(NewsCreationRequest request);
     
     NewsResponse toNewsResponse(News news);

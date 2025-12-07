@@ -29,6 +29,12 @@ public class News extends BaseEntity {
     @Column(nullable = false)
     String title;
 
+    @Column(columnDefinition = "TEXT")
+    String description;
+
+    @Column(name = "thumbnail_url")
+    String thumbnailUrl;
+
     @Column(name = "is_public")
     @Builder.Default
     Boolean isPublic = false;

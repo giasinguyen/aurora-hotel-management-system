@@ -13,6 +13,8 @@ import java.util.Map;
 public class NewsUpdateRequest {
     String title;
     String slug;
+    String description;
+    String thumbnailUrl;
     Map<String, Object> contentJson;
     String contentHtml;
     Boolean isPublic;
