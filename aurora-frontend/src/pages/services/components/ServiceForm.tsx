@@ -18,9 +18,12 @@ import {
   Calendar,
   CheckCircle2,
   XCircle,
-  Timer
+  Timer,
+  Upload
 } from 'lucide-react';
 import fallbackImage from '@/assets/images/commons/fallback.png';
+import { uploadMultipleToCloudinary } from '@/config/cloudinary';
+import { toast } from 'sonner';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -119,7 +122,7 @@ export default function ServiceForm({
     images: service?.images || [],
   });
   
-  const [newImageUrl, setNewImageUrl] = useState('');
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
   
   // Helper to get select value (convert empty string to undefined)
   const getSelectValue = (value: string): string | undefined => {
@@ -231,13 +234,48 @@ export default function ServiceForm({
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleAddImage = () => {
-    if (newImageUrl.trim() && !formState.images.includes(newImageUrl.trim())) {
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    const remainingSlots = 10 - formState.images.length;
+    if (remainingSlots <= 0) {
+      toast.error('Đã đạt tối đa 10 ảnh');
+      return;
+    }
+
+    const filesToUpload = Array.from(files).slice(0, remainingSlots);
+    
+    // Validate file types and sizes
+    for (const file of filesToUpload) {
+      if (!file.type.startsWith('image/')) {
+        toast.error(`File ${file.name} không phải là ảnh`);
+        e.target.value = '';
+        return;
+      }
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error(`File ${file.name} quá lớn (tối đa 5MB)`);
+        e.target.value = '';
+        return;
+      }
+    }
+
+    try {
+      setIsUploadingImage(true);
+      const uploadedUrls = await uploadMultipleToCloudinary(filesToUpload, 'services');
+      
       setFormState(prev => ({
         ...prev,
-        images: [...prev.images, newImageUrl.trim()]
+        images: [...prev.images, ...uploadedUrls]
       }));
-      setNewImageUrl('');
+      
+      toast.success(`Đã tải lên ${uploadedUrls.length} ảnh thành công`);
+    } catch (error: any) {
+      console.error('Upload error:', error);
+      toast.error(error.message || 'Tải ảnh lên thất bại');
+    } finally {
+      setIsUploadingImage(false);
+      e.target.value = '';
     }
   };
 
@@ -615,30 +653,35 @@ export default function ServiceForm({
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
-            {/* Add Image URL Input */}
+            {/* File Upload Button */}
             <div className="flex gap-2">
-              <Input
-                type="url"
-                value={newImageUrl}
-                onChange={(e) => setNewImageUrl(e.target.value)}
-                placeholder="Nhập URL ảnh..."
-                className="flex-1"
-                onKeyDown={(e) => {
-                  if (e.key === 'Enter') {
-                    e.preventDefault();
-                    handleAddImage();
-                  }
-                }}
-              />
               <Button
                 type="button"
-                onClick={handleAddImage}
-                disabled={!newImageUrl.trim() || formState.images.length >= 10}
-                className="gap-2"
+                variant="outline"
+                className="gap-2 flex-1"
+                disabled={formState.images.length >= 10 || isUploadingImage}
+                onClick={() => document.getElementById('service-image-upload')?.click()}
               >
-                <Plus className="h-4 w-4" />
-                Thêm
+                {isUploadingImage ? (
+                  <>
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    Đang tải lên...
+                  </>
+                ) : (
+                  <>
+                    <Upload className="h-4 w-4" />
+                    Chọn ảnh ({formState.images.length}/10)
+                  </>
+                )}
               </Button>
+              <input
+                id="service-image-upload"
+                type="file"
+                accept="image/*"
+                multiple
+                onChange={handleImageUpload}
+                className="hidden"
+              />
             </div>
 
             {/* Image Preview Grid */}
@@ -660,7 +703,7 @@ export default function ServiceForm({
                       type="button"
                       variant="destructive"
                       size="icon"
-                      className="absolute top-2 right-2 h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
+                      className="absolute top-2 right-2 h-8 w-8 rounded-full shadow-md opacity-90 hover:opacity-100 transition-opacity"
                       onClick={() => handleRemoveImage(index)}
                     >
                       <X className="h-4 w-4" />
@@ -671,9 +714,10 @@ export default function ServiceForm({
             )}
 
             {formState.images.length === 0 && (
-              <div className="text-center py-8 text-muted-foreground">
+              <div className="text-center py-8 text-muted-foreground border-2 border-dashed rounded-lg">
                 <ImageIcon className="h-12 w-12 mx-auto mb-2 opacity-50" />
-                <p>Chưa có hình ảnh nào. Nhập URL ảnh để thêm.</p>
+                <p>Chưa có hình ảnh nào được thêm</p>
+                <p className="text-sm">Nhấp nút "Chọn ảnh" để tải lên</p>
               </div>
             )}
 

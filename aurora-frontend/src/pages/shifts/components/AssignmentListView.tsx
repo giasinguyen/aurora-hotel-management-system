@@ -1,12 +1,17 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Clock, Users, MapPin, Calendar } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Clock, Users, MapPin, Calendar, Trash2 } from 'lucide-react';
 import type { StaffShiftAssignment, WorkShift } from '@/types/shift.types';
+import { staffShiftApi } from '@/services/shiftApi';
+import { toast } from 'sonner';
+import { useState } from 'react';
 
 interface AssignmentListViewProps {
   assignments: StaffShiftAssignment[];
   selectedDate?: Date;
+  onRefresh?: () => void;
 }
 
 interface ShiftGroup {
@@ -15,7 +20,27 @@ interface ShiftGroup {
   assignments: StaffShiftAssignment[];
 }
 
-export function AssignmentListView({ assignments, selectedDate }: AssignmentListViewProps) {
+export function AssignmentListView({ assignments, selectedDate, onRefresh }: AssignmentListViewProps) {
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+
+  const handleCancelAssignment = async (assignmentId: string, staffName: string) => {
+    if (!confirm(`Bạn có chắc muốn huỷ ca làm việc của ${staffName}?`)) {
+      return;
+    }
+
+    setDeletingId(assignmentId);
+    try {
+      await staffShiftApi.cancelAssignment(assignmentId, 'Huỷ từ danh sách ca làm việc');
+      toast.success('Đã huỷ ca làm việc thành công');
+      onRefresh?.();
+    } catch (error) {
+      console.error('Lỗi khi huỷ ca làm việc:', error);
+      toast.error('Không thể huỷ ca làm việc');
+    } finally {
+      setDeletingId(null);
+    }
+  };
+
   // Filter out assignments without workShift data and group by shift
   const groupedByShift = assignments
     .filter(assignment => assignment.workShift || (assignment.workShiftId && assignment.startTime))
@@ -153,8 +178,21 @@ export function AssignmentListView({ assignments, selectedDate }: AssignmentList
                       <span className="truncate">{assignment.branchName}</span>
                     </div>
                   </div>
-                  <div className="flex-shrink-0">
-                    {getStatusBadge(assignment.status)}
+                  <div className="flex items-center gap-2">
+                    <div className="flex-shrink-0">
+                      {getStatusBadge(assignment.status)}
+                    </div>
+                    {assignment.status === 'SCHEDULED' && (
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10"
+                        onClick={() => handleCancelAssignment(assignment.id, assignment.staffName)}
+                        disabled={deletingId === assignment.id}
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    )}
                   </div>
                 </div>
               ))}
