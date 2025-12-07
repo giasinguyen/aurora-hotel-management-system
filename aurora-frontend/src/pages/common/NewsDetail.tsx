@@ -1,17 +1,34 @@
+import { useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { mockNews } from "@/mocks/news";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, CalendarDays, User } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { format } from "date-fns";
+import { useAppDispatch, useAppSelector } from "@/hooks/useRedux";
+import { fetchPublicNewsBySlug, clearCurrentNews } from "@/features/slices/newsSlice";
+import LoadingScreen from "@/components/custom/LoadingScreen";
 
 export default function NewsDetailPage() {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
+  const { currentNews, loading, error, newsList } = useAppSelector((state) => state.news);
 
-  const news = mockNews.find((item) => item.slug === slug);
+  useEffect(() => {
+    if (slug) {
+      dispatch(fetchPublicNewsBySlug(slug));
+    }
+    
+    return () => {
+      dispatch(clearCurrentNews());
+    };
+  }, [slug, dispatch]);
 
-  if (!news) {
+  if (loading) {
+    return <LoadingScreen />;
+  }
+
+  if (error || !currentNews) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
@@ -43,8 +60,8 @@ export default function NewsDetailPage() {
       {/* Header Image */}
       <div className="relative h-96 w-full overflow-hidden">
         <img
-          src={news.thumbnailUrl}
-          alt={news.title}
+          src={currentNews.thumbnailUrl || "/placeholder-news.jpg"}
+          alt={currentNews.title}
           className="w-full h-full object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
@@ -65,7 +82,7 @@ export default function NewsDetailPage() {
             </Button>
 
             {/* Status Badge */}
-            {news.status === "PUBLISHED" && (
+            {currentNews.status === "PUBLISHED" && (
               <Badge className="mb-6 bg-primary text-primary-foreground">
                 Published
               </Badge>
@@ -74,69 +91,73 @@ export default function NewsDetailPage() {
 
           {/* Title */}
           <h1 className="text-4xl font-bold text-foreground mb-6">
-            {news.title}
+            {currentNews.title}
           </h1>
 
           {/* Meta Information */}
           <div className="flex flex-wrap gap-6 text-muted-foreground mb-8 pb-8 border-b border-border">
             <div className="flex items-center gap-2">
               <CalendarDays className="w-5 h-5" />
-              <span>{formatDate(news.publishedAt)}</span>
+              <span>{formatDate(currentNews.publishedAt)}</span>
             </div>
             <div className="flex items-center gap-2">
               <User className="w-5 h-5" />
-              <span>{news.createdBy}</span>
+              <span>{currentNews.createdBy}</span>
             </div>
           </div>
 
           {/* Description */}
-          <div className="prose prose-lg max-w-none">
+          <div className="prose prose-lg max-w-none mb-8">
             <p className="text-lg text-foreground leading-relaxed">
-              {news.description}
+              {currentNews.description}
             </p>
           </div>
 
-          {/* Placeholder for full content */}
-          <div className="mt-8 p-6 bg-muted/50 rounded-lg border border-border">
-            <p className="text-muted-foreground italic">
-              Nội dung chi tiết của tin tức sẽ được hiển thị tại đây khi tích
-              hợp với API.
-            </p>
-          </div>
+          {/* Content HTML */}
+          <div 
+            className="prose prose-lg max-w-none"
+            dangerouslySetInnerHTML={{ __html: currentNews.contentHtml }}
+          />
         </div>
 
-        {/* Related News Section (Optional) */}
-        <div className="mt-12 mb-12">
-          <h2 className="text-2xl font-bold text-foreground mb-6">
-            Tin tức liên quan
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {mockNews
-              .filter((item) => item.id !== news.id)
-              .slice(0, 3)
-              .map((relatedNews) => (
-                <div
-                  key={relatedNews.id}
-                  onClick={() => navigate(`/news/${relatedNews.slug}`)}
-                  className="bg-card rounded-lg overflow-hidden shadow-lg cursor-pointer hover:shadow-xl transition-shadow"
-                >
-                  <img
-                    src={relatedNews.thumbnailUrl}
-                    alt={relatedNews.title}
-                    className="w-full h-48 object-cover"
-                  />
-                  <div className="p-4">
-                    <h3 className="font-semibold text-foreground line-clamp-2 mb-2">
-                      {relatedNews.title}
-                    </h3>
-                    <p className="text-sm text-muted-foreground">
-                      {formatDate(relatedNews.publishedAt)}
-                    </p>
+        {/* Related News Section */}
+        {newsList.filter((item) => item.id !== currentNews.id).length > 0 && (
+          <div className="mt-12 mb-12">
+            <h2 className="text-2xl font-bold text-foreground mb-6">
+              Tin tức liên quan
+            </h2>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {newsList
+                .filter((item) => item.id !== currentNews.id)
+                .slice(0, 3)
+                .map((relatedNews) => (
+                  <div
+                    key={relatedNews.id}
+                    onClick={() => navigate(`/news/${relatedNews.slug}`)}
+                    className="bg-card rounded-lg overflow-hidden shadow-lg cursor-pointer hover:shadow-xl transition-shadow"
+                  >
+                    <img
+                      src={relatedNews.thumbnailUrl || "/placeholder-news.jpg"}
+                      alt={relatedNews.title}
+                      className="w-full h-48 object-cover"
+                      onError={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        target.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300'%3E%3Crect width='400' height='300' fill='%23e5e7eb'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='Arial' font-size='18' fill='%239ca3af'%3ENo Image%3C/text%3E%3C/svg%3E";
+                      }}
+                    />
+                    <div className="p-4">
+                      <h3 className="font-semibold text-foreground line-clamp-2 mb-2">
+                        {relatedNews.title}
+                      </h3>
+                      <p className="text-sm text-muted-foreground">
+                        {formatDate(relatedNews.publishedAt)}
+                      </p>
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))}
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </div>
   );

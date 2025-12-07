@@ -1,5 +1,38 @@
 // News Types for Aurora Hotel Management System
 
+// API Response Types
+export interface NewsListResponse {
+  id: string;
+  slug: string;
+  title: string;
+  description: string;
+  thumbnailUrl?: string;
+  isPublic: boolean;
+  status: NewsStatus;
+  publishedAt: string;
+  createdAt: string;
+  updatedAt: string;
+  createdBy: string;
+}
+
+export interface NewsDetailResponse {
+  id: string;
+  slug: string;
+  title: string;
+  description: string;
+  thumbnailUrl?: string;
+  isPublic: boolean;
+  contentJson: unknown;
+  contentHtml: string;
+  status: NewsStatus;
+  publishedAt: string;
+  createdAt: string;
+  updatedAt: string;
+  createdBy: string;
+  images: string[];
+}
+
+// Legacy News interface (for backward compatibility)
 export interface News {
   id: string;
   title: string;

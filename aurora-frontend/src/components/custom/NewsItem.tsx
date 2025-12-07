@@ -44,11 +44,15 @@ export default function NewsItem({
       onClick={handleClick}
     >
       <CardHeader className="p-0">
-        <div className="relative h-48 overflow-hidden">
+        <div className="relative h-48 overflow-hidden bg-muted">
           <img
-            src={thumbnailUrl}
+            src={thumbnailUrl || "/placeholder-news.jpg"}
             alt={title}
             className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+            onError={(e) => {
+              const target = e.target as HTMLImageElement;
+              target.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='400' height='300'%3E%3Crect width='400' height='300' fill='%23e5e7eb'/%3E%3Ctext x='50%25' y='50%25' dominant-baseline='middle' text-anchor='middle' font-family='Arial' font-size='18' fill='%239ca3af'%3ENo Image%3C/text%3E%3C/svg%3E";
+            }}
           />
           {status === "PUBLISHED" && (
             <Badge className="absolute top-4 right-4 bg-primary text-primary-foreground">
