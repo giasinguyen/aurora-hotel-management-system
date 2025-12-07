@@ -9,6 +9,13 @@ export interface HotelService {
   categoryName: string;
   description?: string;
   basePrice: number;
+  unit?: string;
+  durationMinutes?: number;
+  maxCapacityPerSlot?: number;
+  requiresBooking?: boolean;
+  active?: boolean;
+  operatingHours?: string;
+  images?: string[];
 }
 
 export interface ServiceCreationRequest {
@@ -17,6 +24,13 @@ export interface ServiceCreationRequest {
   categoryId: string;
   description?: string;
   basePrice: number;
+  unit?: string;
+  durationMinutes?: number;
+  maxCapacityPerSlot?: number;
+  requiresBooking?: boolean;
+  active?: boolean;
+  operatingHours?: string;
+  images?: string[];
 }
 
 export interface ServiceUpdateRequest {
@@ -24,6 +38,13 @@ export interface ServiceUpdateRequest {
   categoryId?: string;
   description?: string;
   basePrice?: number;
+  unit?: string;
+  durationMinutes?: number;
+  maxCapacityPerSlot?: number;
+  requiresBooking?: boolean;
+  active?: boolean;
+  operatingHours?: string;
+  images?: string[];
 }
 
 export interface ServiceSearchParams {

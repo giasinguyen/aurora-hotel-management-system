@@ -9,14 +9,25 @@ import {
   Tag,
   FileText,
   DollarSign,
-  Sparkles
+  Sparkles,
+  Image as ImageIcon,
+  X,
+  Plus,
+  Clock,
+  Users,
+  Calendar,
+  CheckCircle2,
+  XCircle,
+  Timer
 } from 'lucide-react';
+import fallbackImage from '@/assets/images/commons/fallback.png';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Switch } from '@/components/ui/switch';
 import {
   Select,
   SelectContent,
@@ -45,6 +56,13 @@ interface FormState {
   categoryId: string;
   description: string;
   basePrice: number;
+  unit: string;
+  durationMinutes: number | null;
+  maxCapacityPerSlot: number | null;
+  requiresBooking: boolean;
+  active: boolean;
+  operatingHours: string;
+  images: string[];
 }
 
 interface FormErrors {
@@ -83,6 +101,8 @@ export default function ServiceForm({
   const [isLoadingBranches, setIsLoadingBranches] = useState(true);
   const [isLoadingCategories, setIsLoadingCategories] = useState(false);
   const [errors, setErrors] = useState<FormErrors>({});
+  // Track if service is being loaded to prevent category reset
+  const [isServiceLoading, setIsServiceLoading] = useState(false);
 
   const [formState, setFormState] = useState<FormState>({
     branchId: service?.branchId || '',
@@ -90,7 +110,16 @@ export default function ServiceForm({
     categoryId: service?.categoryId || '',
     description: service?.description || '',
     basePrice: service?.basePrice || 100000,
+    unit: service?.unit || '',
+    durationMinutes: service?.durationMinutes || null,
+    maxCapacityPerSlot: service?.maxCapacityPerSlot || null,
+    requiresBooking: service?.requiresBooking ?? true,
+    active: service?.active ?? true,
+    operatingHours: service?.operatingHours || '',
+    images: service?.images || [],
   });
+  
+  const [newImageUrl, setNewImageUrl] = useState('');
   
   // Helper to get select value (convert empty string to undefined)
   const getSelectValue = (value: string): string | undefined => {
@@ -102,14 +131,26 @@ export default function ServiceForm({
   // Update form state when service prop changes (for edit mode)
   useEffect(() => {
     if (service) {
+      setIsServiceLoading(true);
       setFormState({
         branchId: service.branchId || '',
         name: service.name || '',
         categoryId: service.categoryId || '',
         description: service.description || '',
         basePrice: service.basePrice || 100000,
+        unit: service.unit || '',
+        durationMinutes: service.durationMinutes || null,
+        maxCapacityPerSlot: service.maxCapacityPerSlot || null,
+        requiresBooking: service.requiresBooking ?? true,
+        active: service.active ?? true,
+        operatingHours: service.operatingHours || '',
+        images: service.images || [],
       });
       setErrors({});
+      // Mark service loading as complete after state is set
+      setTimeout(() => setIsServiceLoading(false), 100);
+    } else {
+      setIsServiceLoading(false);
     }
   }, [service]);
 
@@ -146,17 +187,23 @@ export default function ServiceForm({
         setIsLoadingCategories(false);
       }
     };
+    
     fetchCategories();
-    // Reset category when branch changes
-    if (formState.branchId) {
-      setFormState(prev => ({ ...prev, categoryId: '' }));
-    }
-  }, [formState.branchId]);
+    
+    // Don't reset category when loading service - reset only happens in updateField
+  }, [formState.branchId, isServiceLoading]);
 
   // ========== Handlers ==========
 
   const updateField = <K extends keyof FormState>(field: K, value: FormState[K]) => {
-    setFormState(prev => ({ ...prev, [field]: value }));
+    setFormState(prev => {
+      const newState = { ...prev, [field]: value };
+      // Reset category when branch is manually changed (not when loading from service)
+      if (field === 'branchId' && prev.branchId && prev.branchId !== value && !isEditMode && !isServiceLoading) {
+        newState.categoryId = '';
+      }
+      return newState;
+    });
     if (errors[field as keyof FormErrors]) {
       setErrors(prev => ({ ...prev, [field]: undefined }));
     }
@@ -184,6 +231,23 @@ export default function ServiceForm({
     return Object.keys(newErrors).length === 0;
   };
 
+  const handleAddImage = () => {
+    if (newImageUrl.trim() && !formState.images.includes(newImageUrl.trim())) {
+      setFormState(prev => ({
+        ...prev,
+        images: [...prev.images, newImageUrl.trim()]
+      }));
+      setNewImageUrl('');
+    }
+  };
+
+  const handleRemoveImage = (index: number) => {
+    setFormState(prev => ({
+      ...prev,
+      images: prev.images.filter((_, i) => i !== index)
+    }));
+  };
+
   const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -195,6 +259,13 @@ export default function ServiceForm({
         categoryId: formState.categoryId,
         description: formState.description || undefined,
         basePrice: formState.basePrice,
+        unit: formState.unit || undefined,
+        durationMinutes: formState.durationMinutes || undefined,
+        maxCapacityPerSlot: formState.maxCapacityPerSlot || undefined,
+        requiresBooking: formState.requiresBooking,
+        active: formState.active,
+        operatingHours: formState.operatingHours || undefined,
+        images: formState.images.length > 0 ? formState.images : undefined,
       };
       console.log('Updating service with data:', updateData);
       await onSubmit(updateData);
@@ -205,6 +276,13 @@ export default function ServiceForm({
         categoryId: formState.categoryId,
         description: formState.description || undefined,
         basePrice: formState.basePrice,
+        unit: formState.unit || undefined,
+        durationMinutes: formState.durationMinutes || undefined,
+        maxCapacityPerSlot: formState.maxCapacityPerSlot || undefined,
+        requiresBooking: formState.requiresBooking,
+        active: formState.active,
+        operatingHours: formState.operatingHours || undefined,
+        images: formState.images.length > 0 ? formState.images : undefined,
       };
       console.log('Creating service with data:', createData);
       await onSubmit(createData);
@@ -398,6 +476,214 @@ export default function ServiceForm({
         </CardContent>
       </Card>
 
+      {/* Service Details Section */}
+      <Card className="border-0 shadow-lg bg-gradient-to-br from-white to-slate-50">
+        <CardHeader className="pb-4">
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-xl bg-blue-100 text-blue-600">
+              <Clock className="h-5 w-5" />
+            </div>
+            <div>
+              <CardTitle className="text-lg">Chi tiết dịch vụ</CardTitle>
+              <CardDescription>Thông tin về đơn vị, thời gian và sức chứa</CardDescription>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent className="grid gap-6 md:grid-cols-2">
+          {/* Unit */}
+          <div className="space-y-2">
+            <Label className="flex items-center gap-2">
+              <Tag className="h-4 w-4 text-muted-foreground" />
+              Đơn vị tính
+            </Label>
+            <Input
+              value={formState.unit}
+              onChange={(e) => updateField('unit', e.target.value)}
+              placeholder="VD: per hour, per person, per item, per trip"
+              className="h-11"
+            />
+            <p className="text-sm text-muted-foreground">Đơn vị tính giá (VD: per hour, per person)</p>
+          </div>
+
+          {/* Duration Minutes */}
+          <div className="space-y-2">
+            <Label className="flex items-center gap-2">
+              <Timer className="h-4 w-4 text-muted-foreground" />
+              Thời lượng (phút)
+            </Label>
+            <Input
+              type="number"
+              value={formState.durationMinutes || ''}
+              onChange={(e) => updateField('durationMinutes', e.target.value ? parseInt(e.target.value) : null)}
+              min={0}
+              placeholder="VD: 60"
+              className="h-11"
+            />
+            <p className="text-sm text-muted-foreground">Thời lượng dịch vụ tính bằng phút</p>
+          </div>
+
+          {/* Max Capacity Per Slot */}
+          <div className="space-y-2">
+            <Label className="flex items-center gap-2">
+              <Users className="h-4 w-4 text-muted-foreground" />
+              Sức chứa tối đa mỗi slot
+            </Label>
+            <Input
+              type="number"
+              value={formState.maxCapacityPerSlot || ''}
+              onChange={(e) => updateField('maxCapacityPerSlot', e.target.value ? parseInt(e.target.value) : null)}
+              min={1}
+              placeholder="VD: 10"
+              className="h-11"
+            />
+            <p className="text-sm text-muted-foreground">Số lượng khách tối đa mỗi slot thời gian</p>
+          </div>
+
+          {/* Operating Hours */}
+          <div className="space-y-2">
+            <Label className="flex items-center gap-2">
+              <Calendar className="h-4 w-4 text-muted-foreground" />
+              Giờ hoạt động
+            </Label>
+            <Input
+              value={formState.operatingHours}
+              onChange={(e) => updateField('operatingHours', e.target.value)}
+              placeholder="VD: 08:00-22:00 hoặc 24/7"
+              className="h-11"
+            />
+            <p className="text-sm text-muted-foreground">Giờ hoạt động (VD: 08:00-22:00 hoặc 24/7)</p>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Service Settings Section */}
+      <Card className="border-0 shadow-lg bg-gradient-to-br from-white to-slate-50">
+        <CardHeader className="pb-4">
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-xl bg-amber-100 text-amber-600">
+              <CheckCircle2 className="h-5 w-5" />
+            </div>
+            <div>
+              <CardTitle className="text-lg">Cài đặt dịch vụ</CardTitle>
+              <CardDescription>Bật/tắt các tính năng và trạng thái dịch vụ</CardDescription>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {/* Requires Booking */}
+          <div className="flex items-center justify-between rounded-lg border p-4 bg-white">
+            <div className="space-y-0.5">
+              <Label className="text-base">Yêu cầu đặt trước</Label>
+              <p className="text-sm text-muted-foreground">
+                Dịch vụ có cần đặt trước không
+              </p>
+            </div>
+            <Switch
+              checked={formState.requiresBooking}
+              onCheckedChange={(checked) => updateField('requiresBooking', checked)}
+            />
+          </div>
+
+          {/* Active */}
+          <div className="flex items-center justify-between rounded-lg border p-4 bg-white">
+            <div className="space-y-0.5">
+              <Label className="text-base">Trạng thái hoạt động</Label>
+              <p className="text-sm text-muted-foreground">
+                Dịch vụ có đang hoạt động không
+              </p>
+            </div>
+            <Switch
+              checked={formState.active}
+              onCheckedChange={(checked) => updateField('active', checked)}
+            />
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Images Section */}
+      <Card className="border-0 shadow-lg bg-gradient-to-br from-white to-slate-50">
+        <CardHeader className="pb-4">
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-xl bg-pink-100 text-pink-600">
+              <ImageIcon className="h-5 w-5" />
+            </div>
+            <div>
+              <CardTitle className="text-lg">Hình ảnh dịch vụ</CardTitle>
+              <CardDescription>Thêm hình ảnh minh họa cho dịch vụ (tối đa 10 ảnh)</CardDescription>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-4">
+            {/* Add Image URL Input */}
+            <div className="flex gap-2">
+              <Input
+                type="url"
+                value={newImageUrl}
+                onChange={(e) => setNewImageUrl(e.target.value)}
+                placeholder="Nhập URL ảnh..."
+                className="flex-1"
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') {
+                    e.preventDefault();
+                    handleAddImage();
+                  }
+                }}
+              />
+              <Button
+                type="button"
+                onClick={handleAddImage}
+                disabled={!newImageUrl.trim() || formState.images.length >= 10}
+                className="gap-2"
+              >
+                <Plus className="h-4 w-4" />
+                Thêm
+              </Button>
+            </div>
+
+            {/* Image Preview Grid */}
+            {formState.images.length > 0 && (
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                {formState.images.map((imageUrl, index) => (
+                  <div key={index} className="relative group">
+                    <div className="aspect-video rounded-lg overflow-hidden border-2 border-gray-200 bg-gray-100">
+                      <img
+                        src={imageUrl}
+                        alt={`Service image ${index + 1}`}
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).src = fallbackImage;
+                        }}
+                      />
+                    </div>
+                    <Button
+                      type="button"
+                      variant="destructive"
+                      size="icon"
+                      className="absolute top-2 right-2 h-8 w-8 opacity-0 group-hover:opacity-100 transition-opacity"
+                      onClick={() => handleRemoveImage(index)}
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {formState.images.length === 0 && (
+              <div className="text-center py-8 text-muted-foreground">
+                <ImageIcon className="h-12 w-12 mx-auto mb-2 opacity-50" />
+                <p>Chưa có hình ảnh nào. Nhập URL ảnh để thêm.</p>
+              </div>
+            )}
+
+            {formState.images.length >= 10 && (
+              <p className="text-sm text-amber-600">Đã đạt tối đa 10 ảnh</p>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+
       {/* Action Buttons */}
       <div className="flex items-center justify-end gap-4 pt-4">
         <Button
@@ -429,3 +715,4 @@ export default function ServiceForm({
     </form>
   );
 }
+

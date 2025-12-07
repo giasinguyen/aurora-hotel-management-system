@@ -102,7 +102,7 @@ export interface RoomType {
   totalRooms: number;
   availableRooms: number;
   amenities: Amenity[];
-  images?: string[];
+  imageUrl?: string; // Ảnh đại diện cho room type
 }
 
 export interface RoomTypeCreationRequest {
@@ -116,7 +116,7 @@ export interface RoomTypeCreationRequest {
   sizeM2: number;
   refundable?: boolean;
   amenityIds?: string[];
-  images?: string[];
+  imageUrl?: string; // Ảnh đại diện cho room type
 }
 
 export interface RoomTypeUpdateRequest {
@@ -129,7 +129,7 @@ export interface RoomTypeUpdateRequest {
   sizeM2?: number;
   refundable?: boolean;
   amenityIds?: string[];
-  images?: string[];
+  imageUrl?: string; // Ảnh đại diện cho room type
 }
 
 export interface RoomTypeSearchParams {

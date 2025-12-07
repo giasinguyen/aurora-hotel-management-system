@@ -440,7 +440,7 @@ INSERT INTO room_types (
     id, branch_id, category_id, name, code, price_from,
     capacity_adults, capacity_children, max_occupancy,
     sizem2, bed_type, number_of_beds, refundable, smoking_allowed,
-    description, short_description, images,
+    description, short_description, image_url,
     created_at, updated_at, version, deleted
 ) VALUES 
 -- ===== STANDARD ROOM CATEGORY =====
@@ -459,7 +459,7 @@ INSERT INTO room_types (
     true, false,
     'Phòng đơn tiêu chuẩn với view thành phố, phù hợp cho khách công tác. Trang bị đầy đủ tiện nghi cơ bản: TV, minibar, điều hòa, wifi miễn phí.',
     'Phòng đơn view thành phố 25m²',
-    '["https://images.unsplash.com/photo-1566665797739-1674de7a421a?w=1200&h=800&fit=crop"]',
+    'https://images.unsplash.com/photo-1566665797739-1674de7a421a?w=1200&h=800&fit=crop',
     NOW(), NOW(), 0, false
 ),
 -- Standard Couple Bedroom Sea View
@@ -477,7 +477,7 @@ INSERT INTO room_types (
     true, false,
     'Phòng đôi tiêu chuẩn với view sông Sài Gòn lãng mạn, giường Queen size thoải mái. Thích hợp cho cặp đôi, gia đình nhỏ.',
     'Phòng đôi view sông 30m²',
-    '["https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=1200&h=800&fit=crop"]',
+    'https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=1200&h=800&fit=crop',
     NOW(), NOW(), 0, false
 ),
 
@@ -497,7 +497,7 @@ INSERT INTO room_types (
     true, false,
     'Phòng đơn cao cấp với giường King size, view toàn cảnh thành phố từ tầng cao. Nội thất sang trọng, phòng tắm đứng hiện đại.',
     'Phòng đơn cao cấp view thành phố 35m²',
-    '["https://images.unsplash.com/photo-1596394516093-501ba68a0ba6?w=1200&h=800&fit=crop"]',
+    'https://images.unsplash.com/photo-1596394516093-501ba68a0ba6?w=1200&h=800&fit=crop',
     NOW(), NOW(), 0, false
 ),
 -- Deluxe Couple Bedroom Sea View
@@ -515,7 +515,7 @@ INSERT INTO room_types (
     true, false,
     'Phòng đôi cao cấp view sông tuyệt đẹp, có ban công riêng. Bồn tắm nằm, minibar cao cấp, máy pha cà phê Nespresso.',
     'Phòng đôi cao cấp view sông 40m²',
-    '["https://images.unsplash.com/photo-1568605117037-4d9c780fac89?w=1200&h=800&fit=crop"]',
+    'https://images.unsplash.com/photo-1568605117037-4d9c780fac89?w=1200&h=800&fit=crop',
     NOW(), NOW(), 0, false
 ),
 
@@ -535,7 +535,7 @@ INSERT INTO room_types (
     true, false,
     'Suite 2 phòng ngủ siêu sang với view panorama thành phố. Phòng khách rộng, bếp nhỏ, 2 phòng tắm, dịch vụ butler 24/7.',
     'Suite 2 phòng ngủ view thành phố 80m²',
-    '["https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=1200&h=800&fit=crop"]',
+    'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=1200&h=800&fit=crop',
     NOW(), NOW(), 0, false
 ),
 -- Presidential Three Bedroom Sea View
@@ -553,7 +553,7 @@ INSERT INTO room_types (
     true, false,
     'Suite tổng thống 3 phòng ngủ đẳng cấp nhất với view sông Sài Gòn 270°. Phòng khách 50m², phòng ăn riêng, bếp đầy đủ, 3 phòng tắm marble, spa mini, dịch vụ butler & limousine.',
     'Suite tổng thống 3 phòng ngủ view sông 120m²',
-    '["https://images.unsplash.com/photo-1618773928121-c32242e63f39?w=1200&h=800&fit=crop","https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=1200&h=800&fit=crop"]',
+    'https://images.unsplash.com/photo-1618773928121-c32242e63f39?w=1200&h=800&fit=crop',
     NOW(), NOW(), 0, false
 )
 ON CONFLICT DO NOTHING;
@@ -818,7 +818,7 @@ INSERT INTO services (
     false,
     true,
     '05:00 - 23:00',
-    '["https://images.unsplash.com/photo-1540497077202-7c8a3999166f?w=1200&h=800&fit=crop"]',
+    '["https://images.unsplash.com/photo-1540497077202-7c8a3999166f?w=1200&h=800&fit=crop","https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=1200&h=800&fit=crop","https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=1200&h=800&fit=crop","https://images.unsplash.com/photo-1571902943202-507ec2618e8f?w=1200&h=800&fit=crop"]',
     NOW(), NOW(), 0, false
 ),
 -- Massage
@@ -835,7 +835,7 @@ INSERT INTO services (
     true,
     true,
     '09:00 - 22:00',
-    '["https://images.unsplash.com/photo-1544161515-4ab6ce6db874?w=1200&h=800&fit=crop"]',
+    '["https://images.unsplash.com/photo-1544161515-4ab6ce6db874?w=1200&h=800&fit=crop","https://images.unsplash.com/photo-1600334585358-93470feb59ca?w=1200&h=800&fit=crop","https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?w=1200&h=800&fit=crop","https://images.unsplash.com/photo-1599901860904-17e6ed7083a0?w=1200&h=800&fit=crop"]',
     NOW(), NOW(), 0, false
 ),
 -- Tắm sauna kiểu Đức
@@ -852,7 +852,7 @@ INSERT INTO services (
     true,
     true,
     '10:00 - 22:00',
-    '["https://images.unsplash.com/photo-1600334585358-93470feb59ca?w=1200&h=800&fit=crop"]',
+    '["https://images.unsplash.com/photo-1600334585358-93470feb59ca?w=1200&h=800&fit=crop","https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=1200&h=800&fit=crop","https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=1200&h=800&fit=crop","https://images.unsplash.com/photo-1576816579740-28848e2fd5e5?w=1200&h=800&fit=crop"]',
     NOW(), NOW(), 0, false
 ),
 -- Xông hơi
@@ -869,7 +869,7 @@ INSERT INTO services (
     true,
     true,
     '10:00 - 22:00',
-    '["https://images.unsplash.com/photo-1596979544786-7e6d5f2e8d7e?w=1200&h=800&fit=crop"]',
+    '["https://images.unsplash.com/photo-1596979544786-7e6d5f2e8d7e?w=1200&h=800&fit=crop","https://images.unsplash.com/photo-1600334585358-93470feb59ca?w=1200&h=800&fit=crop","https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=1200&h=800&fit=crop","https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=1200&h=800&fit=crop"]',
     NOW(), NOW(), 0, false
 ),
 
@@ -888,7 +888,7 @@ INSERT INTO services (
     true,
     true,
     '06:00 - 10:00',
-    '["https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=1200&h=800&fit=crop"]',
+    '["https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=1200&h=800&fit=crop","https://images.unsplash.com/photo-1526367790999-0150786686a2?w=1200&h=800&fit=crop","https://images.unsplash.com/photo-1544025162-d76694265947?w=1200&h=800&fit=crop","https://images.unsplash.com/photo-1495521821757-a1efb6729352?w=1200&h=800&fit=crop"]',
     NOW(), NOW(), 0, false
 ),
 -- Buffet trưa
@@ -905,7 +905,7 @@ INSERT INTO services (
     true,
     true,
     '11:30 - 14:00',
-    '["https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=1200&h=800&fit=crop"]',
+    '["https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=1200&h=800&fit=crop","https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=1200&h=800&fit=crop","https://images.unsplash.com/photo-1559339352-11d035aa65de?w=1200&h=800&fit=crop","https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=1200&h=800&fit=crop"]',
     NOW(), NOW(), 0, false
 ),
 -- Buffet tối
@@ -922,7 +922,7 @@ INSERT INTO services (
     true,
     true,
     '18:00 - 22:00',
-    '["https://images.unsplash.com/photo-1559339352-11d035aa65de?w=1200&h=800&fit=crop"]',
+    '["https://images.unsplash.com/photo-1559339352-11d035aa65de?w=1200&h=800&fit=crop","https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=1200&h=800&fit=crop","https://images.unsplash.com/photo-1555939594-58d7cb561ad1?w=1200&h=800&fit=crop","https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=1200&h=800&fit=crop"]',
     NOW(), NOW(), 0, false
 ),
 -- Buffet đặc biệt
@@ -939,7 +939,7 @@ INSERT INTO services (
     true,
     true,
     '18:00 - 22:00',
-    '["https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=1200&h=800&fit=crop"]',
+    '["https://images.unsplash.com/photo-1555396273-367ea4eb4db5?w=1200&h=800&fit=crop","https://images.unsplash.com/photo-1559339352-11d035aa65de?w=1200&h=800&fit=crop","https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=1200&h=800&fit=crop","https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?w=1200&h=800&fit=crop"]',
     NOW(), NOW(), 0, false
 ),
 
@@ -958,7 +958,7 @@ INSERT INTO services (
     true,
     true,
     '24/7',
-    '["https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=1200&h=800&fit=crop"]',
+    '["https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=1200&h=800&fit=crop","https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?w=1200&h=800&fit=crop","https://images.unsplash.com/photo-1502877338535-766e1452684a?w=1200&h=800&fit=crop","https://images.unsplash.com/photo-1502169863049-9f700775dca0?w=1200&h=800&fit=crop"]',
     NOW(), NOW(), 0, false
 ),
 -- Đưa đón sân bay xe 7 chỗ
@@ -975,7 +975,7 @@ INSERT INTO services (
     true,
     true,
     '24/7',
-    '["https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=1200&h=800&fit=crop"]',
+    '["https://images.unsplash.com/photo-1449824913935-59a10b8d2000?w=1200&h=800&fit=crop","https://images.unsplash.com/photo-1502877338535-766e1452684a?w=1200&h=800&fit=crop","https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=1200&h=800&fit=crop","https://images.unsplash.com/photo-1502169863049-9f700775dca0?w=1200&h=800&fit=crop"]',
     NOW(), NOW(), 0, false
 ),
 -- Đưa đón sân bay xe Limousine D-Car
@@ -992,7 +992,7 @@ INSERT INTO services (
     true,
     true,
     '24/7',
-    '["https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?w=1200&h=800&fit=crop"]',
+    '["https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?w=1200&h=800&fit=crop","https://images.unsplash.com/photo-1492144534655-ae79c964c9d7?w=1200&h=800&fit=crop","https://images.unsplash.com/photo-1502877338535-766e1452684a?w=1200&h=800&fit=crop","https://images.unsplash.com/photo-1502169863049-9f700775dca0?w=1200&h=800&fit=crop"]',
     NOW(), NOW(), 0, false
 ),
 -- Thuê hướng dẫn viên địa phương
@@ -1009,7 +1009,7 @@ INSERT INTO services (
     true,
     true,
     '08:00 - 20:00',
-    '["https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=1200&h=800&fit=crop"]',
+    '["https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=1200&h=800&fit=crop","https://images.unsplash.com/photo-1467269204594-9661b134dd2b?w=1200&h=800&fit=crop","https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=1200&h=800&fit=crop","https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=1200&h=800&fit=crop"]',
     NOW(), NOW(), 0, false
 ),
 
@@ -1028,7 +1028,7 @@ INSERT INTO services (
     true,
     true,
     '08:00 - 18:00',
-    '["https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=1200&h=800&fit=crop"]',
+    '["https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=1200&h=800&fit=crop","https://images.unsplash.com/photo-1584622787769-7bd3c4a4e3c6?w=1200&h=800&fit=crop","https://images.unsplash.com/photo-1583496661160-fb5886a013aa?w=1200&h=800&fit=crop","https://images.unsplash.com/photo-1563453392212-326f5e854473?w=1200&h=800&fit=crop"]',
     NOW(), NOW(), 0, false
 ),
 -- Giặt khô (Dry Cleaning)
@@ -1045,7 +1045,7 @@ INSERT INTO services (
     true,
     true,
     '08:00 - 18:00',
-    '["https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=1200&h=800&fit=crop"]',
+    '["https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=1200&h=800&fit=crop","https://images.unsplash.com/photo-1584622787769-7bd3c4a4e3c6?w=1200&h=800&fit=crop","https://images.unsplash.com/photo-1583496661160-fb5886a013aa?w=1200&h=800&fit=crop","https://images.unsplash.com/photo-1563453392212-326f5e854473?w=1200&h=800&fit=crop"]',
     NOW(), NOW(), 0, false
 ),
 -- Dịch vụ ủi đồ (Pressing only)
@@ -1062,7 +1062,7 @@ INSERT INTO services (
     true,
     true,
     '08:00 - 18:00',
-    '["https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=1200&h=800&fit=crop"]',
+    '["https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=1200&h=800&fit=crop","https://images.unsplash.com/photo-1584622787769-7bd3c4a4e3c6?w=1200&h=800&fit=crop","https://images.unsplash.com/photo-1583496661160-fb5886a013aa?w=1200&h=800&fit=crop","https://images.unsplash.com/photo-1563453392212-326f5e854473?w=1200&h=800&fit=crop"]',
     NOW(), NOW(), 0, false
 ),
 -- Giữ & chăm sóc thú cưng
@@ -1079,7 +1079,7 @@ INSERT INTO services (
     true,
     true,
     '24/7',
-    '["https://images.unsplash.com/photo-1552053831-71594a27632d?w=1200&h=800&fit=crop"]',
+    '["https://images.unsplash.com/photo-1552053831-71594a27632d?w=1200&h=800&fit=crop","https://images.unsplash.com/photo-1583337130417-3346a1be7dee?w=1200&h=800&fit=crop","https://images.unsplash.com/photo-1596854407944-bf87f6fdd49e?w=1200&h=800&fit=crop","https://images.unsplash.com/photo-1583512603805-3cc6b41f3dcb?w=1200&h=800&fit=crop"]',
     NOW(), NOW(), 0, false
 )
 ON CONFLICT DO NOTHING;

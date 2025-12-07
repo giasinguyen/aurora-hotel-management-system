@@ -4,7 +4,6 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.math.BigDecimal;
-import java.util.List;
 import java.util.Set;
 
 @Getter
@@ -34,5 +33,5 @@ public class RoomTypeResponse {
     Integer totalRooms;
     Integer availableRooms;
     Set<AmenityResponse> amenities;
-    List<String> images;
+    String imageUrl; // Ảnh đại diện cho room type
 }

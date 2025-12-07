@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { Eye, MoreHorizontal, Trash2, Edit, DollarSign } from 'lucide-react';
+import fallbackImage from '@/assets/images/commons/fallback.png';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -164,6 +165,26 @@ export default function ServiceList() {
 
   // Table columns
   const columns: Column<HotelService>[] = [
+    {
+      key: 'image',
+      header: 'Ảnh',
+      cell: (service) => {
+        const imageUrl = service.images && service.images.length > 0 ? service.images[0] : null;
+        return (
+          <div className="w-16 h-16 rounded-lg overflow-hidden border border-gray-200 bg-gray-100">
+            <img
+              src={imageUrl || fallbackImage}
+              alt={service.name}
+              className="w-full h-full object-cover"
+              onError={(e) => {
+                (e.target as HTMLImageElement).src = fallbackImage;
+              }}
+            />
+          </div>
+        );
+      },
+      className: 'w-[80px]',
+    },
     {
       key: 'name',
       header: 'Tên dịch vụ',

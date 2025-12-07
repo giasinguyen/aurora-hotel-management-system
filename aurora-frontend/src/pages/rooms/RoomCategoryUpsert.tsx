@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { toast } from 'sonner';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Image as ImageIcon } from 'lucide-react';
+import fallbackImage from '@/assets/images/commons/fallback.png';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -28,6 +29,7 @@ export default function RoomCategoryUpsert() {
     branchName: '',
     displayOrder: 0,
     active: true,
+    imageUrl: '',
   });
   const [branches, setBranches] = useState<Branch[]>([]);
   const [isLoading, setIsLoading] = useState(isEdit);
@@ -77,6 +79,7 @@ export default function RoomCategoryUpsert() {
             branchName: res.result.branchName,
             displayOrder: res.result.displayOrder || 0,
             active: res.result.active ?? true,
+            imageUrl: res.result.imageUrl || '',
           });
         }
       } catch (error) {
@@ -114,6 +117,7 @@ export default function RoomCategoryUpsert() {
         branchName: formData.branchName,
         displayOrder: formData.displayOrder,
         active: formData.active,
+        imageUrl: formData.imageUrl.trim() || undefined,
       };
 
       if (isEdit) {
@@ -246,6 +250,50 @@ export default function RoomCategoryUpsert() {
                 </Label>
               </div>
             </div>
+
+            {/* Image URL */}
+            <div className="space-y-2">
+              <Label htmlFor="imageUrl">URL ảnh đại diện</Label>
+              <Input
+                id="imageUrl"
+                type="url"
+                value={formData.imageUrl}
+                onChange={(e) => setFormData(prev => ({ ...prev, imageUrl: e.target.value }))}
+                placeholder="https://..."
+              />
+            </div>
+
+            {/* Image Preview */}
+            {formData.imageUrl && (
+              <div className="space-y-2">
+                <Label>Ảnh đại diện</Label>
+                <div className="w-full max-w-md">
+                  <div className="aspect-video rounded-lg overflow-hidden border-2 border-gray-200 bg-gray-100">
+                    <img
+                      src={formData.imageUrl}
+                      alt="Category preview"
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src = fallbackImage;
+                      }}
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {!formData.imageUrl && (
+              <div className="space-y-2">
+                <Label>Ảnh đại diện</Label>
+                <div className="w-full max-w-md aspect-video rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 flex items-center justify-center">
+                  <div className="text-center text-muted-foreground">
+                    <ImageIcon className="h-12 w-12 mx-auto mb-2 opacity-50" />
+                    <p className="text-sm">Chưa có ảnh đại diện</p>
+                    <p className="text-xs">Nhập URL ảnh ở trên để xem preview</p>
+                  </div>
+                </div>
+              </div>
+            )}
 
             <div className="flex gap-2 justify-end">
               <Button

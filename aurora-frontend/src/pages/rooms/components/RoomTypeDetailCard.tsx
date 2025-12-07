@@ -13,8 +13,10 @@ import {
   Sparkles,
   CheckCircle2,
   XCircle,
-  DollarSign
+  DollarSign,
+  Image as ImageIcon
 } from 'lucide-react';
+import fallbackImage from '@/assets/images/commons/fallback.png';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -76,9 +78,18 @@ export default function RoomTypeDetailCard({ roomType }: RoomTypeDetailCardProps
         <div className="bg-gradient-to-r from-emerald-600 via-emerald-700 to-teal-700 p-6 text-white">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
-              <div className="p-4 rounded-2xl bg-white/20 backdrop-blur-sm">
-                <DoorOpen className="h-8 w-8" />
-              </div>
+              {roomType.imageUrl ? (
+                <img
+                  src={roomType.imageUrl}
+                  alt={roomType.name}
+                  className="w-20 h-20 object-cover rounded-2xl border-4 border-white/20"
+                  onError={(e) => { e.currentTarget.src = fallbackImage; }}
+                />
+              ) : (
+                <div className="p-4 rounded-2xl bg-white/20 backdrop-blur-sm">
+                  <DoorOpen className="h-8 w-8" />
+                </div>
+              )}
               <div>
                 <h2 className="text-3xl font-bold tracking-tight">
                   {roomType.name}

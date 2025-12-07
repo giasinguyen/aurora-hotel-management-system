@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { Eye, MoreHorizontal, Trash2, Edit, Users, Maximize, BedDouble, Check, DollarSign } from 'lucide-react';
+import fallbackImage from '@/assets/images/commons/fallback.png';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -158,6 +159,18 @@ export default function RoomTypeList() {
 
   // Table columns
   const columns: Column<RoomType>[] = [
+    {
+      key: 'imageUrl',
+      header: 'Ảnh',
+      cell: (roomType) => (
+        <img
+          src={roomType.imageUrl || fallbackImage}
+          alt={roomType.name}
+          className="w-16 h-16 object-cover rounded-md"
+          onError={(e) => { e.currentTarget.src = fallbackImage; }}
+        />
+      ),
+    },
     {
       key: 'name',
       header: 'Tên loại phòng',

@@ -14,8 +14,10 @@ import {
   RefreshCcw,
   Sparkles,
   Check,
-  DollarSign
+  DollarSign,
+  Image as ImageIcon
 } from 'lucide-react';
+import fallbackImage from '@/assets/images/commons/fallback.png';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -53,6 +55,7 @@ interface FormState {
   sizeM2: number;
   refundable: boolean;
   amenityIds: string[];
+  imageUrl: string;
 }
 
 interface FormErrors {
@@ -111,6 +114,7 @@ export default function RoomTypeForm({
     sizeM2: roomType?.sizeM2 || 25,
     refundable: roomType?.refundable ?? true,
     amenityIds: roomType?.amenities?.map(a => a.id) || [],
+    imageUrl: roomType?.imageUrl || '',
   });
 
   // ========== Effects ==========
@@ -130,6 +134,7 @@ export default function RoomTypeForm({
         sizeM2: roomType.sizeM2 || 25,
         refundable: roomType.refundable ?? true,
         amenityIds: roomType.amenities?.map(a => a.id) || [],
+        imageUrl: roomType.imageUrl || '',
       });
       setErrors({});
     }
@@ -256,6 +261,7 @@ export default function RoomTypeForm({
         sizeM2: formState.sizeM2,
         refundable: formState.refundable,
         amenityIds: formState.amenityIds,
+        imageUrl: formState.imageUrl || undefined,
       };
       console.log('Updating room type with data:', updateData);
       await onSubmit(updateData);
@@ -272,6 +278,7 @@ export default function RoomTypeForm({
         sizeM2: formState.sizeM2,
         refundable: formState.refundable,
         amenityIds: formState.amenityIds,
+        imageUrl: formState.imageUrl || undefined,
       };
       console.log('Creating room type with data:', createData);
       await onSubmit(createData);
@@ -577,6 +584,43 @@ export default function RoomTypeForm({
               className={`h-11 ${errors.sizeM2 ? 'border-destructive' : ''}`}
             />
             {errors.sizeM2 && <p className="text-sm text-destructive">{errors.sizeM2}</p>}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Image Section */}
+      <Card className="border-0 shadow-lg bg-gradient-to-br from-white to-slate-50">
+        <CardHeader className="pb-4">
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-xl bg-blue-100 text-blue-600">
+              <ImageIcon className="h-5 w-5" />
+            </div>
+            <div>
+              <CardTitle className="text-lg">Ảnh đại diện</CardTitle>
+              <CardDescription>URL ảnh đại diện cho loại phòng</CardDescription>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-2">
+            <Label htmlFor="imageUrl">URL ảnh</Label>
+            <Input
+              id="imageUrl"
+              type="url"
+              value={formState.imageUrl}
+              onChange={(e) => updateField('imageUrl', e.target.value)}
+              placeholder="https://..."
+            />
+            {formState.imageUrl && (
+              <div className="mt-2">
+                <img
+                  src={formState.imageUrl}
+                  alt="Preview"
+                  className="w-32 h-32 object-cover rounded-md"
+                  onError={(e) => { e.currentTarget.src = fallbackImage; }}
+                />
+              </div>
+            )}
           </div>
         </CardContent>
       </Card>

@@ -3,7 +3,8 @@
 // ============================================
 
 import { useEffect, useState } from 'react';
-import { Loader2, Building2, DoorOpen, Users, Maximize, Layers, DollarSign, Eye, Percent } from 'lucide-react';
+import { Loader2, Building2, DoorOpen, Users, Maximize, Layers, DollarSign, Eye, Percent, Image as ImageIcon, Plus, X } from 'lucide-react';
+import fallbackImage from '@/assets/images/commons/fallback.png';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -37,6 +38,7 @@ interface FormState {
   viewType: string;
   basePrice: number;
   salePercent: number;
+  images: string[];
 }
 
 interface FormErrors {
@@ -88,7 +90,10 @@ export default function RoomForm({
     viewType: room?.viewType || 'CITY',
     basePrice: room?.basePrice || 500000,
     salePercent: room?.salePercent || 0,
+    images: room?.images || [],
   });
+  
+  const [newImageUrl, setNewImageUrl] = useState('');
 
   // ========== Effects ==========
 
@@ -104,7 +109,9 @@ export default function RoomForm({
         viewType: room.viewType || 'CITY',
         basePrice: room.basePrice || 500000,
         salePercent: room.salePercent || 0,
+        images: room.images || [],
       });
+      setNewImageUrl('');
       setErrors({});
     }
   }, [room]);
@@ -190,6 +197,23 @@ export default function RoomForm({
     return Object.keys(newErrors).length === 0;
   };
 
+  const handleAddImage = () => {
+    if (newImageUrl.trim() && !formState.images.includes(newImageUrl.trim())) {
+      setFormState(prev => ({
+        ...prev,
+        images: [...prev.images, newImageUrl.trim()]
+      }));
+      setNewImageUrl('');
+    }
+  };
+
+  const handleRemoveImage = (index: number) => {
+    setFormState(prev => ({
+      ...prev,
+      images: prev.images.filter((_, i) => i !== index)
+    }));
+  };
+
   const handleFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -204,6 +228,7 @@ export default function RoomForm({
         viewType: formState.viewType,
         basePrice: formState.basePrice,
         salePercent: formState.salePercent,
+        images: formState.images.length > 0 ? formState.images : undefined,
       };
       await onSubmit(updateData);
     } else {
@@ -216,6 +241,7 @@ export default function RoomForm({
         viewType: formState.viewType,
         basePrice: formState.basePrice,
         salePercent: formState.salePercent,
+        images: formState.images.length > 0 ? formState.images : undefined,
       };
       await onSubmit(createData);
     }
@@ -462,6 +488,65 @@ export default function RoomForm({
             </p>
             {errors.salePercent && <p className="text-sm text-destructive">{errors.salePercent}</p>}
           </div>
+        </CardContent>
+      </Card>
+
+      {/* Images Section */}
+      <Card className="border-0 shadow-lg bg-gradient-to-br from-white to-slate-50">
+        <CardHeader className="pb-4">
+          <div className="flex items-center gap-3">
+            <div className="p-2 rounded-xl bg-blue-100 text-blue-600">
+              <ImageIcon className="h-5 w-5" />
+            </div>
+            <div>
+              <CardTitle className="text-lg">Hình ảnh phòng</CardTitle>
+              <CardDescription>Thêm URL hình ảnh cho phòng (tối đa 10 ảnh)</CardDescription>
+            </div>
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className="flex items-center space-x-2 mb-4">
+            <Input
+              type="url"
+              placeholder="Dán URL hình ảnh vào đây..."
+              value={newImageUrl}
+              onChange={(e) => setNewImageUrl(e.target.value)}
+              className="flex-1 h-11"
+            />
+            <Button type="button" onClick={handleAddImage} disabled={!newImageUrl.trim() || formState.images.length >= 10}>
+              <Plus className="h-4 w-4 mr-2" /> Thêm ảnh
+            </Button>
+          </div>
+          {formState.images.length > 0 ? (
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+              {formState.images.map((image, index) => (
+                <div key={index} className="relative group">
+                  <img
+                    src={image}
+                    alt={`Room Image ${index + 1}`}
+                    className="w-full h-24 object-cover rounded-md border"
+                    onError={(e) => { e.currentTarget.src = fallbackImage; }}
+                  />
+                  <Button
+                    type="button"
+                    variant="destructive"
+                    size="icon"
+                    className="absolute top-1 right-1 h-6 w-6 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
+                    onClick={() => handleRemoveImage(index)}
+                  >
+                    <X className="h-3 w-3" />
+                  </Button>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center text-muted-foreground py-4 border rounded-md">
+              Chưa có hình ảnh nào được thêm.
+            </div>
+          )}
+          {formState.images.length >= 10 && (
+            <p className="text-sm text-amber-600 mt-2">Đã đạt tối đa 10 ảnh</p>
+          )}
         </CardContent>
       </Card>
 

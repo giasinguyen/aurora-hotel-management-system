@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { toast } from 'sonner';
-import { ArrowLeft, Sparkles, Loader2 } from 'lucide-react';
+import { ArrowLeft, Sparkles, Loader2, Image as ImageIcon } from 'lucide-react';
+import fallbackImage from '@/assets/images/commons/fallback.png';
 
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -270,6 +271,38 @@ export default function ServiceCategoryUpsert() {
                 />
               </div>
             </div>
+
+            {/* Image Preview */}
+            {formData.imageUrl && (
+              <div className="space-y-2">
+                <Label>Ảnh đại diện</Label>
+                <div className="w-full max-w-md">
+                  <div className="aspect-video rounded-lg overflow-hidden border-2 border-gray-200 bg-gray-100">
+                    <img
+                      src={formData.imageUrl}
+                      alt="Category preview"
+                      className="w-full h-full object-cover"
+                      onError={(e) => {
+                        (e.target as HTMLImageElement).src = fallbackImage;
+                      }}
+                    />
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {!formData.imageUrl && (
+              <div className="space-y-2">
+                <Label>Ảnh đại diện</Label>
+                <div className="w-full max-w-md aspect-video rounded-lg border-2 border-dashed border-gray-300 bg-gray-50 flex items-center justify-center">
+                  <div className="text-center text-muted-foreground">
+                    <ImageIcon className="h-12 w-12 mx-auto mb-2 opacity-50" />
+                    <p className="text-sm">Chưa có ảnh đại diện</p>
+                    <p className="text-xs">Nhập URL ảnh ở trên để xem preview</p>
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* Active Checkbox */}
             <div className="flex items-center space-x-2">

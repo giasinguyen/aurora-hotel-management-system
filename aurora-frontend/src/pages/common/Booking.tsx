@@ -507,7 +507,7 @@ export default function BookingPage() {
                           {/* Image */}
                           <div className="md:w-64 flex-shrink-0 relative group">
                             <img
-                              src={room.images?.[0] || currentRoomType.images?.[0] || FALLBACK_IMAGE}
+                              src={room.images?.[0] || currentRoomType.imageUrl || FALLBACK_IMAGE}
                               alt={currentRoomType.name}
                               className="w-full h-48 md:h-full object-cover"
                               onError={handleImageError}
@@ -632,14 +632,12 @@ export default function BookingPage() {
                     <div className="space-y-2 max-h-64 overflow-y-auto">
                       {bookingRooms.map((room) => (
                         <div key={room.roomId} className="flex items-center gap-2 p-2 bg-gray-50 rounded">
-                          {room.imageUrl && (
-                            <img 
-                              src={room.imageUrl} 
-                              alt={room.roomTypeName}
-                              className="w-12 h-12 object-cover rounded"
-                              onError={handleImageError}
-                            />
-                          )}
+                          <img 
+                            src={room.imageUrl || FALLBACK_IMAGE} 
+                            alt={room.roomTypeName}
+                            className="w-12 h-12 object-cover rounded"
+                            onError={handleImageError}
+                          />
                           <div className="flex-grow">
                             <p className="text-sm font-medium">{room.roomTypeName}</p>
                             <p className="text-xs text-gray-600">{formatCurrency(room.basePrice)}/đêm</p>
@@ -708,11 +706,10 @@ export default function BookingPage() {
               <div className="relative w-full">
                 <img
                   src={
-                    (selectedRoom.images?.[currentImageIndex] || 
-                    currentRoomType.images?.[currentImageIndex] || 
+                    selectedRoom.images?.[currentImageIndex] || 
                     selectedRoom.images?.[0] || 
-                    currentRoomType.images?.[0] || 
-                    FALLBACK_IMAGE)
+                    currentRoomType.imageUrl || 
+                    FALLBACK_IMAGE
                   }
                   alt={`${currentRoomType.name} - Ảnh ${currentImageIndex + 1}`}
                   className="w-full h-64 md:h-96 object-cover rounded-lg"
@@ -720,13 +717,13 @@ export default function BookingPage() {
                 />
                 
                 {/* Image Navigation */}
-                {((selectedRoom.images?.length || 0) > 1 || (currentRoomType.images?.length || 0) > 1) && (
+                {(selectedRoom.images?.length || 0) > 1 && (
                   <div className="absolute inset-0 flex items-center justify-between p-4">
                     <Button
                       variant="secondary"
                       size="icon"
                       onClick={() => setCurrentImageIndex(prev => 
-                        prev === 0 ? ((selectedRoom.images?.length || currentRoomType.images?.length || 1) - 1) : prev - 1
+                        prev === 0 ? ((selectedRoom.images?.length || 1) - 1) : prev - 1
                       )}
                       className="bg-black/50 hover:bg-black/70 text-white"
                     >
@@ -736,7 +733,7 @@ export default function BookingPage() {
                       variant="secondary"
                       size="icon"
                       onClick={() => setCurrentImageIndex(prev => 
-                        prev === ((selectedRoom.images?.length || currentRoomType.images?.length || 1) - 1) ? 0 : prev + 1
+                        prev === ((selectedRoom.images?.length || 1) - 1) ? 0 : prev + 1
                       )}
                       className="bg-black/50 hover:bg-black/70 text-white"
                     >
@@ -745,15 +742,17 @@ export default function BookingPage() {
                   </div>
                 )}
                 
-                <Badge className="absolute bottom-4 right-4 bg-black/70 text-white">
-                  {currentImageIndex + 1} / {selectedRoom.images?.length || currentRoomType.images?.length || 1}
-                </Badge>
+                {(selectedRoom.images?.length || 0) > 1 && (
+                  <Badge className="absolute bottom-4 right-4 bg-black/70 text-white">
+                    {currentImageIndex + 1} / {selectedRoom.images?.length || 1}
+                  </Badge>
+                )}
               </div>
 
               {/* Thumbnail Gallery */}
-              {((selectedRoom.images?.length || 0) > 1 || (currentRoomType.images?.length || 0) > 1) && (
+              {(selectedRoom.images?.length || 0) > 1 && (
                 <div className="flex gap-2 md:gap-3 overflow-x-auto pb-2 px-1">
-                  {(selectedRoom.images || currentRoomType.images || []).map((img: string, idx: number) => (
+                  {(selectedRoom.images || []).map((img: string, idx: number) => (
                     <button
                       key={idx}
                       onClick={() => setCurrentImageIndex(idx)}

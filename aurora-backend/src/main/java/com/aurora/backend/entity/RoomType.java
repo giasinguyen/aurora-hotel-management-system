@@ -1,6 +1,5 @@
 package com.aurora.backend.entity;
 
-import com.aurora.backend.converter.StringListConverter;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.*;
@@ -8,8 +7,6 @@ import lombok.experimental.FieldDefaults;
 import lombok.experimental.SuperBuilder;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Set;
 
 @Getter
@@ -94,11 +91,9 @@ public class RoomType extends BaseEntity {
     @Column(length = 500)
     String shortDescription;
     
-    // Images - lưu dưới dạng JSON array trong column
-    @Convert(converter = StringListConverter.class)
-    @Column(name = "images", columnDefinition = "TEXT")
-    @Builder.Default
-    List<String> images = new ArrayList<>();
+    // Image - ảnh đại diện cho room type
+    @Column(name = "image_url", length = 500)
+    String imageUrl;
 
     @OneToMany(mappedBy = "roomType")
     Set<Room> rooms;

@@ -151,16 +151,14 @@ export default function AccommodationCategoryPage() {
                 >
                   <div className="flex flex-col md:flex-row">
                     {/* Image */}
-                    {roomType.images && roomType.images.length > 0 && (
-                      <div className="relative w-full md:w-80 h-64 flex-shrink-0">
-                        <img 
-                          src={roomType.images[0]} 
-                          alt={roomType.name}
-                          className="w-full h-full object-cover"
-                          onError={handleImageError}
-                        />
-                      </div>
-                    )}
+                    <div className="relative w-full md:w-80 h-64 flex-shrink-0">
+                      <img 
+                        src={roomType.imageUrl || fallbackImage} 
+                        alt={roomType.name}
+                        className="w-full h-full object-cover"
+                        onError={handleImageError}
+                      />
+                    </div>
                     
                     {/* Content */}
                     <div className="flex-1 p-6 flex flex-col">

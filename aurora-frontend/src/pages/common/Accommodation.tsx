@@ -7,6 +7,7 @@ import { toast } from 'sonner';
 import { Loader2, ChevronRight } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import fallbackImage from '@/assets/images/commons/fallback.png';
 
 export default function AccommodationPage() {
   const navigate = useNavigate();
@@ -75,24 +76,23 @@ export default function AccommodationPage() {
                   className="group hover:shadow-xl transition-all duration-300 cursor-pointer overflow-hidden"
                   onClick={() => handleCategoryClick(category.id)}
                 >
-                  {category.imageUrl && (
-                    <div className="relative h-64 overflow-hidden">
-                      <img 
-                        src={category.imageUrl} 
-                        alt={category.name}
-                        className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
-                      <div className="absolute bottom-4 left-4 right-4">
-                        <h3 className="text-2xl font-bold text-white mb-1">
-                          {category.name}
-                        </h3>
-                        <p className="text-sm text-gray-200">
-                          {category.totalRoomTypes || 0} loại phòng
-                        </p>
-                      </div>
+                  <div className="relative h-64 overflow-hidden">
+                    <img 
+                      src={category.imageUrl || fallbackImage} 
+                      alt={category.name}
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                      onError={(e) => { e.currentTarget.src = fallbackImage; }}
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+                    <div className="absolute bottom-4 left-4 right-4">
+                      <h3 className="text-2xl font-bold text-white mb-1">
+                        {category.name}
+                      </h3>
+                      <p className="text-sm text-gray-200">
+                        {category.totalRoomTypes || 0} loại phòng
+                      </p>
                     </div>
-                  )}
+                  </div>
                   <CardContent className="p-6">
                     <p className="text-gray-600 mb-4 line-clamp-3">
                       {category.description}

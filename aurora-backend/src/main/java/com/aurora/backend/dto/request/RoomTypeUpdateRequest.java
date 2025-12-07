@@ -5,7 +5,6 @@ import lombok.*;
 import lombok.experimental.FieldDefaults;
 
 import java.math.BigDecimal;
-import java.util.List;
 import java.util.Set;
 
 @Data
@@ -40,5 +39,5 @@ public class RoomTypeUpdateRequest {
     
     Boolean refundable;
     Set<String> amenityIds;
-    List<String> images;
+    String imageUrl; // Ảnh đại diện cho room type
 }
