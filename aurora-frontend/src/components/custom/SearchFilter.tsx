@@ -59,7 +59,7 @@ export function SearchFilter({
       {filters.map((filter) => (
         <Select
           key={filter.key}
-          value={filter.value}
+          value={filter.value && filter.value.trim() !== '' ? filter.value : undefined}
           onValueChange={filter.onChange}
           disabled={filter.disabled}
         >

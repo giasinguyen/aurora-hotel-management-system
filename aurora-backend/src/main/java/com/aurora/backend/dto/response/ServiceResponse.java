@@ -15,7 +15,8 @@ public class ServiceResponse {
     String branchId;
     String branchName;
     String name;
-    String type;
+    String categoryId;
+    String categoryName;
     String description;
     Double basePrice;
     List<String> images;

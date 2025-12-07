@@ -26,20 +26,10 @@ import {
 
 import { serviceApi } from '@/services/serviceApi';
 import { branchApi } from '@/services/branchApi';
-import type { HotelService, ServiceType } from '@/types/service.types';
+import { serviceCategoryApi } from '@/services/serviceCategoryApi';
+import type { HotelService } from '@/types/service.types';
 import type { Branch } from '@/types/branch.types';
-
-// Service type configurations
-const serviceTypeConfig: Record<ServiceType, { label: string; icon: string; color: string }> = {
-  SPA: { label: 'Spa & Massage', icon: '🧖', color: 'bg-pink-100 text-pink-800' },
-  RESTAURANT: { label: 'Nhà hàng', icon: '🍽️', color: 'bg-orange-100 text-orange-800' },
-  LAUNDRY: { label: 'Giặt ủi', icon: '🧺', color: 'bg-blue-100 text-blue-800' },
-  TRANSPORT: { label: 'Vận chuyển', icon: '🚗', color: 'bg-green-100 text-green-800' },
-  TOUR: { label: 'Tour du lịch', icon: '🗺️', color: 'bg-yellow-100 text-yellow-800' },
-  GYM: { label: 'Phòng gym', icon: '🏋️', color: 'bg-red-100 text-red-800' },
-  POOL: { label: 'Hồ bơi', icon: '🏊', color: 'bg-cyan-100 text-cyan-800' },
-  OTHER: { label: 'Khác', icon: '📦', color: 'bg-gray-100 text-gray-800' },
-};
+import type { ServiceCategory } from '@/types/serviceCategory.types';
 
 export default function ServiceList() {
   const navigate = useNavigate();
@@ -47,6 +37,7 @@ export default function ServiceList() {
   // State
   const [services, setServices] = useState<HotelService[]>([]);
   const [branches, setBranches] = useState<Branch[]>([]);
+  const [categories, setCategories] = useState<ServiceCategory[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   
   // Pagination
@@ -58,7 +49,7 @@ export default function ServiceList() {
   // Filters
   const [searchKeyword, setSearchKeyword] = useState('');
   const [selectedBranch, setSelectedBranch] = useState('');
-  const [selectedType, setSelectedType] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('');
   
   // Sorting
   const [sortColumn, setSortColumn] = useState('name');
@@ -81,6 +72,23 @@ export default function ServiceList() {
     fetchBranches();
   }, []);
 
+  // Fetch categories when branch is selected
+  useEffect(() => {
+    const fetchCategories = async () => {
+      if (!selectedBranch) {
+        setCategories([]);
+        return;
+      }
+      try {
+        const response = await serviceCategoryApi.getByBranch(selectedBranch);
+        setCategories(response.result || []);
+      } catch (error) {
+        console.error('Failed to fetch categories:', error);
+      }
+    };
+    fetchCategories();
+  }, [selectedBranch]);
+
   // Fetch services
   const fetchServices = useCallback(async () => {
     try {
@@ -88,7 +96,7 @@ export default function ServiceList() {
       
       const response = await serviceApi.search({
         hotelId: selectedBranch || undefined,
-        type: selectedType as ServiceType || undefined,
+        categoryId: selectedCategory || undefined,
         name: searchKeyword || undefined,
         page: currentPage,
         size: pageSize,
@@ -106,7 +114,7 @@ export default function ServiceList() {
     } finally {
       setIsLoading(false);
     }
-  }, [currentPage, pageSize, selectedBranch, selectedType, searchKeyword, sortColumn, sortDirection]);
+  }, [currentPage, pageSize, selectedBranch, selectedCategory, searchKeyword, sortColumn, sortDirection]);
 
   useEffect(() => {
     fetchServices();
@@ -142,7 +150,7 @@ export default function ServiceList() {
   const handleClearFilters = () => {
     setSearchKeyword('');
     setSelectedBranch('');
-    setSelectedType('');
+    setSelectedCategory('');
     setCurrentPage(0);
   };
 
@@ -175,17 +183,13 @@ export default function ServiceList() {
       cell: (service) => service.branchName,
     },
     {
-      key: 'type',
-      header: 'Loại dịch vụ',
-      cell: (service) => {
-        const config = serviceTypeConfig[service.type as ServiceType];
-        return (
-          <Badge variant="outline" className={config?.color}>
-            <span className="mr-1">{config?.icon}</span>
-            {config?.label || service.type}
-          </Badge>
-        );
-      },
+      key: 'categoryName',
+      header: 'Danh mục dịch vụ',
+      cell: (service) => (
+        <Badge variant="outline" className="bg-purple-100 text-purple-800">
+          {service.categoryName || 'Chưa phân loại'}
+        </Badge>
+      ),
     },
     {
       key: 'basePrice',
@@ -243,10 +247,13 @@ export default function ServiceList() {
     label: branch.name,
   }));
 
-  const typeOptions = Object.entries(serviceTypeConfig).map(([value, config]) => ({
-    value,
-    label: config.label,
-  }));
+  const categoryOptions = [
+    { value: 'all', label: 'Tất cả danh mục' },
+    ...categories.map((cat) => ({
+      value: cat.id,
+      label: cat.name,
+    })),
+  ];
 
   return (
     <div className="space-y-6">
@@ -280,12 +287,12 @@ export default function ServiceList() {
                 },
               },
               {
-                key: 'type',
-                label: 'Loại dịch vụ',
-                value: selectedType,
-                options: typeOptions,
+                key: 'category',
+                label: 'Danh mục dịch vụ',
+                value: selectedCategory,
+                options: categoryOptions,
                 onChange: (value) => {
-                  setSelectedType(value === 'all' ? '' : value);
+                  setSelectedCategory(value === 'all' ? '' : value);
                   setCurrentPage(0);
                 },
               },

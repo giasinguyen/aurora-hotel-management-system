@@ -11,9 +11,9 @@ import org.mapstruct.MappingTarget;
 @Mapper(componentModel = "spring")
 public interface AmenityMapper {
     Amenity toAmenity(AmenityCreationRequest request);
-    
+
     AmenityResponse toAmenityResponse(Amenity amenity);
-    
+
     @Mapping(target = "id", ignore = true)
     void updateAmenityFromRequest(AmenityUpdateRequest request, @MappingTarget Amenity amenity);
 }

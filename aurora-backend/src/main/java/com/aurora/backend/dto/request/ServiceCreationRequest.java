@@ -19,7 +19,8 @@ public class ServiceCreationRequest {
     @NotBlank(message = "SERVICE_NAME_REQUIRED")
     String name;
     
-    String type;
+    @NotBlank(message = "SERVICE_CATEGORY_REQUIRED")
+    String categoryId;
     
     String description;
     

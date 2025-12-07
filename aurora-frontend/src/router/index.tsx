@@ -94,6 +94,8 @@ import RoomUpsertPage from "@/pages/rooms/RoomUpsert";
 // Services
 import ServiceListPage from "@/pages/services/ServiceList";
 import ServiceUpsertPage from "@/pages/services/ServiceUpsert";
+import ServiceCategoryListPage from "@/pages/services/ServiceCategoryList";
+import ServiceCategoryUpsertPage from "@/pages/services/ServiceCategoryUpsert";
 
 // Shifts
 import ShiftManagementPage from "@/pages/shifts/ShiftManagement";
@@ -206,6 +208,8 @@ const router = createBrowserRouter([
       { path: "room-types/upsert", element: <RoomTypeUpsertPage /> },
       { path: "room-categories", element: <RoomCategoryListPage /> },
       { path: "room-categories/upsert", element: <RoomCategoryUpsertPage /> },
+      { path: "service-categories", element: <ServiceCategoryListPage /> },
+      { path: "service-categories/upsert", element: <ServiceCategoryUpsertPage /> },
       { path: "services", element: <ServiceListPage /> },
       { path: "services/upsert", element: <ServiceUpsertPage /> },
       { path: "promotions", element: <PromotionListPage /> },

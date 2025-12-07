@@ -345,8 +345,8 @@ export default function BookingPage() {
             </Button>
           </div>
           <div className="max-w-full mx-auto">
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-7 gap-3">
-              <div>
+            <div className="flex flex-wrap gap-3">
+              <div className="flex-1 min-w-[140px] max-w-[200px]">
                 <Label htmlFor="checkIn">Check-in</Label>
                 <Input
                   id="checkIn"
@@ -354,9 +354,10 @@ export default function BookingPage() {
                   value={filter.checkIn}
                   onChange={(e) => setFilter(prev => ({ ...prev, checkIn: e.target.value }))}
                   min={new Date().toISOString().split('T')[0]}
+                  className="w-full"
                 />
               </div>
-              <div>
+              <div className="flex-1 min-w-[140px] max-w-[200px]">
                 <Label htmlFor="checkOut">Check-out</Label>
                 <Input
                   id="checkOut"
@@ -364,9 +365,10 @@ export default function BookingPage() {
                   value={filter.checkOut}
                   onChange={(e) => setFilter(prev => ({ ...prev, checkOut: e.target.value }))}
                   min={filter.checkIn}
+                  className="w-full"
                 />
               </div>
-              <div className="min-w-0">
+              <div className="flex-1 min-w-[160px] max-w-[220px]">
                 <Label htmlFor="category" className="truncate block">Hạng phòng</Label>
                 <Select
                   value={filter.category}
@@ -379,7 +381,7 @@ export default function BookingPage() {
                     }));
                   }}
                 >
-                  <SelectTrigger id="category" className="truncate">
+                  <SelectTrigger id="category" className="w-full truncate">
                     <SelectValue placeholder="Tất cả" className="truncate" />
                   </SelectTrigger>
                   <SelectContent>
@@ -392,14 +394,14 @@ export default function BookingPage() {
                   </SelectContent>
                 </Select>
               </div>
-              <div className="min-w-0">
+              <div className="flex-1 min-w-[180px] max-w-[250px]">
                 <Label htmlFor="roomType" className="truncate block">Loại phòng</Label>
                 <Select
                   value={filter.roomType}
                   onValueChange={(value) => setFilter(prev => ({ ...prev, roomType: value }))}
                   disabled={filter.category === 'all'}
                 >
-                  <SelectTrigger id="roomType" className={`truncate ${filter.category === 'all' ? 'opacity-50 cursor-not-allowed' : ''}`}>
+                  <SelectTrigger id="roomType" className={`w-full truncate ${filter.category === 'all' ? 'opacity-50 cursor-not-allowed' : ''}`}>
                     <SelectValue placeholder="Tất cả" className="truncate" />
                   </SelectTrigger>
                   <SelectContent>
@@ -417,13 +419,13 @@ export default function BookingPage() {
                   <p className="text-xs text-gray-500 mt-1">Chọn hạng phòng trước</p>
                 )}
               </div>
-              <div className="min-w-0">
+              <div className="flex-1 min-w-[120px] max-w-[160px]">
                 <Label htmlFor="viewType" className="truncate block">View</Label>
                 <Select
                   value={filter.viewType || "all"}
                   onValueChange={(value) => setFilter(prev => ({ ...prev, viewType: value }))}
                 >
-                  <SelectTrigger id="viewType" className="truncate">
+                  <SelectTrigger id="viewType" className="w-full truncate">
                     <SelectValue placeholder="Tất cả" className="truncate" />
                   </SelectTrigger>
                   <SelectContent>
@@ -435,13 +437,13 @@ export default function BookingPage() {
                   </SelectContent>
                 </Select>
               </div>
-              <div className="min-w-0">
+              <div className="flex-1 min-w-[120px] max-w-[160px]">
                 <Label htmlFor="guests" className="truncate block">Guest</Label>
                 <Select
                   value={filter.guests.toString()}
                   onValueChange={(value) => setFilter(prev => ({ ...prev, guests: parseInt(value) }))}
                 >
-                  <SelectTrigger id="guests" className="truncate">
+                  <SelectTrigger id="guests" className="w-full truncate">
                     <SelectValue placeholder="Số khách" className="truncate" />
                   </SelectTrigger>
                   <SelectContent>
@@ -453,13 +455,13 @@ export default function BookingPage() {
                   </SelectContent>
                 </Select>
               </div>
-              <div className="min-w-0">
+              <div className="flex-1 min-w-[140px] max-w-[180px]">
                 <Label htmlFor="priceRange" className="truncate block">Giá</Label>
                 <Select
                   value={filter.priceRange || "all"}
                   onValueChange={(value) => setFilter(prev => ({ ...prev, priceRange: value }))}
                 >
-                  <SelectTrigger id="priceRange" className="truncate">
+                  <SelectTrigger id="priceRange" className="w-full truncate">
                     <SelectValue placeholder="Tất cả" className="truncate" />
                   </SelectTrigger>
                   <SelectContent>

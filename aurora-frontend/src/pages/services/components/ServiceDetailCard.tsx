@@ -8,13 +8,6 @@ import {
   FileText,
   DollarSign,
   Sparkles,
-  Utensils,
-  Car,
-  Dumbbell,
-  Waves,
-  Shirt,
-  Map,
-  Package,
   ArrowLeft,
   Edit
 } from 'lucide-react';
@@ -23,7 +16,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
-import type { HotelService, ServiceType } from '@/types/service.types';
+import type { HotelService } from '@/types/service.types';
 
 // ============================================
 // Helper Functions
@@ -36,46 +29,8 @@ function formatCurrency(amount: number): string {
   }).format(amount);
 }
 
-const getServiceTypeIcon = (type: ServiceType) => {
-  const icons: Record<ServiceType, React.ReactNode> = {
-    SPA: <Sparkles className="h-6 w-6" />,
-    RESTAURANT: <Utensils className="h-6 w-6" />,
-    LAUNDRY: <Shirt className="h-6 w-6" />,
-    TRANSPORT: <Car className="h-6 w-6" />,
-    TOUR: <Map className="h-6 w-6" />,
-    GYM: <Dumbbell className="h-6 w-6" />,
-    POOL: <Waves className="h-6 w-6" />,
-    OTHER: <Package className="h-6 w-6" />,
-  };
-  return icons[type] || <Package className="h-6 w-6" />;
-};
-
-const getServiceTypeLabel = (type: ServiceType): string => {
-  const labels: Record<ServiceType, string> = {
-    SPA: 'Spa & Massage',
-    RESTAURANT: 'Nhà hàng',
-    LAUNDRY: 'Giặt ủi',
-    TRANSPORT: 'Vận chuyển',
-    TOUR: 'Tour du lịch',
-    GYM: 'Phòng gym',
-    POOL: 'Hồ bơi',
-    OTHER: 'Khác',
-  };
-  return labels[type] || 'Khác';
-};
-
-const getServiceTypeColor = (type: ServiceType): string => {
-  const colors: Record<ServiceType, string> = {
-    SPA: 'from-pink-500 to-rose-500',
-    RESTAURANT: 'from-orange-500 to-amber-500',
-    LAUNDRY: 'from-cyan-500 to-teal-500',
-    TRANSPORT: 'from-blue-500 to-indigo-500',
-    TOUR: 'from-green-500 to-emerald-500',
-    GYM: 'from-red-500 to-rose-500',
-    POOL: 'from-sky-500 to-blue-500',
-    OTHER: 'from-gray-500 to-slate-500',
-  };
-  return colors[type] || 'from-gray-500 to-slate-500';
+const getCategoryColor = (): string => {
+  return 'from-purple-500 to-violet-500';
 };
 
 // ============================================
@@ -139,11 +94,11 @@ export default function ServiceDetailCard({ service, onEdit, onBack }: ServiceDe
 
       {/* Header Card */}
       <Card className="border-0 shadow-lg overflow-hidden">
-        <div className={`bg-gradient-to-r ${getServiceTypeColor(service.type)} p-6 text-white`}>
+        <div className={`bg-gradient-to-r ${getCategoryColor()} p-6 text-white`}>
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <div className="p-4 rounded-2xl bg-white/20 backdrop-blur-sm">
-                {getServiceTypeIcon(service.type)}
+                <Sparkles className="h-6 w-6" />
               </div>
               <div>
                 <h2 className="text-3xl font-bold tracking-tight">
@@ -151,7 +106,7 @@ export default function ServiceDetailCard({ service, onEdit, onBack }: ServiceDe
                 </h2>
                 <div className="flex items-center gap-2 mt-1">
                   <Badge variant="secondary" className="bg-white/20 text-white border-0">
-                    {getServiceTypeLabel(service.type)}
+                    {service.categoryName || 'Chưa phân loại'}
                   </Badge>
                   <span className="text-white/80">•</span>
                   <span className="text-white/80">{service.branchName}</span>
@@ -187,10 +142,10 @@ export default function ServiceDetailCard({ service, onEdit, onBack }: ServiceDe
             <Separator />
             <InfoItem
               icon={<Sparkles className="h-4 w-4" />}
-              label="Loại dịch vụ"
+              label="Danh mục dịch vụ"
               value={
                 <Badge variant="secondary" className="mt-1">
-                  {getServiceTypeLabel(service.type)}
+                  {service.categoryName || 'Chưa phân loại'}
                 </Badge>
               }
             />
@@ -244,10 +199,10 @@ export default function ServiceDetailCard({ service, onEdit, onBack }: ServiceDe
         <Card className="border-0 shadow-md bg-gradient-to-br from-purple-50 to-purple-100 hover:shadow-lg transition-shadow">
           <CardContent className="p-4 text-center">
             <div className="mx-auto mb-2 p-3 rounded-full bg-purple-500 text-white w-fit">
-              {getServiceTypeIcon(service.type)}
+              <Sparkles className="h-5 w-5" />
             </div>
-            <p className="text-lg font-bold text-purple-700">{getServiceTypeLabel(service.type)}</p>
-            <p className="text-sm text-purple-600">Loại dịch vụ</p>
+            <p className="text-lg font-bold text-purple-700">{service.categoryName || 'Chưa phân loại'}</p>
+            <p className="text-sm text-purple-600">Danh mục dịch vụ</p>
           </CardContent>
         </Card>
 

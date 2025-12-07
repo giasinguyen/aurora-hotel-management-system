@@ -5,10 +5,12 @@ import com.aurora.backend.dto.request.ServiceUpdateRequest;
 import com.aurora.backend.dto.response.ServiceResponse;
 import com.aurora.backend.entity.Branch;
 import com.aurora.backend.entity.Service;
+import com.aurora.backend.entity.ServiceCategory;
 import com.aurora.backend.exception.AppException;
 import com.aurora.backend.enums.ErrorCode;
 import com.aurora.backend.mapper.ServiceMapper;
 import com.aurora.backend.repository.BranchRepository;
+import com.aurora.backend.repository.ServiceCategoryRepository;
 import com.aurora.backend.repository.ServiceRepository;
 import com.aurora.backend.service.ServiceService;
 import lombok.AccessLevel;
@@ -29,6 +31,7 @@ public class ServiceServiceImpl implements ServiceService {
     
     ServiceRepository serviceRepository;
     BranchRepository branchRepository;
+    ServiceCategoryRepository serviceCategoryRepository;
     ServiceMapper serviceMapper;
 
     @Override
@@ -39,12 +42,16 @@ public class ServiceServiceImpl implements ServiceService {
         Branch branch = branchRepository.findById(request.getBranchId())
                 .orElseThrow(() -> new AppException(ErrorCode.BRANCH_NOT_EXISTED));
         
+        ServiceCategory category = serviceCategoryRepository.findById(request.getCategoryId())
+                .orElseThrow(() -> new AppException(ErrorCode.SERVICE_NOT_FOUND)); // Reuse error code
+        
         if (serviceRepository.existsByBranchAndName(branch, request.getName())) {
             throw new AppException(ErrorCode.SERVICE_EXISTED);
         }
         
         Service service = serviceMapper.toService(request);
         service.setBranch(branch);
+        service.setCategory(category);
         
         Service savedService = serviceRepository.save(service);
         log.info("Service created successfully with ID: {}", savedService.getId());
@@ -65,6 +72,13 @@ public class ServiceServiceImpl implements ServiceService {
             if (serviceRepository.existsByBranchAndName(service.getBranch(), request.getName())) {
                 throw new AppException(ErrorCode.SERVICE_EXISTED);
             }
+        }
+        
+        // If category is being updated, verify it exists
+        if (request.getCategoryId() != null && !request.getCategoryId().equals(service.getCategory().getId())) {
+            ServiceCategory category = serviceCategoryRepository.findById(request.getCategoryId())
+                    .orElseThrow(() -> new AppException(ErrorCode.SERVICE_NOT_FOUND));
+            service.setCategory(category);
         }
         
         serviceMapper.updateService(service, request);
@@ -124,17 +138,20 @@ public class ServiceServiceImpl implements ServiceService {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<ServiceResponse> getServicesByType(String type, Pageable pageable) {
-        log.debug("Fetching services with type: {} with pagination: {}", type, pageable);
+    public Page<ServiceResponse> getServicesByType(String categoryId, Pageable pageable) {
+        log.debug("Fetching services with category: {} with pagination: {}", categoryId, pageable);
         
-        Page<Service> services = serviceRepository.findByType(type, pageable);
+        ServiceCategory category = serviceCategoryRepository.findById(categoryId)
+                .orElseThrow(() -> new AppException(ErrorCode.SERVICE_NOT_FOUND));
+        
+        Page<Service> services = serviceRepository.findByCategory(category, pageable);
         return services.map(serviceMapper::toServiceResponse);
     }
 
     @Override
     @Transactional(readOnly = true)
-    public Page<ServiceResponse> searchServices(String branchId, String type, String name, Pageable pageable) {
-        log.debug("Searching services with filters - branch: {}, Type: {}, Name: {}", branchId, type, name);
+    public Page<ServiceResponse> searchServices(String branchId, String categoryId, String name, Pageable pageable) {
+        log.debug("Searching services with filters - branch: {}, Category: {}, Name: {}", branchId, categoryId, name);
         
         Branch branch = null;
         if (branchId != null && !branchId.trim().isEmpty()) {
@@ -142,7 +159,7 @@ public class ServiceServiceImpl implements ServiceService {
                     .orElseThrow(() -> new AppException(ErrorCode.BRANCH_NOT_EXISTED));
         }
         
-        Page<Service> services = serviceRepository.findByFilters(branch, type, name, pageable);
+        Page<Service> services = serviceRepository.findByFilters(branch, categoryId, name, pageable);
         return services.map(serviceMapper::toServiceResponse);
     }
 }

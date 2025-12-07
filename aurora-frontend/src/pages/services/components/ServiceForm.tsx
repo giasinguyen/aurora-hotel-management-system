@@ -9,14 +9,7 @@ import {
   Tag,
   FileText,
   DollarSign,
-  Sparkles,
-  Utensils,
-  Car,
-  Dumbbell,
-  Waves,
-  Shirt,
-  Map,
-  Package
+  Sparkles
 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
@@ -33,28 +26,14 @@ import {
 } from '@/components/ui/select';
 
 import { branchApi } from '@/services/branchApi';
+import { serviceCategoryApi } from '@/services/serviceCategoryApi';
 import type { Branch } from '@/types/branch.types';
+import type { ServiceCategory } from '@/types/serviceCategory.types';
 import type { 
   HotelService, 
   ServiceCreationRequest, 
-  ServiceUpdateRequest,
-  ServiceType 
+  ServiceUpdateRequest
 } from '@/types/service.types';
-
-// ============================================
-// Service Type Options
-// ============================================
-
-const SERVICE_TYPES: { value: ServiceType; label: string; icon: React.ReactNode; description: string }[] = [
-  { value: 'SPA', label: 'Spa & Massage', icon: <Sparkles className="h-5 w-5" />, description: 'Dịch vụ spa, massage thư giãn' },
-  { value: 'RESTAURANT', label: 'Nhà hàng', icon: <Utensils className="h-5 w-5" />, description: 'Dịch vụ ẩm thực, đồ uống' },
-  { value: 'LAUNDRY', label: 'Giặt ủi', icon: <Shirt className="h-5 w-5" />, description: 'Dịch vụ giặt ủi quần áo' },
-  { value: 'TRANSPORT', label: 'Vận chuyển', icon: <Car className="h-5 w-5" />, description: 'Dịch vụ đưa đón, thuê xe' },
-  { value: 'TOUR', label: 'Tour du lịch', icon: <Map className="h-5 w-5" />, description: 'Tour tham quan, du lịch' },
-  { value: 'GYM', label: 'Phòng gym', icon: <Dumbbell className="h-5 w-5" />, description: 'Phòng tập thể dục, gym' },
-  { value: 'POOL', label: 'Hồ bơi', icon: <Waves className="h-5 w-5" />, description: 'Dịch vụ hồ bơi, bể bơi' },
-  { value: 'OTHER', label: 'Khác', icon: <Package className="h-5 w-5" />, description: 'Các dịch vụ khác' },
-];
 
 // ============================================
 // Form State Types
@@ -63,7 +42,7 @@ const SERVICE_TYPES: { value: ServiceType; label: string; icon: React.ReactNode;
 interface FormState {
   branchId: string;
   name: string;
-  type: ServiceType;
+  categoryId: string;
   description: string;
   basePrice: number;
 }
@@ -71,7 +50,7 @@ interface FormState {
 interface FormErrors {
   branchId?: string;
   name?: string;
-  type?: string;
+  categoryId?: string;
   basePrice?: string;
 }
 
@@ -100,16 +79,23 @@ export default function ServiceForm({
 }: ServiceFormProps) {
   // ========== States ==========
   const [branches, setBranches] = useState<Branch[]>([]);
+  const [categories, setCategories] = useState<ServiceCategory[]>([]);
   const [isLoadingBranches, setIsLoadingBranches] = useState(true);
+  const [isLoadingCategories, setIsLoadingCategories] = useState(false);
   const [errors, setErrors] = useState<FormErrors>({});
 
   const [formState, setFormState] = useState<FormState>({
     branchId: service?.branchId || '',
     name: service?.name || '',
-    type: service?.type || 'OTHER',
+    categoryId: service?.categoryId || '',
     description: service?.description || '',
     basePrice: service?.basePrice || 100000,
   });
+  
+  // Helper to get select value (convert empty string to undefined)
+  const getSelectValue = (value: string): string | undefined => {
+    return value && value.trim() !== '' ? value : undefined;
+  };
 
   // ========== Effects ==========
 
@@ -119,7 +105,7 @@ export default function ServiceForm({
       setFormState({
         branchId: service.branchId || '',
         name: service.name || '',
-        type: service.type || 'OTHER',
+        categoryId: service.categoryId || '',
         description: service.description || '',
         basePrice: service.basePrice || 100000,
       });
@@ -143,6 +129,30 @@ export default function ServiceForm({
     fetchBranches();
   }, []);
 
+  // Fetch categories when branch is selected
+  useEffect(() => {
+    const fetchCategories = async () => {
+      if (!formState.branchId) {
+        setCategories([]);
+        return;
+      }
+      try {
+        setIsLoadingCategories(true);
+        const response = await serviceCategoryApi.getByBranch(formState.branchId);
+        setCategories(response.result || []);
+      } catch (error) {
+        console.error('Failed to fetch categories:', error);
+      } finally {
+        setIsLoadingCategories(false);
+      }
+    };
+    fetchCategories();
+    // Reset category when branch changes
+    if (formState.branchId) {
+      setFormState(prev => ({ ...prev, categoryId: '' }));
+    }
+  }, [formState.branchId]);
+
   // ========== Handlers ==========
 
   const updateField = <K extends keyof FormState>(field: K, value: FormState[K]) => {
@@ -163,8 +173,8 @@ export default function ServiceForm({
     } else if (formState.name.length > 100) {
       newErrors.name = 'Tên tối đa 100 ký tự';
     }
-    if (!formState.type) {
-      newErrors.type = 'Vui lòng chọn loại dịch vụ';
+    if (!formState.categoryId) {
+      newErrors.categoryId = 'Vui lòng chọn danh mục dịch vụ';
     }
     if (!formState.basePrice || formState.basePrice <= 0) {
       newErrors.basePrice = 'Giá dịch vụ phải lớn hơn 0';
@@ -182,7 +192,7 @@ export default function ServiceForm({
     if (isEditMode) {
       const updateData: ServiceUpdateRequest = {
         name: formState.name,
-        type: formState.type,
+        categoryId: formState.categoryId,
         description: formState.description || undefined,
         basePrice: formState.basePrice,
       };
@@ -192,7 +202,7 @@ export default function ServiceForm({
       const createData: ServiceCreationRequest = {
         branchId: formState.branchId,
         name: formState.name,
-        type: formState.type,
+        categoryId: formState.categoryId,
         description: formState.description || undefined,
         basePrice: formState.basePrice,
       };
@@ -201,7 +211,6 @@ export default function ServiceForm({
     }
   };
 
-  const selectedTypeConfig = SERVICE_TYPES.find(t => t.value === formState.type);
 
   // ========== Render ==========
 
@@ -228,7 +237,7 @@ export default function ServiceForm({
             </Label>
             <Select
               disabled={isEditMode || isLoadingBranches}
-              value={formState.branchId}
+              value={getSelectValue(formState.branchId)}
               onValueChange={(value) => updateField('branchId', value)}
             >
               <SelectTrigger className={`h-11 max-w-md ${errors.branchId ? 'border-destructive' : ''}`}>
@@ -253,7 +262,7 @@ export default function ServiceForm({
         </CardContent>
       </Card>
 
-      {/* Service Type Selection */}
+      {/* Service Category Selection */}
       <Card className="border-0 shadow-lg bg-gradient-to-br from-white to-slate-50">
         <CardHeader className="pb-4">
           <div className="flex items-center gap-3">
@@ -261,45 +270,49 @@ export default function ServiceForm({
               <Sparkles className="h-5 w-5" />
             </div>
             <div>
-              <CardTitle className="text-lg">Loại dịch vụ</CardTitle>
-              <CardDescription>Chọn loại dịch vụ phù hợp</CardDescription>
+              <CardTitle className="text-lg">Danh mục dịch vụ</CardTitle>
+              <CardDescription>Chọn danh mục dịch vụ phù hợp</CardDescription>
             </div>
           </div>
         </CardHeader>
         <CardContent>
-          <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-4">
-            {SERVICE_TYPES.map((type) => {
-              const isSelected = formState.type === type.value;
-              return (
-                <button
-                  key={type.value}
-                  type="button"
-                  onClick={() => updateField('type', type.value)}
-                  className={`
-                    flex flex-col items-center gap-2 p-4 rounded-xl border-2 transition-all duration-200
-                    ${isSelected 
-                      ? 'border-purple-500 bg-purple-50 text-purple-700 shadow-md' 
-                      : 'border-gray-200 bg-white hover:border-gray-300 hover:bg-gray-50'
-                    }
-                  `}
-                >
-                  <div className={`
-                    p-3 rounded-full
-                    ${isSelected ? 'bg-purple-500 text-white' : 'bg-gray-100 text-gray-500'}
-                  `}>
-                    {type.icon}
-                  </div>
-                  <span className="text-sm font-medium">{type.label}</span>
-                </button>
-              );
-            })}
+          <div className="space-y-2">
+            <Label className="flex items-center gap-2">
+              <Sparkles className="h-4 w-4 text-muted-foreground" />
+              Danh mục dịch vụ <span className="text-destructive">*</span>
+            </Label>
+            <Select
+              value={getSelectValue(formState.categoryId)}
+              onValueChange={(value) => updateField('categoryId', value)}
+              disabled={!formState.branchId || isLoadingCategories}
+            >
+              <SelectTrigger className={`h-11 max-w-md ${errors.categoryId ? 'border-destructive' : ''}`}>
+                <SelectValue placeholder={
+                  !formState.branchId 
+                    ? 'Vui lòng chọn chi nhánh trước' 
+                    : isLoadingCategories 
+                    ? 'Đang tải...' 
+                    : categories.length === 0
+                    ? 'Không có danh mục nào'
+                    : 'Chọn danh mục dịch vụ'
+                } />
+              </SelectTrigger>
+              <SelectContent>
+                {categories.length > 0 && categories.map((category) => (
+                  <SelectItem key={category.id} value={category.id}>
+                    <div className="flex items-center gap-2">
+                      <Sparkles className="h-4 w-4 text-muted-foreground" />
+                      {category.name}
+                    </div>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            {!formState.branchId && (
+              <p className="text-sm text-amber-600">Vui lòng chọn chi nhánh trước để xem danh mục dịch vụ</p>
+            )}
+            {errors.categoryId && <p className="text-sm text-destructive">{errors.categoryId}</p>}
           </div>
-          {selectedTypeConfig && (
-            <p className="mt-3 text-sm text-muted-foreground text-center">
-              {selectedTypeConfig.description}
-            </p>
-          )}
-          {errors.type && <p className="text-sm text-destructive mt-2">{errors.type}</p>}
         </CardContent>
       </Card>
 

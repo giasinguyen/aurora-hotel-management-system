@@ -19,7 +19,7 @@ import java.util.List;
 @Entity
 @Table(name = "services", indexes = {
         @Index(name = "idx_service_branch", columnList = "branch_id"),
-        @Index(name = "idx_service_type", columnList = "type"),
+        @Index(name = "idx_service_category", columnList = "category_id"),
         @Index(name = "idx_service_active", columnList = "active")
 })
 public class Service extends BaseEntity {
@@ -31,9 +31,9 @@ public class Service extends BaseEntity {
     @Column(nullable = false, length = 200)
     String name; // Spa, Massage, Airport Pickup, Laundry...
     
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false, length = 50)
-    ServiceType type;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_id", nullable = false)
+    ServiceCategory category;
     
     @Column(length = 2000)
     String description;
@@ -67,18 +67,4 @@ public class Service extends BaseEntity {
     // Operating hours (if different from branch)
     @Column(length = 100)
     String operatingHours; // "08:00-22:00" or "24/7"
-    
-    // Service Type Enum
-    public enum ServiceType {
-        SPA,            // Spa services
-        MASSAGE,        // Massage
-        RESTAURANT,     // Nhà hàng
-        ROOM_SERVICE,   // Dịch vụ phòng
-        LAUNDRY,        // Giặt ủi
-        AIRPORT_TRANSFER, // Đưa đón sân bay
-        TOUR,           // Tour du lịch
-        GYM,            // Phòng gym
-        CONFERENCE,     // Hội nghị
-        OTHER           // Khác
-    }
 }

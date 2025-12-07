@@ -89,7 +89,7 @@ public class ServiceController {
     @GetMapping("/search")
     public ApiResponse<Page<ServiceResponse>> searchServices(
             @RequestParam(required = false) String hotelId,
-            @RequestParam(required = false) String type,
+            @RequestParam(required = false) String categoryId,
             @RequestParam(required = false) String name,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
@@ -97,7 +97,7 @@ public class ServiceController {
             @RequestParam(defaultValue = "asc") String sortDir) {
         Sort.Direction direction = sortDir.equalsIgnoreCase("desc") ? Sort.Direction.DESC : Sort.Direction.ASC;
         Pageable pageable = PageRequest.of(page, size, Sort.by(direction, sortBy));
-        Page<ServiceResponse> response = serviceService.searchServices(hotelId, type, name, pageable);
+        Page<ServiceResponse> response = serviceService.searchServices(hotelId, categoryId, name, pageable);
         return ApiResponse.<Page<ServiceResponse>>builder()
                 .code(HttpStatus.OK.value())
                 .message("Services searched successfully")

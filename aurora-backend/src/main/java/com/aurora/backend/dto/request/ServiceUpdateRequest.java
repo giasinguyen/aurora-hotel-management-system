@@ -14,7 +14,7 @@ import java.util.List;
 public class ServiceUpdateRequest {
     String name;
     
-    String type;
+    String categoryId;
     
     String description;
     

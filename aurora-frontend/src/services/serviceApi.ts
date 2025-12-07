@@ -49,7 +49,7 @@ export const serviceApi = {
   search: async (params: ServiceSearchParams = {}) => {
     const { 
       hotelId, 
-      type, 
+      categoryId,
       name,
       page = 0, 
       size = 10, 
@@ -62,7 +62,7 @@ export const serviceApi = {
       { 
         params: { 
           hotelId, 
-          type, 
+          categoryId, 
           name,
           page, 
           size, 

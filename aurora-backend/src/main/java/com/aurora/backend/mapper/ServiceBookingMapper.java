@@ -20,7 +20,7 @@ public interface ServiceBookingMapper {
     @Mapping(target = "bookingCode", source = "booking.bookingCode")
     @Mapping(target = "serviceId", source = "service.id")
     @Mapping(target = "serviceName", source = "service.name")
-    @Mapping(target = "serviceType", source = "service.type")
+    @Mapping(target = "serviceType", source = "service.category.name")
     @Mapping(target = "customerId", source = "customer.id")
     @Mapping(target = "customerName", expression = "java(serviceBooking.getCustomer().getFirstName() + \" \" + serviceBooking.getCustomer().getLastName())")
     ServiceBookingResponse toServiceBookingResponse(ServiceBooking serviceBooking);
