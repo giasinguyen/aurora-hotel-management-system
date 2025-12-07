@@ -166,7 +166,7 @@ export default function RoomTypeList() {
         <img
           src={roomType.imageUrl || fallbackImage}
           alt={roomType.name}
-          className="w-16 h-16 object-cover rounded-md"
+          className="w-32 h-32 object-cover rounded-md"
           onError={(e) => { e.currentTarget.src = fallbackImage; }}
         />
       ),
