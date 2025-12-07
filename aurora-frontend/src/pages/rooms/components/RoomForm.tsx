@@ -3,8 +3,10 @@
 // ============================================
 
 import { useEffect, useState } from 'react';
-import { Loader2, Building2, DoorOpen, Users, Maximize, Layers, DollarSign, Eye, Percent, Image as ImageIcon, Plus, X } from 'lucide-react';
+import { Loader2, Building2, DoorOpen, Users, Maximize, Layers, DollarSign, Eye, Percent, Image as ImageIcon, Plus, X, Upload } from 'lucide-react';
 import fallbackImage from '@/assets/images/commons/fallback.png';
+import { uploadToCloudinary, uploadMultipleToCloudinary } from '@/config/cloudinary';
+import { toast } from 'sonner';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -94,6 +96,7 @@ export default function RoomForm({
   });
   
   const [newImageUrl, setNewImageUrl] = useState('');
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
 
   // ========== Effects ==========
 
@@ -204,6 +207,52 @@ export default function RoomForm({
         images: [...prev.images, newImageUrl.trim()]
       }));
       setNewImageUrl('');
+    }
+  };
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    // Validate max images
+    if (formState.images.length + files.length > 10) {
+      toast.error('Chỉ được tải tối đa 10 ảnh');
+      return;
+    }
+
+    // Validate file types and sizes
+    for (const file of Array.from(files)) {
+      if (!file.type.startsWith('image/')) {
+        toast.error('Vui lòng chỉ chọn các file ảnh');
+        return;
+      }
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error(`File ${file.name} vượt quá 5MB`);
+        return;
+      }
+    }
+
+    try {
+      setIsUploadingImage(true);
+      toast.info(`Đang tải lên ${files.length} ảnh...`);
+      
+      // Upload all files using backend API
+      const uploadedUrls = await uploadMultipleToCloudinary(Array.from(files), 'rooms');
+      
+      // Add to form state
+      setFormState(prev => ({
+        ...prev,
+        images: [...prev.images, ...uploadedUrls]
+      }));
+      
+      toast.success(`Đã tải lên ${uploadedUrls.length} ảnh thành công!`);
+    } catch (error) {
+      console.error('Upload error:', error);
+      toast.error('Không thể tải ảnh lên. Vui lòng thử lại.');
+    } finally {
+      setIsUploadingImage(false);
+      // Reset input
+      e.target.value = '';
     }
   };
 
@@ -500,53 +549,73 @@ export default function RoomForm({
             </div>
             <div>
               <CardTitle className="text-lg">Hình ảnh phòng</CardTitle>
-              <CardDescription>Thêm URL hình ảnh cho phòng (tối đa 10 ảnh)</CardDescription>
+              <CardDescription>Tải lên hình ảnh cho phòng (tối đa 10 ảnh)</CardDescription>
             </div>
           </div>
         </CardHeader>
         <CardContent>
-          <div className="flex items-center space-x-2 mb-4">
-            <Input
-              type="url"
-              placeholder="Dán URL hình ảnh vào đây..."
-              value={newImageUrl}
-              onChange={(e) => setNewImageUrl(e.target.value)}
-              className="flex-1 h-11"
-            />
-            <Button type="button" onClick={handleAddImage} disabled={!newImageUrl.trim() || formState.images.length >= 10}>
-              <Plus className="h-4 w-4 mr-2" /> Thêm ảnh
-            </Button>
+          <div className="space-y-4">
+            <div className="flex items-center gap-4">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => document.getElementById('room-images-upload')?.click()}
+                disabled={isUploadingImage || formState.images.length >= 10}
+                className="flex items-center gap-2"
+              >
+                {isUploadingImage ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Upload className="h-4 w-4" />
+                )}
+                {isUploadingImage ? 'Đang tải lên...' : 'Chọn ảnh'}
+              </Button>
+              <input
+                id="room-images-upload"
+                type="file"
+                accept="image/*"
+                multiple
+                onChange={handleImageUpload}
+                className="hidden"
+              />
+              <span className="text-sm text-muted-foreground">
+                JPG, PNG (tối đa 5MB/ảnh, {10 - formState.images.length} ảnh còn lại)
+              </span>
+            </div>
+
+            {formState.images.length > 0 ? (
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+                {formState.images.map((image, index) => (
+                  <div key={index} className="relative group">
+                    <img
+                      src={image}
+                      alt={`Room Image ${index + 1}`}
+                      className="w-full h-24 object-cover rounded-md border"
+                      onError={(e) => { e.currentTarget.src = fallbackImage; }}
+                    />
+                    <Button
+                      type="button"
+                      variant="destructive"
+                      size="icon"
+                      className="absolute top-1 right-1 h-6 w-6 rounded-full shadow-md opacity-90 hover:opacity-100 transition-opacity"
+                      onClick={() => handleRemoveImage(index)}
+                    >
+                      <X className="h-3 w-3" />
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center text-muted-foreground py-8 border-2 border-dashed rounded-lg">
+                <ImageIcon className="h-12 w-12 mx-auto mb-2 opacity-50" />
+                <p>Chưa có hình ảnh nào được thêm</p>
+                <p className="text-sm">Nhấp nút "Chọn ảnh" để tải lên</p>
+              </div>
+            )}
+            {formState.images.length >= 10 && (
+              <p className="text-sm text-amber-600">Đã đạt tối đa 10 ảnh</p>
+            )}
           </div>
-          {formState.images.length > 0 ? (
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-              {formState.images.map((image, index) => (
-                <div key={index} className="relative group">
-                  <img
-                    src={image}
-                    alt={`Room Image ${index + 1}`}
-                    className="w-full h-24 object-cover rounded-md border"
-                    onError={(e) => { e.currentTarget.src = fallbackImage; }}
-                  />
-                  <Button
-                    type="button"
-                    variant="destructive"
-                    size="icon"
-                    className="absolute top-1 right-1 h-6 w-6 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
-                    onClick={() => handleRemoveImage(index)}
-                  >
-                    <X className="h-3 w-3" />
-                  </Button>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="text-center text-muted-foreground py-4 border rounded-md">
-              Chưa có hình ảnh nào được thêm.
-            </div>
-          )}
-          {formState.images.length >= 10 && (
-            <p className="text-sm text-amber-600 mt-2">Đã đạt tối đa 10 ảnh</p>
-          )}
         </CardContent>
       </Card>
 
