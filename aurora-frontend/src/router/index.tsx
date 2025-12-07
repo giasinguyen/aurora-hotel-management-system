@@ -28,13 +28,13 @@ import NewsPage from "@/pages/landing/News";
 import ServicePage from "@/pages/landing/Service";
 import UserProfilePage from "@/pages/common/customer/UserProfile";
 import GuestBranchListPage from "@/pages/landing/BranchList";
-import PaymentReturnPage from "@/pages/common/customer/payment/PaymentReturn";
 import AboutPage from "@/pages/landing/About";
 import AccommodationPage from "@/pages/landing/Accommodation";
 import AccommodationCategoryPage from "@/pages/landing/AccommodationCategory";
 import BookingPage from "@/pages/landing/Booking";
 import CheckoutPage from "@/pages/landing/checkout";
 import BookingSuccessPage from "@/pages/landing/checkout/BookingSuccess";
+import PaymentReturnPage from "@/pages/landing/payment/PaymentReturn";
 // Common - Customer Area
 import ProfilePage from "@/pages/common/customer/account/Profile";
 import ProfileUpsertPage from "@/pages/common/customer/account/ProfileUpsert";

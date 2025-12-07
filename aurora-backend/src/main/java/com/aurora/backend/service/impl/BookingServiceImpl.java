@@ -27,6 +27,7 @@ import com.aurora.backend.repository.ServiceRepository;
 import com.aurora.backend.repository.BookingRoomRepository;
 import com.aurora.backend.repository.ServiceBookingRepository;
 import com.aurora.backend.service.BookingService;
+import com.aurora.backend.service.EmailService;
 import com.aurora.backend.service.RefundService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -59,6 +60,7 @@ public class BookingServiceImpl implements BookingService {
     ServiceBookingRepository serviceBookingRepository;
     BookingMapper bookingMapper;
     RefundService refundService;
+    EmailService emailService;
 
     @Override
     @Transactional
@@ -423,11 +425,18 @@ public class BookingServiceImpl implements BookingService {
         Branch branch = branchRepository.findById(request.getBranchId())
                 .orElseThrow(() -> new AppException(ErrorCode.BRANCH_NOT_EXISTED));
         
+        // Set initial booking status based on payment method
+        // For VNPay: Set CONFIRMED so payment can be created, will be updated after payment result
+        // For Cash: Set PENDING initially
+        Booking.BookingStatus initialStatus = "vnpay".equals(request.getPaymentMethod()) 
+                ? Booking.BookingStatus.CONFIRMED 
+                : Booking.BookingStatus.PENDING;
+        
         Booking booking = Booking.builder()
                 .branch(branch)
                 .checkin(request.getCheckIn())
                 .checkout(request.getCheckOut())
-                .status(Booking.BookingStatus.PENDING)
+                .status(initialStatus)
                 .paymentStatus(Booking.PaymentStatus.PENDING)
                 .specialRequest(request.getSpecialRequests())
                 .build();
@@ -505,16 +514,20 @@ public class BookingServiceImpl implements BookingService {
         booking.setDiscountAmount(BigDecimal.ZERO);
         
         // Set payment status based on payment method
-        // Since paymentSuccess = true, payment is confirmed successful
         if ("cash".equals(request.getPaymentMethod())) {
-            // Cash payment - if successful, mark as PAID
+            // Cash payment - mark as PAID and CONFIRMED
             booking.setPaymentStatus(Booking.PaymentStatus.PAID);
-            log.info("Cash payment confirmed - setting payment status to PAID");
+            booking.setStatus(Booking.BookingStatus.CONFIRMED);
+            log.info("Cash payment confirmed - setting payment status to PAID and booking to CONFIRMED");
+        } else if ("vnpay".equals(request.getPaymentMethod())) {
+            // VNPay - keep PENDING payment status, booking already CONFIRMED for payment creation
+            // Will be updated to PAID after VNPay IPN callback confirms payment
+            booking.setPaymentStatus(Booking.PaymentStatus.PENDING);
+            log.info("VNPay payment - keeping payment status PENDING, booking is CONFIRMED for payment gateway");
         } else {
-            // For online payments (vnpay, momo, visa), status will be updated after payment gateway confirmation
-            // But since paymentSuccess = true, we can mark as PAID
-            booking.setPaymentStatus(Booking.PaymentStatus.PAID);
-            log.info("Online payment confirmed - setting payment status to PAID");
+            // Other online payments - similar to VNPay
+            booking.setPaymentStatus(Booking.PaymentStatus.PENDING);
+            log.info("Online payment - keeping payment status PENDING");
         }
         
         Booking savedBooking = bookingRepository.save(booking);
@@ -584,6 +597,18 @@ public class BookingServiceImpl implements BookingService {
         if (savedBooking.getCustomer() != null) {
             // Access customer to trigger lazy load
             savedBooking.getCustomer().getUsername();
+        }
+        
+        // Send booking confirmation email for cash payments
+        if ("cash".equals(request.getPaymentMethod())) {
+            try {
+                emailService.sendBookingConfirmation(savedBooking);
+                log.info("Booking confirmation email queued for cash payment: {}", savedBooking.getBookingCode());
+            } catch (Exception e) {
+                log.error("Failed to send booking confirmation email for: {}", 
+                    savedBooking.getBookingCode(), e);
+                // Don't fail the booking if email fails
+            }
         }
         
         return bookingMapper.toBookingResponse(savedBooking);

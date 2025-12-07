@@ -71,6 +71,7 @@ export const VNPAY_RESPONSE_CODES: Record<string, string> = {
   '24': 'Giao dịch không thành công do: Khách hàng hủy giao dịch',
   '51': 'Giao dịch không thành công do: Tài khoản của quý khách không đủ số dư để thực hiện giao dịch.',
   '65': 'Giao dịch không thành công do: Tài khoản của Quý khách đã vượt quá hạn mức giao dịch trong ngày.',
+  '71': 'Giao dịch thất bại do lỗi kỹ thuật hoặc tham số không hợp lệ. Vui lòng kiểm tra lại thông tin.',
   '75': 'Ngân hàng thanh toán đang bảo trì.',
   '79': 'Giao dịch không thành công do: KH nhập sai mật khẩu thanh toán quá số lần quy định. Xin quý khách vui lòng thực hiện lại giao dịch',
   '99': 'Các lỗi khác (lỗi còn lại, không có trong danh sách mã lỗi đã liệt kê)',

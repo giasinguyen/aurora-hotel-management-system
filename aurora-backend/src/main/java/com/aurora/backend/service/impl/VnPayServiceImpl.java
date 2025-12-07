@@ -8,6 +8,7 @@ import com.aurora.backend.enums.ErrorCode;
 import com.aurora.backend.exception.AppException;
 import com.aurora.backend.repository.BookingRepository;
 import com.aurora.backend.repository.PaymentRepository;
+import com.aurora.backend.service.EmailService;
 import com.aurora.backend.service.VnPayService;
 import com.aurora.backend.util.VnPayUtil;
 import lombok.AccessLevel;
@@ -47,6 +48,7 @@ public class VnPayServiceImpl implements VnPayService {
     
     final BookingRepository bookingRepository;
     final PaymentRepository paymentRepository;
+    final EmailService emailService;
     
     @Override
     public VnPayPaymentResponse createPaymentUrl(
@@ -123,6 +125,8 @@ public class VnPayServiceImpl implements VnPayService {
         String paymentUrl = payUrl + "?" + queryString + "&vnp_SecureHash=" + secureHash;
         
         log.info("Generated VNPay payment URL for booking: {}", bookingId);
+        log.debug("VNPay payment URL: {}", paymentUrl);
+        log.debug("VNPay query params: {}", vnpParams);
         
         return VnPayPaymentResponse.builder()
             .paymentUrl(paymentUrl)
@@ -223,6 +227,7 @@ public class VnPayServiceImpl implements VnPayService {
             
             // Update booking status to PAID
             Booking booking = payment.getBooking();
+            booking.setPaymentStatus(Booking.PaymentStatus.PAID);
             booking.setStatus(Booking.BookingStatus.CONFIRMED);
             booking.setUpdatedAt(LocalDateTime.now());
             
@@ -231,6 +236,16 @@ public class VnPayServiceImpl implements VnPayService {
             
             log.info("Payment SUCCESS for booking: {} ({})", 
                 booking.getBookingCode(), booking.getId());
+            
+            // Send booking confirmation email asynchronously
+            try {
+                emailService.sendBookingConfirmation(booking);
+                log.info("Booking confirmation email queued for: {}", booking.getBookingCode());
+            } catch (Exception e) {
+                log.error("Failed to send booking confirmation email for: {}", 
+                    booking.getBookingCode(), e);
+                // Don't fail the payment processing if email fails
+            }
             
             return Map.of(
                 "RspCode", "00",
@@ -254,18 +269,61 @@ public class VnPayServiceImpl implements VnPayService {
     }
     
     @Override
+    @Transactional
     public Map<String, Object> handleReturnUrl(Map<String, String> params) {
         log.info("Processing VNPay Return URL for txnRef: {}", params.get("vnp_TxnRef"));
         
         boolean isValid = validateSignature(params);
         String txnRef = params.get("vnp_TxnRef");
         String responseCode = params.get("vnp_ResponseCode");
+        String transactionNo = params.get("vnp_TransactionNo");
         long amountInCents = Long.parseLong(params.getOrDefault("vnp_Amount", "0"));
         BigDecimal amount = new BigDecimal(amountInCents).divide(new BigDecimal("100"));
         
-        // Find payment
+        // Find payment with booking eagerly loaded
         Payment payment = paymentRepository.findByVnpayTxnRef(txnRef).orElse(null);
-        Booking booking = payment != null ? payment.getBooking() : null;
+        Booking booking = null;
+        
+        if (payment != null && payment.getBooking() != null) {
+            // Force initialization of booking proxy within transaction
+            booking = payment.getBooking();
+            booking.getBookingCode(); // Trigger lazy load
+            
+            // Update payment status if successful and not already processed
+            if ("00".equals(responseCode) && payment.getStatus() == Payment.PaymentStatus.PENDING) {
+                log.info("=== VNPAY RETURN: Payment successful, updating payment and booking status");
+                
+                payment.setStatus(Payment.PaymentStatus.SUCCESS);
+                payment.setPaidAt(LocalDateTime.now());
+                payment.setProviderTxnId(transactionNo);
+                payment.setVnpayResponseCode(responseCode);
+                payment.setVnpayBankCode(params.get("vnp_BankCode"));
+                payment.setVnpayCardType(params.get("vnp_CardType"));
+                payment.setProviderResponse(params.toString());
+                
+                booking.setPaymentStatus(Booking.PaymentStatus.PAID);
+                booking.setStatus(Booking.BookingStatus.CONFIRMED);
+                booking.setUpdatedAt(LocalDateTime.now());
+                
+                paymentRepository.save(payment);
+                bookingRepository.save(booking);
+                
+                log.info("=== VNPAY RETURN: Payment and booking updated successfully");
+                
+                // Send booking confirmation email
+                try {
+                    log.info("=== VNPAY RETURN: Sending confirmation email...");
+                    emailService.sendBookingConfirmation(booking);
+                    log.info("=== VNPAY RETURN: Email sent successfully");
+                } catch (Exception e) {
+                    log.error("=== VNPAY RETURN: Failed to send confirmation email", e);
+                }
+            } else if ("00".equals(responseCode)) {
+                log.info("=== VNPAY RETURN: Payment already processed (status: {})", payment.getStatus());
+            } else {
+                log.warn("=== VNPAY RETURN: Payment failed with response code: {}", responseCode);
+            }
+        }
         
         Map<String, Object> result = new HashMap<>();
         result.put("valid", isValid);

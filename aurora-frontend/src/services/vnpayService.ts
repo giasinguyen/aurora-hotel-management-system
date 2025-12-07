@@ -12,8 +12,8 @@ import type {
  */
 
 const VNPAY_ENDPOINTS = {
-  CREATE: '/payments/vnpay/create',
-  RETURN: '/payments/vnpay/return',
+  CREATE: '/api/v1/payments/vnpay/create',
+  RETURN: '/api/v1/payments/vnpay/return',
 } as const;
 
 export const vnpayService = {
@@ -57,9 +57,15 @@ export const vnpayService = {
   getPaymentResult: async (
     params: URLSearchParams
   ): Promise<ApiResponse<VnPayReturnResponse>> => {
+    // Convert URLSearchParams to plain object
+    const paramsObject: Record<string, string> = {};
+    params.forEach((value, key) => {
+      paramsObject[key] = value;
+    });
+    
     const response = await instance.get<ApiResponse<VnPayReturnResponse>>(
       VNPAY_ENDPOINTS.RETURN,
-      { params }
+      { params: paramsObject }
     );
     return response.data;
   },

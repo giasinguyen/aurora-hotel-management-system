@@ -100,3 +100,9 @@ cloudinary:
   api-key: ${CLOUDINARY_API_KEY}
   api-secret: ${CLOUDINARY_API_SECRET}
   secure: ${CLOUDINARY_SECURE:true}
+# Mailjet Configuration
+mailjet:
+  api-key: ${MAILJET_API_KEY}
+  secret-key: ${MAILJET_SECRET_KEY}
+  from-email: ${MAILJET_FROM_EMAIL:noreply@aurorahotel.com}
+  from-name: ${MAILJET_FROM_NAME:Aurora Hotel System}
