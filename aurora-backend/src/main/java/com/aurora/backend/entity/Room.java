@@ -55,16 +55,33 @@ public class Room extends BaseEntity {
     @NotNull(message = "Base price is required")
     @DecimalMin(value = "0.0", inclusive = false, message = "Base price must be greater than 0")
     @Column(name = "base_price", nullable = false, precision = 10, scale = 2)
-    BigDecimal basePrice; // Giá gốc của phòng (có thể thay đổi qua cron job)
+    BigDecimal basePrice; // Giá gốc của phòng (có thể thay đổi qua event)
     
     @DecimalMin(value = "0.0", message = "Sale percent cannot be negative")
     @DecimalMax(value = "100.0", message = "Sale percent cannot exceed 100")
     @Column(name = "sale_percent", precision = 5, scale = 2)
     @Builder.Default
-    BigDecimal salePercent = BigDecimal.ZERO; // % giảm giá (0-100), hệ thống tự tính giá hiển thị
+    BigDecimal salePercent = BigDecimal.ZERO; // % giảm giá (0-100)
     
-    // Calculated display price (not stored, calculated dynamically)
-    // displayPrice = basePrice * (100 - salePercent) / 100
+    @DecimalMin(value = "0.0", inclusive = true, message = "Final price cannot be negative")
+    @Column(name = "price_final", precision = 10, scale = 2)
+    BigDecimal priceFinal; // Giá cuối cùng sau khi áp dụng giảm giá = basePrice * (100 - salePercent) / 100
+    
+    // Method to calculate and update final price
+    @PrePersist
+    @PreUpdate
+    public void calculatePriceFinal() {
+        if (basePrice != null) {
+            BigDecimal percent = salePercent != null ? salePercent : BigDecimal.ZERO;
+            BigDecimal discountMultiplier = BigDecimal.valueOf(100)
+                .subtract(percent)
+                .divide(BigDecimal.valueOf(100), 2, java.math.RoundingMode.HALF_UP);
+            this.priceFinal = basePrice.multiply(discountMultiplier)
+                .setScale(0, java.math.RoundingMode.HALF_UP); // Làm tròn thành số nguyên
+        } else {
+            this.priceFinal = BigDecimal.ZERO;
+        }
+    }
     
     @Column(length = 1000)
     String maintenanceNotes;

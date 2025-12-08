@@ -303,7 +303,7 @@ export default function RoomDetailCard({ room }: RoomDetailCardProps) {
               label="Giá hiển thị"
               value={
                 <span className="text-xl font-bold text-primary">
-                  {formatCurrency(room.displayPrice)}
+                  {formatCurrency(room.priceFinal)}
                 </span>
               }
             />
@@ -360,7 +360,7 @@ export default function RoomDetailCard({ room }: RoomDetailCardProps) {
             <div className="mx-auto mb-2 p-3 rounded-full bg-primary text-white w-fit">
               <DollarSign className="h-5 w-5" />
             </div>
-            <p className="text-lg font-bold text-primary">{formatCurrency(room.displayPrice)}</p>
+            <p className="text-lg font-bold text-primary">{formatCurrency(room.priceFinal)}</p>
             <p className="text-sm text-primary/70">Giá/đêm</p>
           </CardContent>
         </Card>

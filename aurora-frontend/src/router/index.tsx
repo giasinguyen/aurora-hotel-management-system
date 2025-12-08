@@ -82,6 +82,8 @@ import RoomCategoryUpsertPage from "@/pages/rooms/RoomCategoryUpsert";
 import RoomTypeListPage from "@/pages/rooms/RoomTypeList";
 import RoomTypeUpsertPage from "@/pages/rooms/RoomTypeUpsert";
 import RoomUpsertPage from "@/pages/rooms/RoomUpsert";
+import RoomEventListPage from "@/pages/rooms/RoomEventList";
+import RoomEventUpsertPage from "@/pages/rooms/RoomEventUpsert";
 
 // Services
 import ServiceListPage from "@/pages/services/ServiceList";
@@ -166,6 +168,8 @@ const router = createBrowserRouter([
       { path: "rooms/upsert", element: <RoomUpsertPage /> },
       { path: "room-types", element: <RoomTypeListPage /> },
       { path: "room-types/upsert", element: <RoomTypeUpsertPage /> },
+      { path: "room-events", element: <RoomEventListPage /> },
+      { path: "room-events/upsert", element: <RoomEventUpsertPage /> },
       { path: "services", element: <ServiceListPage /> },
       { path: "services/upsert", element: <ServiceUpsertPage /> },
       { path: "users", element: <UserListPage /> },
@@ -199,6 +203,8 @@ const router = createBrowserRouter([
       { path: "room-types/upsert", element: <RoomTypeUpsertPage /> },
       { path: "room-categories", element: <RoomCategoryListPage /> },
       { path: "room-categories/upsert", element: <RoomCategoryUpsertPage /> },
+      { path: "room-events", element: <RoomEventListPage /> },
+      { path: "room-events/upsert", element: <RoomEventUpsertPage /> },
       { path: "service-categories", element: <ServiceCategoryListPage /> },
       { path: "service-categories/upsert", element: <ServiceCategoryUpsertPage /> },
       { path: "services", element: <ServiceListPage /> },
