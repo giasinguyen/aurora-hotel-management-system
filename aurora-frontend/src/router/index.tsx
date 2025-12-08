@@ -123,6 +123,7 @@ const router = createBrowserRouter([
       { path: "profile", element: <ProfilePage /> }, //TODO: refactor layout! => fix
       { path: "profile/upsert", element: <ProfileUpsertPage /> }, //TODO: no API call => fix
       { path: "my-bookings", element: <CustomerBookingListPage /> }, // cleanup => update later
+      { path: "booking/:id", element: <BookingDetailPage /> }, // Customer booking detail
       { path: "favorites", element: <FavoriteListPage /> }, //TODO: => update later
       { path: "reviews", element: <ReviewListPage /> }, //TODO => fix URL => matching booking!
       { path: "reviews/upsert", element: <ReviewUpsertPage /> }, //TODO => fix URL => matching booking!

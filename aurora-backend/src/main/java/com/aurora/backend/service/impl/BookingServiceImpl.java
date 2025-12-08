@@ -173,10 +173,15 @@ public class BookingServiceImpl implements BookingService {
     public Page<BookingResponse> getBookingsByCustomer(String customerId, Pageable pageable) {
         log.debug("Fetching bookings for customer ID: {} with pagination: {}", customerId, pageable);
         
-        User customer = userRepository.findById(customerId)
+        // Verify customer exists
+        userRepository.findById(customerId)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
         
-        Page<Booking> bookings = bookingRepository.findByCustomer(customer, pageable);
+        // Use findByCustomerId to handle both authenticated and guest bookings
+        Page<Booking> bookings = bookingRepository.findByCustomerId(customerId, pageable);
+        
+        log.debug("Found {} bookings for customer {}", bookings.getTotalElements(), customerId);
+        
         return bookings.map(bookingMapper::toBookingResponse);
     }
 
