@@ -9,6 +9,7 @@ import type {
   BookingSearchParams
 } from '@/types/booking.types';
 import axiosClient from '@/config/axiosClient';
+import publicAxiosClient from '@/config/publicAxiosClient';
 
 const BOOKING_BASE_URL = '/api/v1/bookings';
 
@@ -44,6 +45,22 @@ export const bookingApi = {
   getById: async (id: string) => {
     const response = await axiosClient.get<ApiResponse<Booking>>(
       `${BOOKING_BASE_URL}/${id}`
+    );
+    return response.data;
+  },
+
+  // Get booking by ID (Public - for guests without authentication)
+  getByIdPublic: async (id: string) => {
+    const response = await publicAxiosClient.get<ApiResponse<Booking>>(
+      `${BOOKING_BASE_URL}/public/${id}`
+    );
+    return response.data;
+  },
+
+  // Get booking by code (Public - for guests without authentication)
+  getByCodePublic: async (code: string) => {
+    const response = await publicAxiosClient.get<ApiResponse<Booking>>(
+      `${BOOKING_BASE_URL}/public/code/${code}`
     );
     return response.data;
   },

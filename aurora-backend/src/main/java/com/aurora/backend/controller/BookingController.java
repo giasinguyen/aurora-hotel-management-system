@@ -86,6 +86,28 @@ public class BookingController {
                 .build();
     }
 
+    // Public endpoint for guest booking lookup (no authentication required)
+    @GetMapping("/public/{id}")
+    public ApiResponse<BookingResponse> getBookingByIdPublic(@PathVariable String id) {
+        BookingResponse response = bookingService.getBookingById(id);
+        return ApiResponse.<BookingResponse>builder()
+                .code(HttpStatus.OK.value())
+                .message("Booking retrieved successfully")
+                .result(response)
+                .build();
+    }
+
+    // Public endpoint for guest booking lookup by code (no authentication required)
+    @GetMapping("/public/code/{code}")
+    public ApiResponse<BookingResponse> getBookingByCodePublic(@PathVariable String code) {
+        BookingResponse response = bookingService.getBookingByCode(code);
+        return ApiResponse.<BookingResponse>builder()
+                .code(HttpStatus.OK.value())
+                .message("Booking retrieved successfully")
+                .result(response)
+                .build();
+    }
+
     @GetMapping("/my-bookings")
     @RequirePermission(PermissionConstants.Customer.BOOKING_VIEW_OWN)
     public ApiResponse<Page<BookingResponse>> getMyBookings(

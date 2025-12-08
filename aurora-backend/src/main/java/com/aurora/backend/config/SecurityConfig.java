@@ -93,7 +93,10 @@ public class SecurityConfig {
             "/api/v1/room-availability/check/**",
             "/api/v1/room-availability/find-available/**",
             "/api/v1/room-availability/calendar/**",
-            "/api/v1/room-availability/count-available/**"
+            "/api/v1/room-availability/count-available/**",
+            
+            // Booking public endpoints - For guest booking lookup
+            "/api/v1/bookings/public/**"
     };
 
     @Bean

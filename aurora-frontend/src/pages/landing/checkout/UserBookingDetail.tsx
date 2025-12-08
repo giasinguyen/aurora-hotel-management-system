@@ -1,5 +1,7 @@
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
+import type { RootState } from "@/features/store";
 import { 
   Calendar, 
   MapPin, 
@@ -33,6 +35,9 @@ const BookingDetailPage = () => {
   const [booking, setBooking] = useState<Booking | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  
+  // Check if user is logged in
+  const isLogin = useSelector((state: RootState) => state.auth.isLogin);
 
   useEffect(() => {
     const fetchBookingDetails = async () => {
@@ -44,7 +49,11 @@ const BookingDetailPage = () => {
 
       try {
         setLoading(true);
-        const response = await bookingApi.getById(id);
+        // Use public API if user is not logged in, otherwise use authenticated API
+        const response = isLogin 
+          ? await bookingApi.getById(id)
+          : await bookingApi.getByIdPublic(id);
+          
         console.log("Booking detail response:", response);
         if (response.code === 200 && response.result) {
           console.log("Booking data:", response.result);
@@ -61,7 +70,7 @@ const BookingDetailPage = () => {
     };
 
     fetchBookingDetails();
-  }, [id]);
+  }, [id, isLogin]);
 
   const calculateNights = (checkin: string, checkout: string) => {
     const checkinDate = new Date(checkin);
