@@ -21,4 +21,6 @@ public class ServiceBookingUpdateRequest {
     Double price;
     
     String status;
+    
+    String roomId; // For updating room when booking room is changed
 }

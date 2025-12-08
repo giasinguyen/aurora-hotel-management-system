@@ -147,6 +147,7 @@ public enum ErrorCode {
     QUANTITY_POSITIVE(2304, "Quantity must be positive", HttpStatus.BAD_REQUEST),
     BOOKING_NOT_FOUND(2305, "Booking not found", HttpStatus.NOT_FOUND),
     USER_NOT_FOUND(2306, "User not found", HttpStatus.NOT_FOUND),
+    SERVICE_BOOKING_REQUIRES_CUSTOMER(2307, "Không thể thêm dịch vụ: Booking không có customer", HttpStatus.BAD_REQUEST),
     
     // Branch errors (replacing Hotel errors)
     BRANCH_NOT_EXISTED(2400, "Branch not found", HttpStatus.NOT_FOUND),

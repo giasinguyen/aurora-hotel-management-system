@@ -31,7 +31,7 @@ public class RoomResponse {
     // Price management
     BigDecimal basePrice; // Giá gốc
     BigDecimal salePercent; // % giảm giá
-    BigDecimal displayPrice; // Giá hiển thị (calculated)
+    BigDecimal priceFinal; // Giá cuối cùng sau giảm giá (stored in DB)
     
     List<String> images;
 }

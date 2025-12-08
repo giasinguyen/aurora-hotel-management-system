@@ -2,7 +2,7 @@ import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { useAppDispatch, useAppSelector } from "@/hooks/useRedux";
-import { setLanguage } from "@/features/slices/languageSlice";
+// import { setLanguage } from "@/features/slices/languageSlice";
 import { setBranchDetails } from "@/features/slices/branchSlice";
 import { branchApi } from "@/services/branchApi";
 import type { Branch } from "@/types/branch.types";
@@ -26,28 +26,28 @@ import {
 import { Search, Menu } from "lucide-react";
 
 // Language option component
-const LanguageOption = ({ value }: { value: string }) => {
-  const flags = {
-    en: "/src/assets/images/commons/english.png",
-    vi: "/src/assets/images/commons/vietnam.png",
-  };
-  return (
-    <img
-      src={flags[value as keyof typeof flags]}
-      alt="languages"
-      className="w-5 h-5 object-cover rounded-sm"
-    />
-  );
-};
+// const LanguageOption = ({ value }: { value: string }) => {
+//   const flags = {
+//     en: "/src/assets/images/commons/english.png",
+//     vi: "/src/assets/images/commons/vietnam.png",
+//   };
+//   return (
+//     <img
+//       src={flags[value as keyof typeof flags]}
+//       alt="languages"
+//       className="w-5 h-5 object-cover rounded-sm"
+//     />
+//   );
+// };
 
 export default function Header() {
   const location = useLocation();
   const navigate = useNavigate();
   const { t } = useTranslation("header");
   const dispatch = useAppDispatch();
-  const currentLanguage = useAppSelector(
-    (state) => state.language.currentLanguage
-  );
+  // const currentLanguage = useAppSelector(
+  //   (state) => state.language.currentLanguage
+  // );
   const currentBranch = useAppSelector(
     (state) => state.branch.currentBranch
   );
@@ -100,9 +100,9 @@ export default function Header() {
     // TODO: Implement search functionality
   };
 
-  const handleLanguageChange = (value: string) => {
-    dispatch(setLanguage(value));
-  };
+  // const handleLanguageChange = (value: string) => {
+  //   dispatch(setLanguage(value));
+  // };
 
   const handleBranchChange = (value: string) => {
     // Find and set full branch details
@@ -162,7 +162,7 @@ export default function Header() {
           {/* Desktop Actions */}
           <div className="hidden lg:flex items-center space-x-4">
             {/* Search Button */}
-            <button
+            {/* <button
               onClick={handleSearchClick}
               className={
                 "p-2.5 rounded-lg transition-all " +
@@ -173,7 +173,7 @@ export default function Header() {
               aria-label="Search"
             >
               <Search className="w-5 h-5" />
-            </button>
+            </button> */}
 
             {/* Branch Select - Desktop */}
             <Select
@@ -222,7 +222,7 @@ export default function Header() {
             </Select>
 
             {/* Language Select - Desktop */}
-            <Select
+            {/* <Select
               value={currentLanguage}
               onValueChange={handleLanguageChange}
             >
@@ -258,7 +258,7 @@ export default function Header() {
                   </div>
                 </SelectItem>
               </SelectContent>
-            </Select>
+            </Select> */}
 
             {/* Auth Button - Login or UserMenu */}
             {isLogin ? (
@@ -352,7 +352,7 @@ export default function Header() {
                   </Select>
 
                   {/* Language Select - Mobile */}
-                  <Select
+                  {/* <Select
                     value={currentLanguage}
                     onValueChange={handleLanguageChange}
                   >
@@ -381,7 +381,7 @@ export default function Header() {
                         </div>
                       </SelectItem>
                     </SelectContent>
-                  </Select>
+                  </Select> */}
 
                   {/* Auth Button - Mobile - Login or UserMenu */}
                   {isLogin ? (

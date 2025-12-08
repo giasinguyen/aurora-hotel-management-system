@@ -1,10 +1,39 @@
 // Booking Types for Aurora Hotel Management System
 
 export interface BookingRoom {
+  id?: string;
+  bookingId?: string;
+  bookingCode?: string;
   roomId: string;
   roomNumber: string;
-  roomTypeName: string;
+  roomType?: string; // Backend uses "roomType"
+  roomTypeName?: string; // Alias for roomType for compatibility - use roomType || roomTypeName
   pricePerNight: number;
+  nights?: number;
+  totalPrice?: number;
+  roomNotes?: string;
+}
+
+// Helper function to get room type name
+export const getRoomTypeName = (room: BookingRoom): string => {
+  return room.roomTypeName || room.roomType || 'Phòng';
+};
+
+export interface ServiceBooking {
+  id: string;
+  bookingId: string;
+  bookingCode: string;
+  serviceId: string;
+  serviceName: string;
+  serviceType: string;
+  customerId: string;
+  customerName: string;
+  roomId?: string;
+  roomNumber?: string;
+  dateTime: string; // LocalDateTime as ISO string
+  quantity: number;
+  price: number;
+  status: string;
 }
 
 export interface Booking {
@@ -25,6 +54,7 @@ export interface Booking {
   paymentStatus: PaymentStatus;
   specialRequest?: string;
   rooms: BookingRoom[];
+  services?: ServiceBooking[];
 }
 
 export type BookingStatus = 
@@ -55,7 +85,9 @@ export interface BookingCreationRequest {
 export interface BookingUpdateRequest {
   checkin?: string;
   checkout?: string;
-  roomIds?: string[];
+  totalPrice?: number;
+  status?: string;
+  paymentStatus?: string;
   specialRequest?: string;
 }
 

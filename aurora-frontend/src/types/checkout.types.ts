@@ -11,6 +11,7 @@ export interface CheckoutRequest {
   specialRequests?: string;
   paymentMethod: "cash" | "vnpay" | "momo" | "visa";
   paymentSuccess: boolean; // true = payment successful, false = payment failed
+  promotionId?: string; // ID of applied promotion
   rooms: RoomBookingRequest[];
   services?: ServiceBookingRequest[];
 }

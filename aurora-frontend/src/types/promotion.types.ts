@@ -1,33 +1,83 @@
 // Promotion Types for Aurora Hotel Management System
 
+export type DiscountType = 'PERCENTAGE' | 'FIXED_AMOUNT';
+
 export interface Promotion {
   id: string;
+  branchId?: string;
+  branchName?: string;
   code: string;
   name: string;
-  description?: string;
-  discount: number;
   startDate: string;
   endDate: string;
   active: boolean;
+  discountType: DiscountType;
+  percentOff?: number;
+  amountOff?: number;
+  minBookingAmount?: number;
+  minNights?: number;
+  usageLimit?: number;
+  usedCount?: number;
+  maxDiscountAmount?: number;
+  applicableRoomTypeIds?: string[];
+  applicableRoomTypes?: RoomTypeInfo[];
+  stackable: boolean;
+  exclusiveWithOthers: boolean;
+  description?: string;
+  termsAndConditions?: string;
+  priority: number;
+  createdBy?: string;
+  // Backward compatibility
+  discount?: number;
+}
+
+export interface RoomTypeInfo {
+  id: string;
+  name: string;
+  code: string;
 }
 
 export interface PromotionCreationRequest {
+  branchId?: string;
   code: string;
   name: string;
-  description?: string;
-  discount: number;
   startDate: string;
   endDate: string;
   active?: boolean;
+  discountType: DiscountType;
+  percentOff?: number;
+  amountOff?: number;
+  minBookingAmount?: number;
+  minNights?: number;
+  usageLimit?: number;
+  maxDiscountAmount?: number;
+  applicableRoomTypeIds?: string[];
+  stackable?: boolean;
+  exclusiveWithOthers?: boolean;
+  description?: string;
+  termsAndConditions?: string;
+  priority?: number;
 }
 
 export interface PromotionUpdateRequest {
+  branchId?: string;
   name?: string;
-  description?: string;
-  discount?: number;
   startDate?: string;
   endDate?: string;
   active?: boolean;
+  discountType?: DiscountType;
+  percentOff?: number;
+  amountOff?: number;
+  minBookingAmount?: number;
+  minNights?: number;
+  usageLimit?: number;
+  maxDiscountAmount?: number;
+  applicableRoomTypeIds?: string[];
+  stackable?: boolean;
+  exclusiveWithOthers?: boolean;
+  description?: string;
+  termsAndConditions?: string;
+  priority?: number;
 }
 
 export interface PromotionSearchParams {

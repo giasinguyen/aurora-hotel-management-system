@@ -154,7 +154,7 @@ export default function RoomCard({
             <div>
               <p className="text-sm text-gray-500">Giá</p>
               <p className="text-2xl font-bold text-amber-600">
-                {formatCurrency(roomType.priceFrom)}
+                {formatCurrency(room.priceFinal)}
                 <span className="text-sm text-gray-500 font-normal">
                   /đêm
                 </span>

@@ -17,6 +17,10 @@ public interface PromotionRepository extends JpaRepository<Promotion, String> {
     boolean existsByCode(String code);
     Page<Promotion> findByActive(Boolean active, Pageable pageable);
     
+    @Query("SELECT p FROM Promotion p WHERE p.active = true " +
+           "AND p.startAt <= :today AND p.endAt >= :today")
+    Page<Promotion> findActiveAndValidPromotions(@Param("today") LocalDate today, Pageable pageable);
+    
     @Query("SELECT p FROM Promotion p WHERE " +
            "(:code IS NULL OR CAST(p.code AS string) LIKE CONCAT('%', CAST(:code AS string), '%')) AND " +
            "(:name IS NULL OR CAST(p.name AS string) LIKE CONCAT('%', CAST(:name AS string), '%')) AND " +

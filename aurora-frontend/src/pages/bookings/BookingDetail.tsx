@@ -12,6 +12,7 @@ import {
   CheckCircle,
   Clock,
   DollarSign,
+  Sparkles,
 } from 'lucide-react';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -60,6 +61,8 @@ const BookingDetailPage = () => {
     try {
       setLoading(true);
       const response = await bookingApi.getById(id!);
+      console.log("Booking detail response:", response);
+      console.log("Booking services:", response.result?.services);
       setBooking(response.result);
     } catch (error: any) {
       toast.error('Không thể tải thông tin đặt phòng', {
@@ -115,6 +118,18 @@ const BookingDetailPage = () => {
       year: 'numeric',
       month: 'long',
       day: 'numeric',
+    });
+  };
+
+  const formatDateTime = (dateString: string) => {
+    if (!dateString) return 'Chưa xác định';
+    const date = new Date(dateString);
+    return date.toLocaleString('vi-VN', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
     });
   };
 
@@ -315,35 +330,101 @@ const BookingDetailPage = () => {
               </CardContent>
             </Card>
 
-            {/* Room Details */}
+            {/* Room Details with Services */}
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <BedDouble className="h-5 w-5" />
-                  Danh sách phòng ({booking.rooms.length})
+                  Danh sách phòng và dịch vụ ({booking.rooms.length})
                 </CardTitle>
               </CardHeader>
               <CardContent>
                 <div className="space-y-3">
-                  {booking.rooms.map((room) => (
-                    <div
-                      key={room.roomId}
-                      className="p-4 border rounded-lg hover:bg-gray-50 transition-colors"
-                    >
-                      <div className="flex justify-between items-start">
-                        <div>
-                          <p className="font-medium text-lg">Phòng {room.roomNumber}</p>
-                          <p className="text-sm text-gray-500">{room.roomTypeName}</p>
+                  {booking.rooms.map((room, index) => {
+                    // Get services for this room - must match roomId exactly
+                    const roomServices = booking.services?.filter(
+                      (service) => service.roomId && room.roomId && service.roomId === room.roomId
+                    ) || [];
+                    const roomServicesTotal = roomServices.reduce(
+                      (sum, service) => sum + service.price * service.quantity,
+                      0
+                    );
+
+                    return (
+                      <div
+                        key={room.roomId || `room-${index}`}
+                        className="p-4 border rounded-lg hover:bg-gray-50 transition-colors bg-gray-50"
+                      >
+                        {/* Room Info */}
+                        <div className="flex justify-between items-start mb-3">
+                          <div>
+                            <p className="font-medium text-lg">
+                              Phòng {room.roomNumber || 'Chưa phân phòng'}
+                            </p>
+                            <p className="text-sm text-gray-500">
+                              {room.roomTypeName || room.roomType || 'Phòng'}
+                            </p>
+                            {!room.roomNumber && (
+                              <p className="text-xs text-amber-600 mt-1">
+                                ⚠️ Phòng sẽ được phân phòng khi check-in
+                              </p>
+                            )}
+                          </div>
+                          <div className="text-right">
+                            <p className="font-semibold text-lg">
+                              {formatCurrency(room.pricePerNight)}
+                            </p>
+                            <p className="text-sm text-gray-500">/ đêm</p>
+                          </div>
                         </div>
-                        <div className="text-right">
-                          <p className="font-semibold text-lg">
-                            {formatCurrency(room.pricePerNight)}
-                          </p>
-                          <p className="text-sm text-gray-500">/ đêm</p>
-                        </div>
+
+                        {/* Services for this room */}
+                        {roomServices.length > 0 && (
+                          <div className="mt-3 pt-3 border-t border-gray-200">
+                            <p className="text-xs font-medium text-gray-700 mb-2">
+                              Dịch vụ đã chọn:
+                            </p>
+                            <div className="space-y-2">
+                              {roomServices.map((service) => (
+                                <div
+                                  key={service.id || `service-${service.serviceId}-${index}`}
+                                  className="flex items-center justify-between text-xs bg-white p-2 rounded border border-gray-100"
+                                >
+                                  <div className="flex items-center gap-2">
+                                    <Sparkles className="w-3 h-3 text-pink-600" />
+                                    <span className="text-gray-700">
+                                      {service.serviceName}
+                                      {service.quantity > 1 && (
+                                        <span className="text-gray-500 ml-1">
+                                          (x{service.quantity})
+                                        </span>
+                                      )}
+                                    </span>
+                                    <span className="text-gray-500">
+                                      • {formatDateTime(service.dateTime)}
+                                    </span>
+                                  </div>
+                                  <span className="text-gray-700 font-medium">
+                                    {formatCurrency(service.price * service.quantity)}
+                                  </span>
+                                </div>
+                              ))}
+                            </div>
+                            {roomServicesTotal > 0 && (
+                              <div className="flex items-center justify-between mt-2 pt-2 border-t border-gray-200">
+                                <span className="text-xs font-medium text-gray-700">
+                                  Tổng dịch vụ:
+                                </span>
+                                <span className="text-xs font-semibold text-pink-600">
+                                  {formatCurrency(roomServicesTotal)}
+                                </span>
+                              </div>
+                            )}
+                          </div>
+                        )}
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </CardContent>
             </Card>
@@ -372,14 +453,28 @@ const BookingDetailPage = () => {
 
                   <Separator />
 
-                  {booking.rooms.map((room) => (
-                    <div key={room.roomId} className="flex justify-between text-sm">
+                  {booking.rooms.map((room, index) => (
+                    <div key={room.roomId || `room-cost-${index}`} className="flex justify-between text-sm">
                       <span className="text-gray-600">Phòng {room.roomNumber}:</span>
                       <span className="font-medium">
                         {formatCurrency(room.pricePerNight * calculateNights())}
                       </span>
                     </div>
                   ))}
+
+                  {booking.services && booking.services.length > 0 && (
+                    <>
+                      <Separator />
+                      <div className="flex justify-between text-sm">
+                        <span className="text-gray-600">Dịch vụ:</span>
+                        <span className="font-medium">
+                          {formatCurrency(
+                            booking.services.reduce((sum, service) => sum + service.price * service.quantity, 0)
+                          )}
+                        </span>
+                      </div>
+                    </>
+                  )}
 
                   <Separator />
 

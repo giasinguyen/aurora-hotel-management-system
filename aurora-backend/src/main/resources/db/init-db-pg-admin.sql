@@ -592,10 +592,11 @@ ON CONFLICT DO NOTHING;
 -- 7. ROOMS (Phòng cụ thể)
 -- Tạo 10 phòng cho HCM - phân bố theo các loại
 -- Mỗi phòng có base_price riêng và sale_percent (dynamic pricing)
+-- price_final = base_price * (100 - sale_percent) / 100
 -- ============================================================================
 INSERT INTO rooms (
     id, branch_id, room_type_id, room_number, floor, status, view_type, 
-    base_price, sale_percent, images,
+    base_price, sale_percent, price_final, images,
     created_at, updated_at, version, deleted
 ) VALUES 
 -- Standard Single Bedroom City View (2 phòng)
@@ -609,6 +610,7 @@ INSERT INTO rooms (
     'CITY',
     1200000.00,
     0.00,
+    1200000.00,  -- 1200000 * (100 - 0) / 100 = 1200000
     '["https://images.unsplash.com/photo-1566665797739-1674de7a421a?w=1200&h=800&fit=crop","https://images.unsplash.com/photo-1611892440504-42a792e24d32?w=1200&h=800&fit=crop","https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=1200&h=800&fit=crop","https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?w=1200&h=800&fit=crop","https://images.unsplash.com/photo-1595526114035-0d45ed16cfbf?w=1200&h=800&fit=crop"]',
     NOW(), NOW(), 0, false
 ),
@@ -622,6 +624,7 @@ INSERT INTO rooms (
     'CITY',
     1200000.00,
     10.00,
+    1080000.00,  -- 1200000 * (100 - 10) / 100 = 1080000
     '["https://images.unsplash.com/photo-1566665797739-1674de7a421a?w=1200&h=800&fit=crop","https://images.unsplash.com/photo-1540518614846-7eded433c457?w=1200&h=800&fit=crop","https://images.unsplash.com/photo-1631049421450-348ccd7f8949?w=1200&h=800&fit=crop","https://images.unsplash.com/photo-1598928506311-c55ded91a20c?w=1200&h=800&fit=crop","https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?w=1200&h=800&fit=crop"]',
     NOW(), NOW(), 0, false
 ),
@@ -636,6 +639,7 @@ INSERT INTO rooms (
     'SEA',
     1500000.00,
     0.00,
+    1500000.00,  -- 1500000 * (100 - 0) / 100 = 1500000
     '["https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=1200&h=800&fit=crop","https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=1200&h=800&fit=crop","https://images.unsplash.com/photo-1578683010236-d716f9a3f461?w=1200&h=800&fit=crop","https://images.unsplash.com/photo-1590490360182-c33d57733427?w=1200&h=800&fit=crop","https://images.unsplash.com/photo-1587985064135-0366536eab42?w=1200&h=800&fit=crop"]',
     NOW(), NOW(), 0, false
 ),
@@ -649,6 +653,7 @@ INSERT INTO rooms (
     'SEA',
     1500000.00,
     0.00,
+    1500000.00,  -- 1500000 * (100 - 0) / 100 = 1500000
     '["https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=1200&h=800&fit=crop","https://images.unsplash.com/photo-1596394516093-501ba68a0ba6?w=1200&h=800&fit=crop","https://images.unsplash.com/photo-1591088398332-8a7791972843?w=1200&h=800&fit=crop","https://images.unsplash.com/photo-1618773928121-c32242e63f39?w=1200&h=800&fit=crop","https://images.unsplash.com/photo-1512918728675-ed5a9ecdebfd?w=1200&h=800&fit=crop"]',
     NOW(), NOW(), 0, false
 ),
@@ -663,6 +668,7 @@ INSERT INTO rooms (
     'CITY',
     1800000.00,
     15.00,
+    1530000.00,  -- 1800000 * (100 - 15) / 100 = 1530000
     '["https://images.unsplash.com/photo-1596394516093-501ba68a0ba6?w=1200&h=800&fit=crop","https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=1200&h=800&fit=crop","https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=1200&h=800&fit=crop","https://images.unsplash.com/photo-1590381105924-c72589b9ef3f?w=1200&h=800&fit=crop","https://images.unsplash.com/photo-1616594039964-ae9021a400a0?w=1200&h=800&fit=crop"]',
     NOW(), NOW(), 0, false
 ),
@@ -676,6 +682,7 @@ INSERT INTO rooms (
     'CITY',
     1800000.00,
     0.00,
+    1800000.00,  -- 1800000 * (100 - 0) / 100 = 1800000
     '["https://images.unsplash.com/photo-1596394516093-501ba68a0ba6?w=1200&h=800&fit=crop","https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?w=1200&h=800&fit=crop","https://images.unsplash.com/photo-1455587734955-081b22074882?w=1200&h=800&fit=crop","https://images.unsplash.com/photo-1520250497591-112f2f40a3f4?w=1200&h=800&fit=crop","https://images.unsplash.com/photo-1559508551-44bff1de756b?w=1200&h=800&fit=crop"]',
     NOW(), NOW(), 0, false
 ),
@@ -690,6 +697,7 @@ INSERT INTO rooms (
     'SEA',
     2200000.00,
     20.00,
+    1760000.00,  -- 2200000 * (100 - 20) / 100 = 1760000
     '["https://images.unsplash.com/photo-1568605117037-4d9c780fac89?w=1200&h=800&fit=crop","https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=1200&h=800&fit=crop","https://images.unsplash.com/photo-1582719508461-905c673771fd?w=1200&h=800&fit=crop","https://images.unsplash.com/photo-1590490360182-c33d57733427?w=1200&h=800&fit=crop","https://images.unsplash.com/photo-1611048267451-e6ed903d4a38?w=1200&h=800&fit=crop"]',
     NOW(), NOW(), 0, false
 ),
@@ -703,6 +711,7 @@ INSERT INTO rooms (
     'SEA',
     2200000.00,
     0.00,
+    2200000.00,  -- 2200000 * (100 - 0) / 100 = 2200000
     '["https://images.unsplash.com/photo-1568605117037-4d9c780fac89?w=1200&h=800&fit=crop","https://images.unsplash.com/photo-1566665797739-1674de7a421a?w=1200&h=800&fit=crop","https://images.unsplash.com/photo-1591088398332-8a7791972843?w=1200&h=800&fit=crop","https://images.unsplash.com/photo-1631049421450-348ccd7f8949?w=1200&h=800&fit=crop","https://images.unsplash.com/photo-1615873968403-89e068629265?w=1200&h=800&fit=crop"]',
     NOW(), NOW(), 0, false
 ),
@@ -717,6 +726,7 @@ INSERT INTO rooms (
     'CITY',
     4500000.00,
     0.00,
+    4500000.00,  -- 4500000 * (100 - 0) / 100 = 4500000
     '["https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=1200&h=800&fit=crop","https://images.unsplash.com/photo-1596394516093-501ba68a0ba6?w=1200&h=800&fit=crop","https://images.unsplash.com/photo-1618773928121-c32242e63f39?w=1200&h=800&fit=crop","https://images.unsplash.com/photo-1611892440504-42a792e24d32?w=1200&h=800&fit=crop","https://images.unsplash.com/photo-1590490360182-c33d57733427?w=1200&h=800&fit=crop"]',
     NOW(), NOW(), 0, false
 ),
@@ -731,6 +741,7 @@ INSERT INTO rooms (
     'SEA',
     6500000.00,
     5.00,
+    6175000.00,  -- 6500000 * (100 - 5) / 100 = 6175000
     '["https://images.unsplash.com/photo-1618773928121-c32242e63f39?w=1200&h=800&fit=crop","https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=1200&h=800&fit=crop","https://images.unsplash.com/photo-1568605117037-4d9c780fac89?w=1200&h=800&fit=crop","https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=1200&h=800&fit=crop","https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=1200&h=800&fit=crop"]',
     NOW(), NOW(), 0, false
 )
@@ -1090,48 +1101,39 @@ ON CONFLICT DO NOTHING;
 -- ============================================================================
 INSERT INTO promotions (
     id, branch_id, code, name, description,
-    discount_type, percent_off, amount_off,
-    min_booking_amount, max_discount_amount,
-    start_at, end_at, active, usage_limit, used_count,
+    discount_type, amount_off,
+    start_at, end_at, active, used_count,
     stackable, exclusive_with_others, priority,
     created_at, updated_at, version, deleted
 ) VALUES 
 (
-    'promo-hcm-summer-001',
-    'branch-hcm-001',
-    'HCMSUMMER2024',
-    'Summer Vacation HCM 2024',
-    'Giảm 20% cho booking từ 3 đêm trở lên tại HCM',
-    'PERCENTAGE',
-    20.0,
-    NULL,
-    5000000.00,
-    2000000.00,
+    'promo-summer-001',
+    NULL, -- Áp dụng cho tất cả chi nhánh
+    'SUMMER2024',
+    'Summer Vacation 2024',
+    'Giảm 500,000đ cho tất cả booking',
+    'FIXED_AMOUNT',
+    500000.00,
     CURRENT_DATE - INTERVAL '30 days',
     CURRENT_DATE + INTERVAL '60 days',
     true,
-    100,
     0,
-    false, false, 1,
+    false, false, 0,
     NOW(), NOW(), 0, false
 ),
 (
-    'promo-hcm-welcome-001',
-    'branch-hcm-001',
-    'HCMWELCOME50',
-    'Welcome New Customer HCM',
-    'Giảm 500k cho khách hàng mới tại HCM',
+    'promo-welcome-001',
+    NULL, -- Áp dụng cho tất cả chi nhánh
+    'WELCOME50',
+    'Welcome New Customer',
+    'Giảm 200,000đ cho khách hàng mới',
     'FIXED_AMOUNT',
-    NULL,
-    500000.00,
-    3000000.00,
-    NULL,
+    200000.00,
     CURRENT_DATE - INTERVAL '10 days',
     CURRENT_DATE + INTERVAL '90 days',
     true,
-    500,
     0,
-    false, false, 2,
+    false, false, 0,
     NOW(), NOW(), 0, false
 )
 ON CONFLICT (code) DO NOTHING;
@@ -1155,6 +1157,10 @@ BEGIN
     -- Make customer_id nullable for walk-in guests
     IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'bookings' AND column_name = 'customer_id' AND is_nullable = 'NO') THEN
         ALTER TABLE bookings ALTER COLUMN customer_id DROP NOT NULL;
+    END IF;
+    -- Make customer_id nullable in service_bookings for walk-in guests
+    IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'service_bookings' AND column_name = 'customer_id' AND is_nullable = 'NO') THEN
+        ALTER TABLE service_bookings ALTER COLUMN customer_id DROP NOT NULL;
     END IF;
 END $$;
 
@@ -1257,20 +1263,45 @@ ON CONFLICT DO NOTHING;
 
 -- ============================================================================
 -- 13. SERVICE BOOKINGS (Đặt dịch vụ)
--- Tạo 2 service bookings cho HCM
+-- Tạo service bookings cho HCM - MỚI: Thêm room_id (REQUIRED)
+-- LƯU Ý: room_id là bắt buộc, phải thuộc về một phòng trong booking
 -- ============================================================================
+-- Add room_id column if not exists (should already exist from entity)
+DO $$ 
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'service_bookings' AND column_name = 'room_id') THEN
+        ALTER TABLE service_bookings ADD COLUMN room_id VARCHAR(255);
+        ALTER TABLE service_bookings ADD CONSTRAINT fk_service_booking_room FOREIGN KEY (room_id) REFERENCES rooms(id);
+    END IF;
+    -- Make room_id NOT NULL if it's nullable (update existing data first)
+    IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'service_bookings' AND column_name = 'room_id' AND is_nullable = 'YES') THEN
+        -- Update existing service bookings to assign room from booking_rooms
+        UPDATE service_bookings sb
+        SET room_id = (
+            SELECT br.room_id 
+            FROM booking_rooms br 
+            WHERE br.booking_id = sb.booking_id 
+            LIMIT 1
+        )
+        WHERE sb.room_id IS NULL AND sb.booking_id IS NOT NULL;
+        -- Then make it NOT NULL
+        ALTER TABLE service_bookings ALTER COLUMN room_id SET NOT NULL;
+    END IF;
+END $$;
+
 INSERT INTO service_bookings (
-    id, booking_id, service_id, customer_id,
+    id, booking_id, service_id, customer_id, room_id,
     service_date_time, quantity, price_per_unit, total_price,
     status, special_instructions,
     created_at, updated_at, version, deleted
 ) VALUES 
--- Service booking 1: Airport transfer (4 seater) cho booking HCM 1
+-- Service booking 1: Airport transfer (4 seater) cho booking HCM 1 - thuộc room 502
 (
     'servicebooking-hcm-001',
     'booking-hcm-001',
     'service-hcm-airport-4seat-001',
     (SELECT id FROM users WHERE username = 'customer' LIMIT 1),
+    'room-hcm-502', -- Room từ booking_rooms của booking này
     (CURRENT_DATE + INTERVAL '5 days')::timestamp + TIME '14:00:00',
     1,
     400000.00,
@@ -1279,12 +1310,13 @@ INSERT INTO service_bookings (
     'Pickup at Tan Son Nhat airport - 4 seater car',
     NOW(), NOW(), 0, false
 ),
--- Service booking 2: Massage cho booking HCM 1
+-- Service booking 2: Massage cho booking HCM 1 - thuộc room 502
 (
     'servicebooking-hcm-002',
     'booking-hcm-001',
     'service-hcm-massage-001',
     (SELECT id FROM users WHERE username = 'customer' LIMIT 1),
+    'room-hcm-502', -- Room từ booking_rooms của booking này
     (CURRENT_DATE + INTERVAL '6 days')::timestamp + TIME '15:00:00',
     2,
     600000.00,

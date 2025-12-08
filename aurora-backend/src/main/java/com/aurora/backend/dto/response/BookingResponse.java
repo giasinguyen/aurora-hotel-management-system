@@ -5,6 +5,7 @@ import lombok.experimental.FieldDefaults;
 
 import java.time.LocalDate;
 import java.util.Set;
+import java.util.List;
 
 @Getter
 @Setter
@@ -30,4 +31,5 @@ public class BookingResponse {
     String paymentStatus;
     String specialRequest;
     Set<BookingRoomResponse> rooms;
+    List<ServiceBookingResponse> services;
 }

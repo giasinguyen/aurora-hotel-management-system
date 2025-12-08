@@ -32,7 +32,7 @@ export interface Room {
   viewType?: string; // e.g., 'CITY', 'RIVER', 'SEA', 'GARDEN'
   basePrice: number; // Giá gốc của phòng
   salePercent: number; // % giảm giá (0-100)
-  displayPrice: number; // Giá hiển thị sau khi tính giảm giá
+  priceFinal: number; // Giá cuối cùng sau khi áp dụng giảm giá
   images?: string[]; // Array of image URLs
 }
 

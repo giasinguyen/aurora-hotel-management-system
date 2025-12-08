@@ -11,6 +11,8 @@ import GuestDetailsStep from "./steps/GuestDetailsStep";
 import PaymentStep from "./steps/PaymentStep";
 import { BookingSummary } from "@/components/booking";
 import type { BookingRoom } from "./types";
+import type { Promotion } from "@/types/promotion.types";
+import type { Promotion } from "@/types/promotion.types";
 
 export type CheckoutStep = 1 | 2 | 3 | 4;
 
@@ -45,11 +47,13 @@ export interface CheckoutData {
 
   // Step 4: Payment
   paymentMethod?: "cash" | "vnpay" | "momo" | "visa";
+  selectedPromotionId?: string; // Selected promotion ID
 }
 
 export default function CheckoutPage() {
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState<CheckoutStep>(1);
+  const [promotions, setPromotions] = useState<Promotion[]>([]);
 
   // Detect current role prefix from URL
   const currentPath = window.location.pathname;
@@ -174,12 +178,8 @@ export default function CheckoutPage() {
     localStorage.setItem("checkoutData", JSON.stringify(checkoutData));
   }, [checkoutData]);
 
-  // Set default payment method to cash when entering step 4
-  useEffect(() => {
-    if (currentStep === 4 && !checkoutData.paymentMethod) {
-      updateCheckoutData({ paymentMethod: "cash" });
-    }
-  }, [currentStep, checkoutData.paymentMethod]);
+  // Set default payment method when entering step 4
+  // Note: PaymentStep component will handle role-based default
 
   // Redirect if no rooms selected
   useEffect(() => {
@@ -191,6 +191,9 @@ export default function CheckoutPage() {
   const updateCheckoutData = (updates: Partial<CheckoutData>) => {
     setCheckoutData((prev) => ({ ...prev, ...updates }));
   };
+
+  // Note: Promotion fetching is now handled in PaymentStep component
+  // This ensures promotions are only fetched when user is logged in
 
   const handleNext = () => {
     if (currentStep < 4) {
@@ -237,6 +240,7 @@ export default function CheckoutPage() {
             checkoutData={checkoutData}
             rolePrefix={rolePrefix}
             updateCheckoutData={updateCheckoutData}
+            onPromotionsChange={setPromotions}
           />
         );
       default:
@@ -350,6 +354,8 @@ export default function CheckoutPage() {
               nights={checkoutData.nights}
               bookingRooms={checkoutData.rooms}
               roomExtras={checkoutData.roomExtras}
+              selectedPromotionId={checkoutData.selectedPromotionId}
+              promotions={promotions}
               showProceedButton={false}
             />
           </div>

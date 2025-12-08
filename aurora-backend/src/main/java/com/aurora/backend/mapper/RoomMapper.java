@@ -36,7 +36,6 @@ public interface RoomMapper {
     @Mapping(target = "capacityAdults", source = "roomType.capacityAdults")
     @Mapping(target = "capacityChildren", source = "roomType.capacityChildren")
     @Mapping(target = "sizeM2", source = "roomType.sizeM2")
-    @Mapping(target = "displayPrice", expression = "java(calculateDisplayPrice(room.getBasePrice(), room.getSalePercent()))")
     RoomResponse toRoomResponse(Room room);
     
     @Mapping(target = "id", ignore = true)
@@ -51,20 +50,4 @@ public interface RoomMapper {
     @Mapping(target = "lastCleaned", ignore = true)
     @Mapping(target = "maintenanceNotes", ignore = true)
     void updateRoom(@MappingTarget Room room, RoomUpdateRequest request);
-    
-    /**
-     * Calculate display price from base price and sale percent
-     * displayPrice = basePrice * (100 - salePercent) / 100
-     */
-    default BigDecimal calculateDisplayPrice(BigDecimal basePrice, BigDecimal salePercent) {
-        if (basePrice == null) {
-            return BigDecimal.ZERO;
-        }
-        if (salePercent == null || salePercent.compareTo(BigDecimal.ZERO) == 0) {
-            return basePrice;
-        }
-        BigDecimal discount = BigDecimal.valueOf(100).subtract(salePercent);
-        return basePrice.multiply(discount)
-                .divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
-    }
 }

@@ -12,7 +12,7 @@ import AuthPage from "@/pages/auth";
 // Bookings
 import BookingDetailPage from "@/pages/bookings/BookingDetail";
 import BookingListPage from "@/pages/bookings/BookingList";
-import BookingUpsertPage from "@/pages/bookings/BookingUpsert";
+import BookingUpdatePage from "@/pages/bookings/BookingUpdate";
 
 // Branches
 import AssignBranchPage from "@/pages/branches/AssignBranch";
@@ -84,6 +84,8 @@ import RoomCategoryUpsertPage from "@/pages/rooms/RoomCategoryUpsert";
 import RoomTypeListPage from "@/pages/rooms/RoomTypeList";
 import RoomTypeUpsertPage from "@/pages/rooms/RoomTypeUpsert";
 import RoomUpsertPage from "@/pages/rooms/RoomUpsert";
+import RoomEventListPage from "@/pages/rooms/RoomEventList";
+import RoomEventUpsertPage from "@/pages/rooms/RoomEventUpsert";
 
 // Services
 import ServiceListPage from "@/pages/services/ServiceList";
@@ -141,7 +143,7 @@ const router = createBrowserRouter([
     children: [
       { index: true, element: <StaffDashboardPage /> },
       { path: "bookings", element: <BookingListPage /> },
-      { path: "bookings/upsert", element: <BookingUpsertPage /> },
+      { path: "bookings/:id/update", element: <BookingUpdatePage /> },
       { path: "bookings/:id", element: <BookingDetailPage /> },
       { path: "booking", element: <BookingPage /> },
       { path: "booking/checkout", element: <CheckoutPage /> },
@@ -159,7 +161,7 @@ const router = createBrowserRouter([
     children: [
       { index: true, element: <ManagerDashboardPage /> },
       { path: "bookings", element: <BookingListPage /> },
-      { path: "bookings/upsert", element: <BookingUpsertPage /> },
+      { path: "bookings/:id/update", element: <BookingUpdatePage /> },
       { path: "bookings/:id", element: <BookingDetailPage /> },
       { path: "booking", element: <BookingPage /> },
       { path: "booking/checkout", element: <CheckoutPage /> },
@@ -169,6 +171,8 @@ const router = createBrowserRouter([
       { path: "rooms/upsert", element: <RoomUpsertPage /> },
       { path: "room-types", element: <RoomTypeListPage /> },
       { path: "room-types/upsert", element: <RoomTypeUpsertPage /> },
+      { path: "room-events", element: <RoomEventListPage /> },
+      { path: "room-events/upsert", element: <RoomEventUpsertPage /> },
       { path: "services", element: <ServiceListPage /> },
       { path: "services/upsert", element: <ServiceUpsertPage /> },
       { path: "users", element: <UserListPage /> },
@@ -192,7 +196,7 @@ const router = createBrowserRouter([
     children: [
       { index: true, element: <AdminDashboardPage /> },
       { path: "bookings", element: <BookingListPage /> },
-      { path: "bookings/upsert", element: <BookingUpsertPage /> },
+      { path: "bookings/:id/update", element: <BookingUpdatePage /> },
       { path: "bookings/:id", element: <BookingDetailPage /> },
       { path: "booking", element: <BookingPage /> },
       { path: "booking/checkout", element: <CheckoutPage /> },
@@ -203,6 +207,8 @@ const router = createBrowserRouter([
       { path: "room-types/upsert", element: <RoomTypeUpsertPage /> },
       { path: "room-categories", element: <RoomCategoryListPage /> },
       { path: "room-categories/upsert", element: <RoomCategoryUpsertPage /> },
+      { path: "room-events", element: <RoomEventListPage /> },
+      { path: "room-events/upsert", element: <RoomEventUpsertPage /> },
       { path: "service-categories", element: <ServiceCategoryListPage /> },
       {
         path: "service-categories/upsert",

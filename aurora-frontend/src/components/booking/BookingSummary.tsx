@@ -3,6 +3,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { formatCurrency } from "@/utils/exportUtils";
 import fallbackImage from "@/assets/images/commons/fallback.png";
+import type { Promotion } from "@/types/promotion.types";
 
 export interface BookingRoom {
   roomId: string;
@@ -28,6 +29,10 @@ interface BookingSummaryProps {
   // Room extras (services per room)
   roomExtras?: Record<string, RoomExtras>;
   
+  // Promotion
+  selectedPromotionId?: string;
+  promotions?: Promotion[];
+  
   // Callbacks
   onRemoveRoom?: (roomId: string) => void;
   onClearAll?: () => void;
@@ -45,6 +50,8 @@ export default function BookingSummary({
   nights,
   bookingRooms,
   roomExtras,
+  selectedPromotionId,
+  promotions = [],
   onRemoveRoom,
   onClearAll,
   onProceed,
@@ -68,9 +75,30 @@ export default function BookingSummary({
     }, 0);
   };
 
+  // Calculate discount from selected promotion
+  const calculateDiscount = () => {
+    if (!selectedPromotionId || !promotions.length) return 0;
+    
+    const promotion = promotions.find(p => p.id === selectedPromotionId);
+    if (!promotion) return 0;
+    
+    const subtotal = calculateTotalPrice() * nights + calculateServicesTotal();
+    
+    if (promotion.discountType === 'FIXED_AMOUNT' && promotion.amountOff) {
+      // Fixed amount discount - cannot exceed subtotal
+      return Math.min(promotion.amountOff, subtotal);
+    }
+    
+    return 0;
+  };
+
   const roomsTotal = calculateTotalPrice() * nights;
   const servicesTotal = calculateServicesTotal();
-  const totalPrice = roomsTotal + servicesTotal;
+  const discountAmount = calculateDiscount();
+  const subtotal = roomsTotal + servicesTotal;
+  const totalPrice = subtotal - discountAmount;
+  
+  const selectedPromotion = promotions.find(p => p.id === selectedPromotionId);
 
   const handleImageError = (e: React.SyntheticEvent<HTMLImageElement>) => {
     const img = e.currentTarget;
@@ -253,6 +281,16 @@ export default function BookingSummary({
             <span className="text-gray-600">Dịch vụ bổ sung</span>
             <span className="text-primary font-semibold">
               {formatCurrency(servicesTotal)}
+            </span>
+          </div>
+        )}
+        {discountAmount > 0 && selectedPromotion && (
+          <div className="flex justify-between text-sm text-green-600">
+            <span>
+              Giảm giá {selectedPromotion.code && `(${selectedPromotion.code})`}
+            </span>
+            <span className="font-semibold">
+              -{formatCurrency(discountAmount)}
             </span>
           </div>
         )}

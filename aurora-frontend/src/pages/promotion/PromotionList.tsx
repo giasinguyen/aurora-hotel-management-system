@@ -199,12 +199,22 @@ export default function PromotionList() {
     {
       key: 'discount',
       header: 'Giảm giá',
-      cell: (promotion) => (
-        <div className="flex items-center gap-1 font-bold text-lg text-green-600">
-          <Percent className="h-4 w-4" />
-          {promotion.discount}%
-        </div>
-      ),
+      cell: (promotion) => {
+        const discountDisplay = promotion.discountType === 'PERCENTAGE' 
+          ? `${promotion.percentOff || promotion.discount || 0}%`
+          : `${new Intl.NumberFormat('vi-VN').format(promotion.amountOff || 0)}đ`;
+        
+        return (
+          <div className="flex items-center gap-1 font-bold text-lg text-green-600">
+            {promotion.discountType === 'PERCENTAGE' ? (
+              <Percent className="h-4 w-4" />
+            ) : (
+              <span className="text-xs">VNĐ</span>
+            )}
+            {discountDisplay}
+          </div>
+        );
+      },
       sortable: true,
     },
     {

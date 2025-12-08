@@ -350,7 +350,7 @@ export default function BookingList() {
                 <Eye className="h-4 w-4 mr-2" />
                 Xem chi tiết
               </DropdownMenuItem>
-              <DropdownMenuItem onClick={() => navigate(`${rolePrefix}/bookings/upsert`)}>
+              <DropdownMenuItem onClick={() => navigate(`${rolePrefix}/bookings/${booking.id}/update`)}>
                 <Edit className="h-4 w-4 mr-2" />
                 Chỉnh sửa
               </DropdownMenuItem>
@@ -415,7 +415,7 @@ export default function BookingList() {
       <PageHeader
         title="Quản lý đặt phòng"
         description="Xem và quản lý tất cả đặt phòng trong hệ thống"
-        onAdd={() => navigate(`${rolePrefix}/bookings/upsert`)}
+        onAdd={() => navigate(`${rolePrefix}/bookings`)}
         addButtonText="Tạo đặt phòng"
         onRefresh={fetchBookings}
         isLoading={isLoading}

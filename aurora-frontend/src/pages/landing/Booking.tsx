@@ -202,30 +202,20 @@ export default function BookingPage() {
           );
         }
 
-        // Step 6: Group by room type and take one representative room per type
-        const roomTypeMap = new Map<
-          string,
-          { room: Room; roomType: RoomType }
-        >();
-        filteredRoomsWithTypes.forEach((item) => {
-          if (!roomTypeMap.has(item.roomType.id)) {
-            roomTypeMap.set(item.roomType.id, item);
-          }
-        });
-
+        // Step 6: Display all rooms (removed grouping logic to show all rooms)
         // Convert to array and set state
-        const finalRooms = Array.from(roomTypeMap.values());
-        setRooms(finalRooms.map((item) => item.room));
+        setRooms(filteredRoomsWithTypes.map((item) => item.room));
 
-        // Set roomType for display (if only one type selected)
-        if (finalRooms.length === 1) {
-          setRoomType(finalRooms[0].roomType);
+        // Set roomType for display (if only one type exists in the filtered results)
+        const uniqueRoomTypes = new Set(filteredRoomsWithTypes.map((item) => item.roomType.id));
+        if (uniqueRoomTypes.size === 1) {
+          setRoomType(filteredRoomsWithTypes[0].roomType);
         } else {
           setRoomType(null);
         }
 
         // Check availability for all rooms
-        await checkRoomAvailability(finalRooms.map((item) => item.room));
+        await checkRoomAvailability(filteredRoomsWithTypes.map((item) => item.room));
       } catch (error) {
         console.error("Failed to fetch data:", error);
         toast.error("Không thể tải thông tin phòng");
@@ -338,7 +328,7 @@ export default function BookingPage() {
       roomNumber: room.roomNumber || typeToUse.name,
       roomTypeId: typeToUse.id,
       roomTypeName: typeToUse.name,
-      basePrice: typeToUse.priceFrom,
+      basePrice: room.priceFinal,
       imageUrl: room.images?.[0] || typeToUse.imageUrl,
     };
 

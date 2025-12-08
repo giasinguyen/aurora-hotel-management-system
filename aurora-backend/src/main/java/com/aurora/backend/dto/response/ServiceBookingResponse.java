@@ -19,6 +19,8 @@ public class ServiceBookingResponse {
     String serviceType;
     String customerId;
     String customerName;
+    String roomId;
+    String roomNumber;
     LocalDateTime dateTime;
     Integer quantity;
     Double price;

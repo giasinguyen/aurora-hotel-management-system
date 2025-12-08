@@ -4,11 +4,13 @@ import com.aurora.backend.dto.request.BookingCreationRequest;
 import com.aurora.backend.dto.request.BookingUpdateRequest;
 import com.aurora.backend.dto.response.BookingResponse;
 import com.aurora.backend.entity.Booking;
+import org.mapstruct.BeanMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
+import org.mapstruct.NullValuePropertyMappingStrategy;
 
-@Mapper(componentModel = "spring")
+@Mapper(componentModel = "spring", uses = {BookingRoomMapper.class})
 public interface BookingMapper {
     @Mapping(target = "branch.id", source = "branchId")
     @Mapping(target = "customer.id", source = "customerId")
@@ -30,5 +32,8 @@ public interface BookingMapper {
     @Mapping(target = "bookingCode", ignore = true)
     @Mapping(target = "branch", ignore = true)
     @Mapping(target = "customer", ignore = true)
+    @Mapping(target = "status", ignore = true) // Don't update status via this endpoint
+    @Mapping(target = "paymentStatus", ignore = true) // Don't update paymentStatus via this endpoint
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     void updateBooking(@MappingTarget Booking booking, BookingUpdateRequest request);
 }

@@ -1,40 +1,152 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { CreditCard, Building2, Lock, Wallet, Smartphone, Loader2 } from "lucide-react";
+import { CreditCard, Building2, Lock, Wallet, Smartphone, Loader2, Tag } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { bookingApi } from "@/services/bookingApi";
 import { vnpayService } from "@/services/vnpayService";
+import { promotionApi } from "@/services/promotionApi";
 import roomAvailabilityApi from "@/services/roomAvailabilityApi";
 import { useSelector } from "react-redux";
 import { toast } from "sonner";
 import type { CheckoutData } from "../index";
 import type { RootState } from "@/features/store";
 import type { CheckoutRequest } from "@/types/checkout.types";
+import type { Promotion } from "@/types/promotion.types";
 
 interface PaymentStepProps {
   checkoutData: CheckoutData;
   updateCheckoutData: (updates: Partial<CheckoutData>) => void;
   rolePrefix?: string;
+  onPromotionsChange?: (promotions: Promotion[]) => void; // Callback to pass promotions to parent
 }
 
 export default function PaymentStep({
   checkoutData,
   updateCheckoutData,
   rolePrefix = '',
+  onPromotionsChange,
 }: PaymentStepProps) {
   const navigate = useNavigate();
-  const { paymentMethod, rooms, checkIn, checkOut, guests, nights, roomExtras, guestInfo } = checkoutData;
+  const { paymentMethod, rooms, checkIn, checkOut, guests, nights, roomExtras, guestInfo, selectedPromotionId } = checkoutData;
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [promotions, setPromotions] = useState<Promotion[]>([]);
+  const [isLoadingPromotions, setIsLoadingPromotions] = useState(false);
   
   // Get current user from Redux
   const currentUser = useSelector((state: RootState) => state.auth.user);
   const isLogin = useSelector((state: RootState) => state.auth.isLogin);
   
+  // Check if user has admin/staff/manager role
+  const userRoles = currentUser?.roles || [];
+  const isAdminStaffManager = userRoles.some(role => 
+    role === 'ADMIN' || role === 'STAFF' || role === 'MANAGER'
+  ) || rolePrefix !== ''; // Also check rolePrefix from URL
+  
   // Get branchId from localStorage
   const branchId = localStorage.getItem("branchId") || "branch-hcm-001";
+
+  // Set default payment method based on role
+  useEffect(() => {
+    if (!paymentMethod) {
+      // If client (not admin/staff/manager), default to VNPay only
+      if (!isAdminStaffManager) {
+        updateCheckoutData({ paymentMethod: "vnpay" });
+      } else {
+        // Admin/Staff/Manager can choose, default to cash
+        updateCheckoutData({ paymentMethod: "cash" });
+      }
+    } else if (!isAdminStaffManager && paymentMethod === "cash") {
+      // If client tries to select cash, force to VNPay
+      updateCheckoutData({ paymentMethod: "vnpay" });
+    }
+  }, [isAdminStaffManager, paymentMethod]);
+
+  // Fetch active promotions - ONLY if user is logged in
+  useEffect(() => {
+    // If user is not logged in, clear promotions and selected promotion
+    if (!isLogin) {
+      setPromotions([]);
+      if (onPromotionsChange) {
+        onPromotionsChange([]);
+      }
+      if (selectedPromotionId) {
+        updateCheckoutData({ selectedPromotionId: undefined });
+      }
+      return;
+    }
+
+    const fetchPromotions = async () => {
+      try {
+        setIsLoadingPromotions(true);
+        const today = new Date().toISOString().split('T')[0];
+        
+        const response = await promotionApi.getActive({
+          page: 0,
+          size: 100,
+          sortBy: 'priority',
+          sortDir: 'desc', // Highest priority first
+        });
+        
+        // Filter promotions that are valid for current booking
+        const validPromotions = (response.result?.content || []).filter((promo) => {
+          // Check if promotion is active
+          if (!promo.active) {
+            return false;
+          }
+          
+          // Check date range - must be within startDate and endDate (inclusive)
+          const startDate = new Date(promo.startDate);
+          const endDate = new Date(promo.endDate);
+          const todayDate = new Date(today);
+          
+          // Set time to start of day for accurate comparison
+          startDate.setHours(0, 0, 0, 0);
+          endDate.setHours(23, 59, 59, 999); // End of day
+          todayDate.setHours(0, 0, 0, 0);
+          
+          if (todayDate < startDate || todayDate > endDate) {
+            return false;
+          }
+          
+          // Check branch (null = all branches)
+          if (promo.branchId && promo.branchId !== branchId) {
+            return false;
+          }
+          
+          // Check minimum nights
+          if (promo.minNights && nights < promo.minNights) {
+            return false;
+          }
+          
+          return true;
+        });
+        
+        setPromotions(validPromotions);
+        
+        // Notify parent component about promotions (for BookingSummary)
+        if (onPromotionsChange) {
+          onPromotionsChange(validPromotions);
+        }
+        
+        // Auto-select promotion with highest priority if none selected
+        if (validPromotions.length > 0 && !selectedPromotionId) {
+          const highestPriorityPromo = validPromotions[0]; // Already sorted by priority desc
+          updateCheckoutData({ selectedPromotionId: highestPriorityPromo.id });
+        }
+      } catch (error) {
+        console.error('Failed to fetch promotions:', error);
+        // Don't show error toast - promotions are optional
+      } finally {
+        setIsLoadingPromotions(false);
+      }
+    };
+    
+    fetchPromotions();
+  }, [isLogin, checkIn, checkOut, nights, branchId, selectedPromotionId]); // Re-fetch when login status or booking details change
 
   const handlePaymentMethodChange = (value: string) => {
     updateCheckoutData({
@@ -55,6 +167,26 @@ export default function PaymentStep({
     }
     return roomsTotal + servicesTotal;
   };
+
+  // Calculate discount from selected promotion
+  const calculateDiscount = () => {
+    if (!selectedPromotionId) return 0;
+    
+    const promotion = promotions.find(p => p.id === selectedPromotionId);
+    if (!promotion) return 0;
+    
+    const subtotal = calculateTotalAmount();
+    
+    if (promotion.discountType === 'FIXED_AMOUNT' && promotion.amountOff) {
+      // Fixed amount discount - cannot exceed subtotal
+      return Math.min(promotion.amountOff, subtotal);
+    }
+    
+    return 0;
+  };
+
+  // Get selected promotion
+  const selectedPromotion = promotions.find(p => p.id === selectedPromotionId);
 
   const handleCompleteBooking = async () => {
     if (!paymentMethod) {
@@ -150,6 +282,7 @@ export default function PaymentStep({
         specialRequests: guestInfo?.specialRequests || "",
         paymentMethod: paymentMethod,
         paymentSuccess: true, // Always true to create booking
+        promotionId: isLogin ? (selectedPromotionId || undefined) : undefined, // Only include promotion if user is logged in
         rooms: roomBookings,
         services: serviceBookings.length > 0 ? serviceBookings : undefined,
       };
@@ -223,7 +356,7 @@ export default function PaymentStep({
       
       // Log detailed error information
       if (error && typeof error === 'object' && 'response' in error) {
-        const axiosError = error as { response?: { data?: any; status?: number } };
+        const axiosError = error as { response?: { data?: unknown; status?: number } };
         console.error("Error Status:", axiosError.response?.status);
         console.error("Error Data:", JSON.stringify(axiosError.response?.data, null, 2));
       }
@@ -232,23 +365,31 @@ export default function PaymentStep({
       let errorMessage = "Đặt phòng thất bại. Vui lòng thử lại.";
       
       if (error && typeof error === 'object' && 'response' in error) {
-        const axiosError = error as { response?: { data?: any } };
+        const axiosError = error as { response?: { data?: unknown } };
         const responseData = axiosError.response?.data;
         
         if (responseData) {
           // Try to extract message from different error formats
           if (typeof responseData === 'string') {
             errorMessage = responseData;
-          } else if (responseData.message) {
-            errorMessage = responseData.message;
-          } else if (responseData.error) {
-            errorMessage = responseData.error;
-          } else if (responseData.errors) {
-            // Validation errors array
-            const errors = Array.isArray(responseData.errors) 
-              ? responseData.errors.map((e: any) => e.message || e).join(', ')
-              : JSON.stringify(responseData.errors);
-            errorMessage = `Validation errors: ${errors}`;
+          } else if (typeof responseData === 'object' && responseData !== null) {
+            const data = responseData as Record<string, unknown>;
+            if (typeof data.message === 'string') {
+              errorMessage = data.message;
+            } else if (typeof data.error === 'string') {
+              errorMessage = data.error;
+            } else if (data.errors) {
+              // Validation errors array
+              const errors = Array.isArray(data.errors) 
+                ? data.errors.map((e: unknown) => {
+                    if (typeof e === 'object' && e !== null && 'message' in e) {
+                      return (e as { message: string }).message;
+                    }
+                    return String(e);
+                  }).join(', ')
+                : JSON.stringify(data.errors);
+              errorMessage = `Validation errors: ${errors}`;
+            }
           }
         }
       }
@@ -268,36 +409,116 @@ export default function PaymentStep({
         </p>
       </div>
 
+      {/* Promotion Selection - Only show if user is logged in */}
+      {isLogin && promotions.length > 0 && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg flex items-center gap-2">
+              <Tag className="h-5 w-5 text-primary" />
+              Khuyến mãi
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {isLoadingPromotions ? (
+              <div className="flex items-center justify-center py-4">
+                <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+              </div>
+            ) : (
+              <div className="space-y-2">
+                <Label htmlFor="promotion">Chọn khuyến mãi</Label>
+                <Select
+                  value={selectedPromotionId || "none"}
+                  onValueChange={(value) => {
+                    updateCheckoutData({ 
+                      selectedPromotionId: value === "none" ? undefined : value
+                    });
+                  }}
+                >
+                  <SelectTrigger id="promotion" className="h-11">
+                    <SelectValue placeholder="Không sử dụng khuyến mãi" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">Không sử dụng khuyến mãi</SelectItem>
+                    {promotions.map((promo) => (
+                      <SelectItem key={promo.id} value={promo.id}>
+                        <div className="flex items-center justify-between w-full">
+                          <div>
+                            <div className="font-semibold">{promo.name}</div>
+                            <div className="text-xs text-muted-foreground">
+                              {promo.discountType === 'FIXED_AMOUNT' 
+                                ? `Giảm ${new Intl.NumberFormat('vi-VN').format(promo.amountOff || 0)}đ`
+                                : `Giảm ${promo.percentOff || 0}%`}
+                            </div>
+                          </div>
+                          {promo.code && (
+                            <span className="ml-4 text-xs font-mono bg-primary/10 text-primary px-2 py-1 rounded">
+                              {promo.code}
+                            </span>
+                          )}
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {selectedPromotion && (
+                  <div className="mt-2 p-3 bg-green-50 border border-green-200 rounded-lg">
+                    <p className="text-sm text-green-800">
+                      <span className="font-semibold">Đã áp dụng:</span> {selectedPromotion.name}
+                      {selectedPromotion.code && (
+                        <span className="ml-2 font-mono text-xs">({selectedPromotion.code})</span>
+                      )}
+                    </p>
+                    <p className="text-xs text-green-600 mt-1">
+                      Bạn sẽ được giảm {new Intl.NumberFormat('vi-VN').format(calculateDiscount())}đ
+                    </p>
+                  </div>
+                )}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      )}
+
       <Card>
         <CardHeader>
           <CardTitle className="text-lg">Phương thức thanh toán</CardTitle>
         </CardHeader>
         <CardContent>
           <RadioGroup
-            value={paymentMethod || "cash"}
+            value={paymentMethod || (isAdminStaffManager ? "cash" : "vnpay")}
             onValueChange={handlePaymentMethodChange}
             className="space-y-4"
           >
-            {/* Cash Option - Active */}
-            <div className="flex items-start space-x-3 p-4 border-2 border-primary rounded-lg bg-primary/5 cursor-pointer">
-              <RadioGroupItem value="cash" id="cash" className="mt-1" />
-              <Label
-                htmlFor="cash"
-                className="flex-1 cursor-pointer"
-              >
-                <div className="flex items-center gap-3">
-                  <div className="p-2 bg-primary/20 rounded-lg">
-                    <Wallet className="h-5 w-5 text-primary" />
+            {/* Cash Option - Only for Admin/Staff/Manager */}
+            {isAdminStaffManager && (
+              <div className={`flex items-start space-x-3 p-4 border-2 rounded-lg cursor-pointer transition-all ${
+                paymentMethod === 'cash' 
+                  ? 'border-primary bg-primary/5' 
+                  : 'border-gray-200 hover:border-primary/50'
+              }`}>
+                <RadioGroupItem value="cash" id="cash" className="mt-1" />
+                <Label
+                  htmlFor="cash"
+                  className="flex-1 cursor-pointer"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className={`p-2 rounded-lg ${
+                      paymentMethod === 'cash' ? 'bg-primary/20' : 'bg-gray-100'
+                    }`}>
+                      <Wallet className={`h-5 w-5 ${
+                        paymentMethod === 'cash' ? 'text-primary' : 'text-gray-600'
+                      }`} />
+                    </div>
+                    <div className="flex-1">
+                      <p className="font-semibold">Tiền mặt (Cash)</p>
+                      <p className="text-sm text-gray-500">
+                        Thanh toán trực tiếp tại khách sạn
+                      </p>
+                    </div>
                   </div>
-                  <div className="flex-1">
-                    <p className="font-semibold">Tiền mặt (Cash)</p>
-                    <p className="text-sm text-gray-500">
-                      Thanh toán trực tiếp tại khách sạn
-                    </p>
-                  </div>
-                </div>
-              </Label>
-            </div>
+                </Label>
+              </div>
+            )}
 
             {/* VNPay Option - Active */}
             <div className={`flex items-start space-x-3 p-4 border-2 rounded-lg cursor-pointer transition-all ${

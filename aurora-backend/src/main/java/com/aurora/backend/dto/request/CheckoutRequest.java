@@ -53,6 +53,9 @@ public class CheckoutRequest {
     @NotNull(message = "PAYMENT_SUCCESS_REQUIRED")
     Boolean paymentSuccess; // true = payment successful, false = payment failed
     
+    // Promotion ID (optional)
+    String promotionId; // ID of applied promotion
+    
     // Rooms with notes
     @NotNull(message = "ROOMS_REQUIRED")
     List<RoomBookingRequest> rooms;

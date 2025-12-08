@@ -3,6 +3,7 @@ import {
   LogOut,
   LockKeyhole,
   LayoutDashboard,
+  Hotel,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -183,6 +184,26 @@ const UserMenu = ({ blackTheme }: UserMenuProps) => {
             </div>
           </Link>
         </DropdownMenuItem>
+
+        {/* My Booking - Only for customers (not ADMIN, MANAGER, STAFF) */}
+        {user.roles && 
+         !user.roles.includes("ADMIN") && 
+         !user.roles.includes("MANAGER") && 
+         !user.roles.includes("STAFF") && (
+          <DropdownMenuItem>
+            <Link
+              to={"/my-bookings"}
+              className="flex cursor-pointer items-center gap-3 rounded-lg"
+            >
+              <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-orange-100">
+                <Hotel className="h-4 w-4 text-orange-600" />
+              </div>
+              <div className="min-w-0">
+                <p className="font-medium">My Booking</p>
+              </div>
+            </Link>
+          </DropdownMenuItem>
+        )}
 
         <DropdownMenuItem>
           <Link

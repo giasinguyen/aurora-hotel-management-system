@@ -55,7 +55,7 @@ public class Promotion extends BaseEntity {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     @Builder.Default
-    DiscountType discountType = DiscountType.PERCENTAGE;
+    DiscountType discountType = DiscountType.FIXED_AMOUNT;
     
     @DecimalMin(value = "0.0", message = "Percent off must be at least 0")
     @DecimalMax(value = "100.0", message = "Percent off cannot exceed 100")

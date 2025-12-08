@@ -7,11 +7,11 @@ import {
   Loader2, 
   Tag,
   FileText,
-  Percent,
   Calendar,
   Code,
   RefreshCcw,
-  ToggleLeft
+  ToggleLeft,
+  DollarSign
 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
@@ -24,7 +24,7 @@ import { Switch } from '@/components/ui/switch';
 import type { 
   Promotion, 
   PromotionCreationRequest, 
-  PromotionUpdateRequest 
+  PromotionUpdateRequest
 } from '@/types/promotion.types';
 
 // ============================================
@@ -35,7 +35,7 @@ interface FormState {
   code: string;
   name: string;
   description: string;
-  discount: number;
+  amountOff: string;
   startDate: string;
   endDate: string;
   active: boolean;
@@ -44,7 +44,7 @@ interface FormState {
 interface FormErrors {
   code?: string;
   name?: string;
-  discount?: string;
+  amountOff?: string;
   startDate?: string;
   endDate?: string;
 }
@@ -98,7 +98,7 @@ export default function PromotionForm({
     code: promotion?.code || '',
     name: promotion?.name || '',
     description: promotion?.description || '',
-    discount: promotion?.discount || 10,
+    amountOff: promotion?.amountOff?.toString() || '',
     startDate: formatDateForInput(promotion?.startDate || ''),
     endDate: formatDateForInput(promotion?.endDate || ''),
     active: promotion?.active ?? true,
@@ -113,7 +113,7 @@ export default function PromotionForm({
         code: promotion.code || '',
         name: promotion.name || '',
         description: promotion.description || '',
-        discount: promotion.discount || 10,
+        amountOff: promotion.amountOff?.toString() || '',
         startDate: formatDateForInput(promotion.startDate || ''),
         endDate: formatDateForInput(promotion.endDate || ''),
         active: promotion.active ?? true,
@@ -136,22 +136,21 @@ export default function PromotionForm({
 
     if (!formState.code || formState.code.trim() === '') {
       newErrors.code = 'Vui lòng nhập mã khuyến mãi';
-    } else if (!/^[A-Z0-9_-]+$/.test(formState.code)) {
-      newErrors.code = 'Mã chỉ chứa chữ in hoa, số, _ và -';
-    } else if (formState.code.length > 20) {
-      newErrors.code = 'Mã tối đa 20 ký tự';
+    } else if (!/^[A-Z0-9_]+$/.test(formState.code)) {
+      newErrors.code = 'Mã chỉ chứa chữ in hoa, số và _';
+    } else if (formState.code.length < 3 || formState.code.length > 50) {
+      newErrors.code = 'Mã phải từ 3 đến 50 ký tự';
     }
 
     if (!formState.name || formState.name.trim() === '') {
       newErrors.name = 'Vui lòng nhập tên khuyến mãi';
-    } else if (formState.name.length > 100) {
-      newErrors.name = 'Tên tối đa 100 ký tự';
+    } else if (formState.name.length > 200) {
+      newErrors.name = 'Tên tối đa 200 ký tự';
     }
 
-    if (!formState.discount || formState.discount <= 0) {
-      newErrors.discount = 'Giảm giá phải lớn hơn 0';
-    } else if (formState.discount > 100) {
-      newErrors.discount = 'Giảm giá tối đa 100%';
+    const amountValue = parseFloat(formState.amountOff);
+    if (!formState.amountOff || isNaN(amountValue) || amountValue <= 0) {
+      newErrors.amountOff = 'Số tiền giảm phải lớn hơn 0';
     }
 
     if (!formState.startDate) {
@@ -176,25 +175,25 @@ export default function PromotionForm({
     if (isEditMode) {
       const updateData: PromotionUpdateRequest = {
         name: formState.name,
-        description: formState.description || undefined,
-        discount: formState.discount,
         startDate: formState.startDate,
         endDate: formState.endDate,
         active: formState.active,
+        discountType: 'FIXED_AMOUNT',
+        amountOff: parseFloat(formState.amountOff),
+        ...(formState.description.trim() && { description: formState.description.trim() }),
       };
-      console.log('Updating promotion with data:', updateData);
       await onSubmit(updateData);
     } else {
       const createData: PromotionCreationRequest = {
         code: formState.code,
         name: formState.name,
-        description: formState.description || undefined,
-        discount: formState.discount,
         startDate: formState.startDate,
         endDate: formState.endDate,
         active: formState.active,
+        discountType: 'FIXED_AMOUNT',
+        amountOff: parseFloat(formState.amountOff),
+        ...(formState.description.trim() && { description: formState.description.trim() }),
       };
-      console.log('Creating promotion with data:', createData);
       await onSubmit(createData);
     }
   };
@@ -249,7 +248,7 @@ export default function PromotionForm({
               )}
             </div>
             <p className="text-sm text-muted-foreground">
-              {isEditMode ? 'Không thể thay đổi mã khi chỉnh sửa' : 'Mã chỉ chứa chữ in hoa, số, _ và -'}
+              {isEditMode ? 'Không thể thay đổi mã khi chỉnh sửa' : 'Mã chỉ chứa chữ in hoa, số và _'}
             </p>
             {errors.code && <p className="text-sm text-destructive">{errors.code}</p>}
           </div>
@@ -291,46 +290,45 @@ export default function PromotionForm({
         <CardHeader className="pb-4">
           <div className="flex items-center gap-3">
             <div className="p-2 rounded-xl bg-green-100 text-green-600">
-              <Percent className="h-5 w-5" />
+              <DollarSign className="h-5 w-5" />
             </div>
             <div>
               <CardTitle className="text-lg">Mức giảm giá</CardTitle>
-              <CardDescription>Thiết lập phần trăm giảm giá</CardDescription>
+              <CardDescription>Thiết lập số tiền giảm cố định</CardDescription>
             </div>
           </div>
         </CardHeader>
-        <CardContent>
-          <div className="max-w-md space-y-4">
-            <div className="space-y-2">
-              <Label className="flex items-center gap-2">
-                <Percent className="h-4 w-4 text-muted-foreground" />
-                Giảm giá (%) <span className="text-destructive">*</span>
-              </Label>
-              <div className="relative">
-                <Input
-                  type="number"
-                  value={formState.discount}
-                  onChange={(e) => updateField('discount', parseFloat(e.target.value) || 0)}
-                  min={0}
-                  max={100}
-                  step={1}
-                  placeholder="10"
-                  className={`h-11 pr-10 ${errors.discount ? 'border-destructive' : ''}`}
-                />
-                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground">%</span>
-              </div>
-              {errors.discount && <p className="text-sm text-destructive">{errors.discount}</p>}
-            </div>
+        <CardContent className="space-y-6">
+          <div className="space-y-2">
+            <Label className="flex items-center gap-2">
+              <DollarSign className="h-4 w-4 text-muted-foreground" />
+              Số tiền giảm (VNĐ) <span className="text-destructive">*</span>
+            </Label>
+            <Input
+              type="number"
+              value={formState.amountOff}
+              onChange={(e) => updateField('amountOff', e.target.value)}
+              placeholder="100000"
+              className={`h-11 ${errors.amountOff ? 'border-destructive' : ''}`}
+            />
+            {errors.amountOff && <p className="text-sm text-destructive">{errors.amountOff}</p>}
+            <p className="text-sm text-muted-foreground">
+              Nhập số tiền giảm cố định (ví dụ: 100000 = 100,000đ)
+            </p>
+          </div>
 
-            {/* Preview */}
-            <div className="p-4 rounded-lg bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200">
-              <p className="text-sm text-green-700">
-                Khách hàng sẽ được giảm <span className="font-bold text-green-800">{formState.discount}%</span> cho đơn hàng
-              </p>
+          {/* Preview */}
+          <div className="p-4 rounded-lg bg-gradient-to-r from-green-50 to-emerald-50 border border-green-200">
+            <p className="text-sm text-green-700">
+              Khách hàng sẽ được giảm <span className="font-bold text-green-800">
+                {formState.amountOff ? new Intl.NumberFormat('vi-VN').format(parseFloat(formState.amountOff)) : '0'}đ
+              </span> cho đơn hàng
+            </p>
+            {formState.amountOff && (
               <p className="text-xs text-green-600 mt-1">
-                VD: Đơn 1,000,000đ → Giảm còn {new Intl.NumberFormat('vi-VN').format(1000000 * (100 - formState.discount) / 100)}đ
+                VD: Đơn 1,000,000đ → Giảm còn {new Intl.NumberFormat('vi-VN').format(1000000 - parseFloat(formState.amountOff || '0'))}đ
               </p>
-            </div>
+            )}
           </div>
         </CardContent>
       </Card>
@@ -349,7 +347,6 @@ export default function PromotionForm({
           </div>
         </CardHeader>
         <CardContent className="grid gap-6 md:grid-cols-2">
-          {/* Start Date */}
           <div className="space-y-2">
             <Label className="flex items-center gap-2">
               <Calendar className="h-4 w-4 text-muted-foreground" />
@@ -364,7 +361,6 @@ export default function PromotionForm({
             {errors.startDate && <p className="text-sm text-destructive">{errors.startDate}</p>}
           </div>
 
-          {/* End Date */}
           <div className="space-y-2">
             <Label className="flex items-center gap-2">
               <Calendar className="h-4 w-4 text-muted-foreground" />

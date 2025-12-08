@@ -52,6 +52,7 @@ const menuItems = [
       { title: 'Room Categories', href: '/admin/room-categories' },
       { title: 'Room Types', href: '/admin/room-types' },
       { title: 'Room List', href: '/admin/rooms' },
+      { title: 'Price Events', href: '/admin/room-events' },
     ],
   },
   {

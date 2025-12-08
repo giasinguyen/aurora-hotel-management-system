@@ -19,6 +19,20 @@ import java.util.Optional;
 public interface BookingRepository extends JpaRepository<Booking, String> {
     boolean existsByBookingCode(String bookingCode);
     Optional<Booking> findByBookingCode(String bookingCode);
+    
+    @Query("SELECT DISTINCT b FROM Booking b " +
+           "LEFT JOIN FETCH b.rooms br " +
+           "LEFT JOIN FETCH br.room r " +
+           "LEFT JOIN FETCH r.roomType rt " +
+           "WHERE b.bookingCode = :code")
+    Optional<Booking> findByBookingCodeWithRooms(@Param("code") String code);
+    
+    @Query("SELECT DISTINCT b FROM Booking b " +
+           "LEFT JOIN FETCH b.rooms br " +
+           "LEFT JOIN FETCH br.room r " +
+           "LEFT JOIN FETCH r.roomType rt " +
+           "WHERE b.id = :id")
+    Optional<Booking> findByIdWithRooms(@Param("id") String id);
     Page<Booking> findByCustomerId(String customerId, Pageable pageable);
     Page<Booking> findByBranchId(String BranchId, Pageable pageable);
     Page<Booking> findByStatus(String status, Pageable pageable);
