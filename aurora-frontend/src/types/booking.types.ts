@@ -85,7 +85,9 @@ export interface BookingCreationRequest {
 export interface BookingUpdateRequest {
   checkin?: string;
   checkout?: string;
-  roomIds?: string[];
+  totalPrice?: number;
+  status?: string;
+  paymentStatus?: string;
   specialRequest?: string;
 }
 

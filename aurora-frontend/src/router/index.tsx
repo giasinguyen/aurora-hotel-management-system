@@ -12,7 +12,7 @@ import AuthPage from "@/pages/auth";
 // Bookings
 import BookingDetailPage from "@/pages/bookings/BookingDetail";
 import BookingListPage from "@/pages/bookings/BookingList";
-import BookingUpsertPage from "@/pages/bookings/BookingUpsert";
+import BookingUpdatePage from "@/pages/bookings/BookingUpdate";
 
 // Branches
 import AssignBranchPage from "@/pages/branches/AssignBranch";
@@ -143,7 +143,7 @@ const router = createBrowserRouter([
     children: [
       { index: true, element: <StaffDashboardPage /> },
       { path: "bookings", element: <BookingListPage /> },
-      { path: "bookings/upsert", element: <BookingUpsertPage /> },
+      { path: "bookings/:id/update", element: <BookingUpdatePage /> },
       { path: "bookings/:id", element: <BookingDetailPage /> },
       { path: "booking", element: <BookingPage /> },
       { path: "booking/checkout", element: <CheckoutPage /> },
@@ -161,7 +161,7 @@ const router = createBrowserRouter([
     children: [
       { index: true, element: <ManagerDashboardPage /> },
       { path: "bookings", element: <BookingListPage /> },
-      { path: "bookings/upsert", element: <BookingUpsertPage /> },
+      { path: "bookings/:id/update", element: <BookingUpdatePage /> },
       { path: "bookings/:id", element: <BookingDetailPage /> },
       { path: "booking", element: <BookingPage /> },
       { path: "booking/checkout", element: <CheckoutPage /> },
@@ -196,7 +196,7 @@ const router = createBrowserRouter([
     children: [
       { index: true, element: <AdminDashboardPage /> },
       { path: "bookings", element: <BookingListPage /> },
-      { path: "bookings/upsert", element: <BookingUpsertPage /> },
+      { path: "bookings/:id/update", element: <BookingUpdatePage /> },
       { path: "bookings/:id", element: <BookingDetailPage /> },
       { path: "booking", element: <BookingPage /> },
       { path: "booking/checkout", element: <CheckoutPage /> },

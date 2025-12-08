@@ -68,6 +68,33 @@ public class ServiceBookingServiceImpl implements ServiceBookingService {
         serviceBooking.setCustomer(customer);
         serviceBooking.setRoom(room); // Set room - REQUIRED
         
+        // Ensure pricePerUnit and totalPrice are set correctly
+        if (request.getPrice() != null && request.getPrice() > 0) {
+            serviceBooking.setPricePerUnit(java.math.BigDecimal.valueOf(request.getPrice()));
+            if (request.getQuantity() != null && request.getQuantity() > 0) {
+                serviceBooking.setTotalPrice(serviceBooking.getPricePerUnit().multiply(java.math.BigDecimal.valueOf(request.getQuantity())));
+            } else {
+                serviceBooking.setTotalPrice(serviceBooking.getPricePerUnit());
+            }
+        } else {
+            // Fallback: use service price if request price is not provided
+            java.math.BigDecimal servicePrice = service.getBasePrice() != null ? service.getBasePrice() : java.math.BigDecimal.ZERO;
+            serviceBooking.setPricePerUnit(servicePrice);
+            int qty = request.getQuantity() != null && request.getQuantity() > 0 ? request.getQuantity() : 1;
+            serviceBooking.setTotalPrice(servicePrice.multiply(java.math.BigDecimal.valueOf(qty)));
+        }
+        
+        // Ensure serviceDateTime is set
+        if (request.getDateTime() == null) {
+            // Default to booking check-in date time if not provided
+            serviceBooking.setServiceDateTime(booking.getCheckin().atStartOfDay());
+        }
+        
+        // Ensure quantity is set
+        if (request.getQuantity() == null || request.getQuantity() <= 0) {
+            serviceBooking.setQuantity(1);
+        }
+        
         if (request.getStatus() == null || request.getStatus().trim().isEmpty()) {
             serviceBooking.setStatus(ServiceBooking.ServiceBookingStatus.PENDING);
         }
@@ -85,6 +112,14 @@ public class ServiceBookingServiceImpl implements ServiceBookingService {
         
         ServiceBooking serviceBooking = serviceBookingRepository.findById(id)
                 .orElseThrow(() -> new AppException(ErrorCode.SERVICE_BOOKING_NOT_FOUND));
+        
+        // Update room if roomId is provided
+        if (request.getRoomId() != null && !request.getRoomId().trim().isEmpty()) {
+            Room newRoom = roomRepository.findById(request.getRoomId())
+                    .orElseThrow(() -> new AppException(ErrorCode.ROOM_NOT_FOUND));
+            serviceBooking.setRoom(newRoom);
+            log.info("Service booking room updated to: {}", newRoom.getRoomNumber());
+        }
         
         serviceBookingMapper.updateServiceBooking(serviceBooking, request);
         

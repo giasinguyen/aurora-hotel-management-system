@@ -15,6 +15,13 @@ public interface ServiceBookingMapper {
     @Mapping(target = "customer.id", source = "customerId")
     @Mapping(target = "room.id", source = "roomId")
     @Mapping(target = "id", ignore = true)
+    @Mapping(target = "booking", ignore = true)
+    @Mapping(target = "service", ignore = true)
+    @Mapping(target = "customer", ignore = true)
+    @Mapping(target = "room", ignore = true)
+    @Mapping(target = "pricePerUnit", expression = "java(request.getPrice() != null ? java.math.BigDecimal.valueOf(request.getPrice()) : null)")
+    @Mapping(target = "serviceDateTime", source = "dateTime")
+    @Mapping(target = "totalPrice", expression = "java(request.getPrice() != null && request.getQuantity() != null ? java.math.BigDecimal.valueOf(request.getPrice()).multiply(java.math.BigDecimal.valueOf(request.getQuantity())) : null)")
     ServiceBooking toServiceBooking(ServiceBookingCreationRequest request);
     
     @Mapping(target = "bookingId", expression = "java(serviceBooking.getBooking() != null ? serviceBooking.getBooking().getId() : null)")
