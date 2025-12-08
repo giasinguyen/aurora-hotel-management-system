@@ -42,7 +42,7 @@ public class VnPayController {
      * @return VNPay payment response với payment URL
      */
     @PostMapping("/create")
-    @RequirePermission(PermissionConstants.Customer.PAYMENT_CREATE)
+    // @RequirePermission(PermissionConstants.Customer.PAYMENT_CREATE) // Removed to support guest checkout
     public ApiResponse<VnPayPaymentResponse> createPaymentUrl(
             @Valid @RequestBody VnPayPaymentRequest request,
             HttpServletRequest httpRequest) {

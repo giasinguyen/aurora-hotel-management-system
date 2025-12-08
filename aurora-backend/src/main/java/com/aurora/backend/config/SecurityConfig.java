@@ -55,6 +55,9 @@ public class SecurityConfig {
             // Booking checkout - PUBLIC for customers and walk-in guests
             "/api/v1/bookings/checkout",
 
+            // VNPay payment creation - PUBLIC for guest checkout
+            "/api/v1/payments/vnpay/create",
+
             // VNPay IPN callback - MUST be public for VNPay server-to-server callback
             "/api/v1/payments/vnpay/ipn",
             
