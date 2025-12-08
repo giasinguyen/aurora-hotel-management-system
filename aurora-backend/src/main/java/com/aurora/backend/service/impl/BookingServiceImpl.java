@@ -149,6 +149,17 @@ public class BookingServiceImpl implements BookingService {
 
     @Override
     @Transactional(readOnly = true)
+    public BookingResponse getBookingByCode(String code) {
+        log.debug("Fetching booking with code: {}", code);
+        
+        Booking booking = bookingRepository.findByBookingCode(code)
+                .orElseThrow(() -> new AppException(ErrorCode.BOOKING_NOT_FOUND));
+        
+        return bookingMapper.toBookingResponse(booking);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public Page<BookingResponse> getAllBookings(Pageable pageable) {
         log.debug("Fetching all bookings with pagination: {}", pageable);
         

@@ -51,7 +51,11 @@ export default function BookingSuccessPage() {
 
       try {
         setLoading(true);
-        const response = await bookingApi.getById(bookingId);
+        // Use public API if user is not logged in, otherwise use authenticated API
+        const response = isLogin 
+          ? await bookingApi.getById(bookingId)
+          : await bookingApi.getByIdPublic(bookingId);
+          
         if (response.code === 200 && response.result) {
           setBooking(response.result);
         } else {
@@ -66,34 +70,7 @@ export default function BookingSuccessPage() {
     };
 
     fetchBookingDetails();
-  }, [bookingId]);
-
-  useEffect(() => {
-    const fetchBookingDetails = async () => {
-      if (!bookingId) {
-        setError("Không tìm thấy mã đặt phòng");
-        setLoading(false);
-        return;
-      }
-
-      try {
-        setLoading(true);
-        const response = await bookingApi.getById(bookingId);
-        if (response.code === 200 && response.result) {
-          setBooking(response.result);
-        } else {
-          setError("Không thể tải thông tin đặt phòng");
-        }
-      } catch (err) {
-        console.error("Error fetching booking:", err);
-        setError("Đã có lỗi xảy ra khi tải thông tin đặt phòng");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchBookingDetails();
-  }, [bookingId]);
+  }, [bookingId, isLogin]);
 
   const calculateNights = (checkin: string, checkout: string) => {
     const checkinDate = new Date(checkin);
