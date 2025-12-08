@@ -21,11 +21,11 @@ export default function ChatBubble({ isOpen, handleOpen }: ChatBubbleProps) {
               type="button"
               onClick={() => handleOpen((prev) => !prev)}
               className={cn(
-                "rounded-full shadow-lg transition-all duration-300 hover:scale-105 active:scale-95 flex justify-center items-center cursor-pointer",
-                "w-14 h-14 border border-white/20",
+                "rounded-full shadow-xl transition-all duration-300 hover:scale-105 active:scale-95 flex justify-center items-center cursor-pointer",
+                "w-14 h-14 sm:w-16 sm:h-16 border-2 border-white/30",
                 isOpen
-                  ? "bg-red-500 hover:bg-red-600"
-                  : "bg-primary hover:bg-primary/90"
+                  ? "bg-red-500 hover:bg-red-600 shadow-red-500/30"
+                  : "bg-primary hover:bg-primary/90 shadow-primary/30"
               )}
             >
               {isOpen ? (

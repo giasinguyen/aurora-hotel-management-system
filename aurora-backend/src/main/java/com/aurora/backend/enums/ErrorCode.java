@@ -198,6 +198,19 @@ public enum ErrorCode {
     CHECKOUT_NOT_CHECKED_IN(3004, "No active check-in found. Please check in first.", HttpStatus.BAD_REQUEST),
     NOT_CHECKED_IN(3004, "No active check-in found. Please check in first.", HttpStatus.BAD_REQUEST), // Alias
     SHIFT_CANCELLED(3005, "Cannot check in to cancelled shift", HttpStatus.BAD_REQUEST),
+    
+    // News errors
+    NEWS_NOT_FOUND(3100, "News not found", HttpStatus.NOT_FOUND),
+    NEWS_SLUG_EXISTED(3101, "News slug already exists", HttpStatus.BAD_REQUEST),
+    NEWS_TITLE_REQUIRED(3102, "News title is required", HttpStatus.BAD_REQUEST),
+    NEWS_CONTENT_REQUIRED(3103, "News content is required", HttpStatus.BAD_REQUEST),
+    NEWS_SLUG_REQUIRED(3104, "News slug is required", HttpStatus.BAD_REQUEST),
+    
+    // ImageAsset errors
+    IMAGE_NOT_FOUND(3200, "Image not found", HttpStatus.NOT_FOUND),
+    IMAGE_UPLOAD_FAILED(3201, "Failed to upload image", HttpStatus.INTERNAL_SERVER_ERROR),
+    IMAGE_DELETE_FAILED(3202, "Failed to delete image", HttpStatus.INTERNAL_SERVER_ERROR),
+    IMAGE_OWNER_REQUIRED(3203, "Image owner information is required", HttpStatus.BAD_REQUEST),
     ;
 
     ErrorCode(int code, String message, HttpStatusCode statusCode) {

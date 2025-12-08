@@ -1,0 +1,80 @@
+export const mockNews = [
+  {
+    id: "00afa4c5-4ba4-4480-9dba-dbbaf74da568",
+    slug: "grand-opening-rooftop-aurora",
+    title: "Grand Opening - Aurora Rooftop",
+    description: "Join us for the grand opening of our new rooftop bar with stunning city views and exclusive cocktails",
+    thumbnailUrl: "https://images.unsplash.com/photo-1551882547-ff40c63fe5fa?w=800&h=600&fit=crop",
+    isPublic: true,
+    status: "PUBLISHED",
+    publishedAt: "2025-12-07T12:25:28.637538",
+    createdAt: "2025-12-07T12:25:28.668937",
+    updatedAt: "2025-12-07T12:25:28.668937",
+    createdBy: "admin"
+  },
+  {
+    id: "11bfa4c5-4ba4-4480-9dba-dbbaf74da569",
+    slug: "aurora-hotel-best-hotel-2024",
+    title: 'Aurora Hotel nhận giải thưởng "Khách sạn tốt nhất 2024"',
+    description: "Chúng tôi vinh dự nhận giải thưởng danh giá từ Hiệp hội Du lịch Quốc tế cho dịch vụ xuất sắc và trải nghiệm khách hàng tuyệt vời",
+    thumbnailUrl: "https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&h=600&fit=crop",
+    isPublic: true,
+    status: "PUBLISHED",
+    publishedAt: "2024-10-15T10:00:00.000000",
+    createdAt: "2024-10-15T10:00:00.000000",
+    updatedAt: "2024-10-15T10:00:00.000000",
+    createdBy: "admin"
+  },
+  {
+    id: "22cfa4c5-4ba4-4480-9dba-dbbaf74da570",
+    slug: "spa-aurora-new-technology",
+    title: "Khai trương Spa mới với công nghệ hiện đại nhất",
+    description: "Spa Aurora với thiết bị và liệu trình chăm sóc đẳng cấp thế giới, mang đến trải nghiệm thư giãn hoàn hảo",
+    thumbnailUrl: "https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=800&h=600&fit=crop",
+    isPublic: true,
+    status: "PUBLISHED",
+    publishedAt: "2024-10-10T14:30:00.000000",
+    createdAt: "2024-10-10T14:30:00.000000",
+    updatedAt: "2024-10-10T14:30:00.000000",
+    createdBy: "admin"
+  },
+  {
+    id: "33dfa4c5-4ba4-4480-9dba-dbbaf74da571",
+    slug: "year-end-promotion-program",
+    title: "Chương trình ưu đãi mùa lễ hội cuối năm",
+    description: "Giảm giá lên đến 30% cho các gói lưu trú dài ngày trong tháng 12. Đặt ngay để nhận ưu đãi tốt nhất!",
+    thumbnailUrl: "https://images.unsplash.com/photo-1445019980597-93fa8acb246c?w=800&h=600&fit=crop",
+    isPublic: true,
+    status: "PUBLISHED",
+    publishedAt: "2024-10-05T09:00:00.000000",
+    createdAt: "2024-10-05T09:00:00.000000",
+    updatedAt: "2024-10-05T09:00:00.000000",
+    createdBy: "admin"
+  },
+  {
+    id: "44efa4c5-4ba4-4480-9dba-dbbaf74da572",
+    slug: "aurora-hotel-expansion-new-building",
+    title: "Aurora Hotel mở rộng với tòa nhà mới",
+    description: "Dự án mở rộng 200 phòng mới dự kiến hoàn thành vào quý 2/2025, nâng tổng số phòng lên 500 phòng sang trọng",
+    thumbnailUrl: "https://images.unsplash.com/photo-1582719508461-905c673771fd?w=800&h=600&fit=crop",
+    isPublic: true,
+    status: "PUBLISHED",
+    publishedAt: "2024-10-01T16:00:00.000000",
+    createdAt: "2024-10-01T16:00:00.000000",
+    updatedAt: "2024-10-01T16:00:00.000000",
+    createdBy: "admin"
+  },
+  {
+    id: "55ffa4c5-4ba4-4480-9dba-dbbaf74da573",
+    slug: "new-michelin-star-restaurant",
+    title: "Nhà hàng Aurora đạt sao Michelin",
+    description: "Tự hào công bố nhà hàng Aurora chính thức được vinh danh với ngôi sao Michelin đầu tiên, mang đến ẩm thực đẳng cấp quốc tế",
+    thumbnailUrl: "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=800&h=600&fit=crop",
+    isPublic: true,
+    status: "PUBLISHED",
+    publishedAt: "2024-09-20T11:00:00.000000",
+    createdAt: "2024-09-20T11:00:00.000000",
+    updatedAt: "2024-09-20T11:00:00.000000",
+    createdBy: "admin"
+  }
+];

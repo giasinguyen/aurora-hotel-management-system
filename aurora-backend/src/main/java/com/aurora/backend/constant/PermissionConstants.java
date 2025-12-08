@@ -92,5 +92,13 @@ public final class PermissionConstants {
         public static final String BRANCH_ASSIGN_MANAGER = "BRANCH_ASSIGN_MANAGER";
         public static final String BRANCH_REMOVE_MANAGER = "BRANCH_REMOVE_MANAGER";
         public static final String DASHBOARD_VIEW_ADMIN = "DASHBOARD_VIEW_ADMIN";
+        public static final String NEWS_VIEW_ALL = "NEWS_VIEW_ALL";
+        public static final String NEWS_CREATE = "NEWS_CREATE";
+        public static final String NEWS_UPDATE = "NEWS_UPDATE";
+        public static final String NEWS_DELETE = "NEWS_DELETE";
+        public static final String DOCUMENT_VIEW = "DOCUMENT_VIEW";
+        public static final String DOCUMENT_CREATE = "DOCUMENT_CREATE";
+        public static final String DOCUMENT_UPDATE = "DOCUMENT_UPDATE";
+        public static final String DOCUMENT_DELETE = "DOCUMENT_DELETE";
     }
 }

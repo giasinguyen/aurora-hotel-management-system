@@ -91,6 +91,7 @@ VALUES (gen_random_uuid(), 'BOOKING_APPROVE', 'Phê duyệt đặt phòng đặc
        (gen_random_uuid(), 'PROMOTION_CREATE', 'Tạo khuyến mãi', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, false),
        (gen_random_uuid(), 'PROMOTION_UPDATE', 'Cập nhật khuyến mãi', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, false),
        (gen_random_uuid(), 'PROMOTION_DELETE', 'Xóa khuyến mãi', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, false),
+       (gen_random_uuid(), 'NEWS_VIEW_ALL', 'Xem toàn bộ danh sách tin tức (bao gồm tin tức đã ẩn)', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, false),
        (gen_random_uuid(), 'NEWS_CREATE', 'Tạo tin tức mới', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, false),
        (gen_random_uuid(), 'NEWS_UPDATE', 'Cập nhật tin tức', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, false),
        (gen_random_uuid(), 'NEWS_DELETE', 'Xóa tin tức', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, false),

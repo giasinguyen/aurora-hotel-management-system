@@ -1,6 +1,7 @@
 package com.aurora.backend.service;
 
-import com.aurora.backend.entity.DocumentMetadata;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import dev.langchain4j.data.document.Document;
 import dev.langchain4j.data.document.DocumentParser;
 import dev.langchain4j.data.document.DocumentSplitter;
@@ -38,16 +39,17 @@ public class EmbeddingService {
     private final EmbeddingStore<TextSegment> embeddingStore;
     private final EmbeddingModel embeddingModel;
     private final DocumentParser documentParser = new ApacheTikaDocumentParser();
-    private final DocumentSplitter documentSplitter = DocumentSplitters.recursive(1000, 200);
+    private final DocumentSplitter documentSplitter = DocumentSplitters.recursive(1500, 200);
+    private final ObjectMapper objectMapper;
 
-    public void deleteFileEmbeddings(Long fileId) {
+    public void deleteFileEmbeddings(String fileId) {
         try {
-            log.info("Bắt đầu xóa embeddings của file ID: {}", fileId);
+            log.info("Starting to delete embeddings for file ID: {}", fileId);
 
             List<String> embeddingIds = findEmbeddingIdsByFileId(fileId);
 
             if (embeddingIds.isEmpty()) {
-                log.warn("Không tìm thấy embeddings nào cho file ID: {}", fileId);
+                log.warn("No embeddings found for file ID: {}", fileId);
                 return;
             }
 
@@ -55,46 +57,55 @@ public class EmbeddingService {
                 embeddingStore.remove(embeddingId);
             }
 
-            log.info("Đã xóa {} embeddings của file ID: {}", embeddingIds.size(), fileId);
+            log.info("Deleted {} embeddings for file ID: {}", embeddingIds.size(), fileId);
         } catch (Exception e) {
-            log.error("Lỗi khi xóa embeddings của file ID {}: {}", fileId, e.getMessage(), e);
-            throw new RuntimeException("Không thể xóa embeddings: " + e.getMessage(), e);
+            log.error("Error deleting embeddings for file ID {}: {}", fileId, e.getMessage(), e);
+            throw new RuntimeException("Cannot delete embeddings: " + e.getMessage(), e);
         }
     }
 
     /**
-     * Tạo embeddings cho file và lưu vào vector store
+     * Create embeddings for file and save to vector store
+     * Returns metadata and total chunks for the document
      */
-    public void indexFile(DocumentMetadata meta) throws IOException {
+    public EmbeddingResult indexFile(com.aurora.backend.entity.Document doc, byte[] fileBytes) throws IOException {
         try {
-            log.info("Bắt đầu index file: {} (ID: {})", meta.getFilename(), meta.getId());
+            log.info("Starting to index file: {} (ID: {})", doc.getFilename(), doc.getId());
 
-            if (meta.getFileContent() == null || meta.getFileContent().getContent() == null) {
-                throw new IOException("File content không tồn tại trong database");
+            if (fileBytes == null || fileBytes.length == 0) {
+                throw new IOException("File bytes are empty");
             }
 
-            byte[] fileBytes = meta.getFileContent().getContent();
             Document document = documentParser.parse(new java.io.ByteArrayInputStream(fileBytes));
-            log.debug("Đã parse document, độ dài: {} ký tự", document.text().length());
+            log.debug("Parsed document, length: {} characters", document.text().length());
 
             List<TextSegment> segments = documentSplitter.split(document);
-            log.info("Đã chia document thành {} chunks", segments.size());
+            log.info("Split document into {} chunks", segments.size());
 
             if (segments.isEmpty()) {
-                log.warn("Document không có nội dung để index: {}", meta.getFilename());
-                return;
+                log.warn("Document has no content to index: {}", doc.getFilename());
+                return new EmbeddingResult(0, null);
             }
 
             List<TextSegment> segmentsWithMetadata = new ArrayList<>();
+            Map<String, Object> documentMetadata = new HashMap<>();
+            
             for (int i = 0; i < segments.size(); i++) {
                 TextSegment segment = segments.get(i);
 
                 Map<String, String> metadata = new HashMap<>();
-                metadata.put(METADATA_DOCUMENT_ID, meta.getId().toString());
-                metadata.put(METADATA_FILENAME, meta.getFilename());
-                metadata.put(METADATA_FILE_TYPE, meta.getFileType());
+                metadata.put(METADATA_DOCUMENT_ID, doc.getId());
+                metadata.put(METADATA_FILENAME, doc.getFilename());
+                metadata.put(METADATA_FILE_TYPE, doc.getFileType());
                 metadata.put(METADATA_CHUNK_INDEX, String.valueOf(i));
                 metadata.put(METADATA_TOTAL_CHUNKS, String.valueOf(segments.size()));
+
+                // Store chunk metadata
+                documentMetadata.put("chunk_" + i, Map.of(
+                    "index", i,
+                    "length", segment.text().length(),
+                    "preview", segment.text().substring(0, Math.min(100, segment.text().length()))
+                ));
 
                 TextSegment segmentWithMetadata = TextSegment.from(
                         segment.text(),
@@ -105,60 +116,64 @@ public class EmbeddingService {
             }
 
             List<Embedding> embeddings = embeddingModel.embedAll(segmentsWithMetadata).content();
-            log.debug("Đã tạo {} embeddings", embeddings.size());
+            log.debug("Created {} embeddings", embeddings.size());
 
             embeddingStore.addAll(embeddings, segmentsWithMetadata);
 
-            log.info("Hoàn thành index file: {} với {} chunks", meta.getFilename(), segments.size());
+            log.info("Completed indexing file: {} with {} chunks", doc.getFilename(), segments.size());
+
+            return new EmbeddingResult(segments.size(), documentMetadata);
 
         } catch (IOException e) {
-            log.error("Lỗi IO khi index file {}: {}", meta.getFilename(), e.getMessage(), e);
+            log.error("IO error indexing file {}: {}", doc.getFilename(), e.getMessage(), e);
             throw e;
         } catch (Exception e) {
-            log.error("Lỗi khi index file {}: {}", meta.getFilename(), e.getMessage(), e);
-            throw new RuntimeException("Không thể index file: " + e.getMessage(), e);
+            log.error("Error indexing file {}: {}", doc.getFilename(), e.getMessage(), e);
+            throw new RuntimeException("Cannot index file: " + e.getMessage(), e);
         }
     }
 
     /**
-     * Cập nhật embeddings cho file (xóa cũ và tạo mới)
+     * Update embeddings for file (delete old and create new)
      */
-    public void reindexFile(DocumentMetadata meta) throws IOException {
-        log.info("Bắt đầu reindex file: {} (ID: {})", meta.getFilename(), meta.getId());
+    public EmbeddingResult reindexFile(com.aurora.backend.entity.Document doc, byte[] fileBytes) throws IOException {
+        log.info("Starting to reindex file: {} (ID: {})", doc.getFilename(), doc.getId());
 
         try {
-            deleteFileEmbeddings(meta.getId());
+            deleteFileEmbeddings(doc.getId());
 
-            indexFile(meta);
+            EmbeddingResult result = indexFile(doc, fileBytes);
 
-            log.info("Hoàn thành reindex file: {}", meta.getFilename());
+            log.info("Completed reindexing file: {}", doc.getFilename());
+            
+            return result;
         } catch (Exception e) {
-            log.error("Lỗi khi reindex file {}: {}", meta.getFilename(), e.getMessage(), e);
+            log.error("Error reindexing file {}: {}", doc.getFilename(), e.getMessage(), e);
             throw e;
         }
     }
 
     /**
-     * Kiểm tra xem file đã được index chưa
+     * Check if file has been indexed
      */
-    public boolean isFileIndexed(Long fileId) {
+    public boolean isFileIndexed(String fileId) {
         try {
             List<String> embeddingIds = findEmbeddingIdsByFileId(fileId);
             boolean indexed = !embeddingIds.isEmpty();
-            log.debug("File ID {} {} được index", fileId, indexed ? "đã" : "chưa");
+            log.debug("File ID {} {} indexed", fileId, indexed ? "is" : "is not");
             return indexed;
         } catch (Exception e) {
-            log.error("Lỗi khi kiểm tra index status của file {}: {}", fileId, e.getMessage());
+            log.error("Error checking index status for file {}: {}", fileId, e.getMessage());
             return false;
         }
     }
 
-    private List<String> findEmbeddingIdsByFileId(Long fileId) {
+    private List<String> findEmbeddingIdsByFileId(String fileId) {
         List<String> embeddingIds = new ArrayList<>();
 
         try {
-            // Với InMemoryEmbeddingStore hoặc PgVector, ta có thể search với filter
-            // Tìm kiếm với một query giả để lấy tất cả kết quả có metadata khớp
+            // With InMemoryEmbeddingStore or PgVector, we can search with filter
+            // Search with a dummy query to get all results with matching metadata
             EmbeddingSearchRequest searchRequest = EmbeddingSearchRequest.builder()
                     .queryEmbedding(embeddingModel.embed("dummy").content())
                     .maxResults(1000)
@@ -171,21 +186,21 @@ public class EmbeddingService {
                 TextSegment segment = match.embedded();
                 if (segment != null && segment.metadata() != null) {
                     String docId = segment.metadata().getString(METADATA_DOCUMENT_ID);
-                    if (docId != null && docId.equals(fileId.toString())) {
+                    if (docId != null && docId.equals(fileId)) {
                         embeddingIds.add(match.embeddingId());
                     }
                 }
             }
 
         } catch (Exception e) {
-            log.warn("Không thể tìm embeddings theo metadata, sử dụng phương pháp fallback: {}", e.getMessage());
-            // Fallback: nếu store không hỗ trợ search, trả về empty list
+            log.warn("Cannot find embeddings by metadata, using fallback method: {}", e.getMessage());
+            // Fallback: if store doesn't support search, return empty list
         }
 
         return embeddingIds;
     }
 
-    public FileIndexInfo getFileIndexInfo(Long fileId) {
+    public FileIndexInfo getFileIndexInfo(String fileId) {
         List<String> embeddingIds = findEmbeddingIdsByFileId(fileId);
 
         if (embeddingIds.isEmpty()) {
@@ -205,28 +220,38 @@ public class EmbeddingService {
                 TextSegment segment = match.embedded();
                 if (segment != null && segment.metadata() != null) {
                     String docId = segment.metadata().getString(METADATA_DOCUMENT_ID);
-                    if (docId != null && docId.equals(fileId.toString())) {
+                    if (docId != null && docId.equals(fileId)) {
                         String filename = segment.metadata().getString(METADATA_FILENAME);
                         return new FileIndexInfo(fileId, true, embeddingIds.size(), filename);
                     }
                 }
             }
         } catch (Exception e) {
-            log.error("Lỗi khi lấy thông tin index: {}", e.getMessage());
+            log.error("Error getting index info: {}", e.getMessage());
         }
 
         return new FileIndexInfo(fileId, true, embeddingIds.size(), null);
     }
 
     /**
-     * Class chứa thông tin về trạng thái index của file
+     * Class containing file index status information
      */
     @Data
     @AllArgsConstructor
     public static class FileIndexInfo {
-        private Long fileId;
+        private String fileId;
         private boolean indexed;
         private int chunkCount;
         private String filename;
+    }
+
+    /**
+     * Class containing embedding result
+     */
+    @Data
+    @AllArgsConstructor
+    public static class EmbeddingResult {
+        private int totalChunks;
+        private Map<String, Object> metadata;
     }
 }

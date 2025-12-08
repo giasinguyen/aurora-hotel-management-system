@@ -1,0 +1,18 @@
+{
+  "type": "doc",
+  "content": [
+    {
+      "type": "heading",
+      "attrs": {
+        "textAlign": "center",
+        "level": 1
+      },
+      "content": [
+        {
+          "type": "text",
+          "text": "Getting started"
+        }
+      ]
+    }
+  ]
+}

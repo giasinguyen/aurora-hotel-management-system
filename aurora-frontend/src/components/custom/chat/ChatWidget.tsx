@@ -13,7 +13,6 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { useAppDispatch, useAppSelector } from "@/hooks/useRedux";
 import {
@@ -28,6 +27,7 @@ import { toast } from "sonner";
 
 import ChatBubble from "./ChatBubble";
 import ChatMessage from "./ChatMessage";
+import ChatbotAvatar from "./ChatbotAvatar";
 
 interface WebSocketMessage {
   type: "connection" | "chunk" | "complete" | "error";
@@ -41,7 +41,7 @@ export default function ChatWidget() {
   const dispatch = useAppDispatch();
   const [isOpen, setIsOpen] = React.useState(false);
   const [input, setInput] = React.useState("");
-  
+
   // WebSocket reference
   const wsRef = React.useRef<WebSocket | null>(null);
   const reconnectTimeoutRef = React.useRef<number | null>(null);
@@ -131,7 +131,7 @@ export default function ChatWidget() {
             case "error": {
               console.error("WebSocket error:", message.message);
               const errorMessage = message.message || "Đã có lỗi xảy ra";
-              
+
               dispatch(
                 addOrUpdateAiMessage({
                   chatId: chatIdRef.current,
@@ -144,7 +144,7 @@ export default function ChatWidget() {
                   },
                 })
               );
-              
+
               dispatch(setStreaming(false));
               dispatch(setError(errorMessage));
               toast.error(errorMessage);
@@ -165,7 +165,7 @@ export default function ChatWidget() {
       ws.onclose = () => {
         console.log("WebSocket disconnected");
         wsRef.current = null;
-        
+
         // Auto-reconnect if widget is still open
         if (isOpen) {
           reconnectTimeoutRef.current = setTimeout(() => {
@@ -256,38 +256,33 @@ export default function ChatWidget() {
 
   return (
     <TooltipProvider>
-      <div className="p-2 fixed bottom-10 right-10 z-50 flex flex-col items-end gap-4 overflow-hidden">
+      <div className="p-2 sm:p-4 fixed bottom-4 right-4 sm:bottom-8 sm:right-8 md:bottom-10 md:right-10 z-50 flex flex-col items-end gap-4 overflow-hidden max-w-[calc(100vw-2rem)]">
         {/* --- Chat Window --- */}
         {isOpen && (
           <Card
             className={cn(
-              "w-[460px] h-[740px] gap-0 p-0 shadow-xl border-gray-200",
+              "w-full sm:w-[420px] md:w-[460px] h-[calc(100vh-120px)] max-h-[740px] gap-0 p-0 shadow-2xl border-gray-200",
               "flex flex-col animate-in slide-in-from-bottom-10 fade-in duration-300"
             )}
           >
-            <CardHeader className="p-4 border-b flex flex-row items-center justify-between bg-primary text-primary-foreground rounded-t-lg">
-              <div className="flex items-center gap-2">
-                <Avatar className="h-12 w-12 border border-white/20">
-                  <AvatarImage src="/bot-avatar.png" />
-                  <AvatarFallback className="bg-white text-primary">
-                    AI
-                  </AvatarFallback>
-                </Avatar>
+            <CardHeader className="p-5 border-b flex flex-row items-center justify-between bg-gradient-to-r from-primary to-primary/90 text-primary-foreground rounded-t-xl shadow-sm">
+              <div className="flex items-center gap-3">
+                <ChatbotAvatar className="bg-white w-11 h-11 ring-2" />
                 <div>
-                  <CardTitle className="text-lg">Trợ lý ảo Aurora</CardTitle>
-                  <span className="text-xs text-primary-foreground/80 flex items-center gap-1">
+                  <CardTitle className="text-lg font-semibold tracking-tight">Trợ lý ảo Aurora</CardTitle>
+                  <span className="text-xs text-primary-foreground/90 flex items-center gap-1.5 mt-0.5">
                     <span
                       className={cn(
-                        "w-3 h-3 rounded-full",
+                        "w-2 h-2 rounded-full",
                         wsRef.current?.readyState === WebSocket.OPEN
-                          ? "bg-green-400 animate-pulse"
-                          : "bg-gray-400"
+                          ? "bg-green-300 animate-pulse shadow-sm shadow-green-400"
+                          : "bg-gray-300"
                       )}
                     ></span>
-                    <span>
+                    <span className="font-medium">
                       {wsRef.current?.readyState === WebSocket.OPEN
-                        ? "Online"
-                        : "Offline"}
+                        ? "Đang hoạt động"
+                        : "Ngoại tuyến"}
                     </span>
                   </span>
                 </div>
@@ -298,19 +293,22 @@ export default function ChatWidget() {
                 className="text-primary-foreground hover:bg-primary-foreground/20 h-8 w-8"
                 onClick={() => setIsOpen(false)}
               >
-                <X size={22} />
+                <X size={28} />
               </Button>
             </CardHeader>
 
             <CardContent className="flex-1 h-full p-0 overflow-hidden">
               <ScrollArea className="h-full p-4">
                 <div className="flex flex-col gap-4">
-                  <div className="flex-col justify-center items-center">
-                    <span className="block text-center text-md text-gray-500 mb-4">
+                  <div className="flex flex-col justify-center items-center gap-3 my-6 mx-6 p-4 bg-gradient-to-br from-primary/5 to-primary/10 rounded-xl border border-primary/10">
+                    <span className="block text-center text-base font-semibold text-gray-700">
+                      👋 Xin chào! Tôi là Aurora
+                    </span>
+                    <span className="text-center text-sm text-gray-600 leading-relaxed">
                       Bắt đầu trò chuyện nhanh với Trợ lý ảo Aurora
                     </span>
-                    <span className="text-center text-md text-gray-500">
-                      Thông tin của bạn được ẩn và tin nhắn trò chuyện chỉ lưu
+                    <span className="text-center text-xs text-gray-500 leading-relaxed">
+                      🔒 Thông tin của bạn được ẩn và tin nhắn trò chuyện chỉ lưu
                       trên trình duyệt web.
                     </span>
                   </div>
@@ -327,7 +325,7 @@ export default function ChatWidget() {
               </ScrollArea>
             </CardContent>
 
-            <CardFooter className="px-3 pb-6 rounded-b-2xl border-t bg-gray-50/50">
+            <CardFooter className="p-4 rounded-b-2xl border-t bg-white/80 backdrop-blur-sm">
               <form
                 className="flex w-full items-center gap-2"
                 onSubmit={(e) => {
@@ -336,20 +334,21 @@ export default function ChatWidget() {
                 }}
               >
                 <Input
-                  placeholder="Nhập tin nhắn..."
+                  placeholder="Nhập tin nhắn của bạn..."
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   disabled={isStreaming}
                   className={cn(
-                    "bg-gray-50/50 border-0 outline-0 shadow-none text-lg pl-2",
-                    "focus-visible:ring-0 text-lg"
+                    "bg-gray-100 border border-gray-200 shadow-sm text-sm pl-4 py-5 rounded-xl",
+                    "focus-visible:ring-2 focus-visible:ring-primary/20 focus-visible:border-primary",
+                    "transition-all placeholder:text-gray-400"
                   )}
                 />
                 <Button
                   type="submit"
                   size="icon"
                   disabled={isStreaming || !input.trim()}
-                  className="shrink-0"
+                  className="shrink-0 h-10 w-10 rounded-xl shadow-md hover:shadow-lg transition-all"
                 >
                   <Send size={18} />
                 </Button>

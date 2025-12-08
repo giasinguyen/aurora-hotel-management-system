@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { 
@@ -7,10 +7,10 @@ import {
   Trash2, 
   Edit, 
   Calendar, 
-  User, 
-  Star,
-  Archive,
-  Send 
+  User,
+  ImageOff,
+  Globe,
+  Lock
 } from 'lucide-react';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -35,89 +35,24 @@ import {
   type Column 
 } from '@/components/custom';
 
+import { useAppDispatch, useAppSelector } from '@/hooks/useRedux';
+import { fetchAllNews, updateVisibility, deleteNewsById } from '@/features/slices/newsSlice';
+
 import type { 
-  News
+  NewsListResponse
 } from '@/types/news.types';
 
 import {
-  NEWS_CATEGORY_CONFIG,
   NEWS_STATUS_CONFIG,
 } from '@/types/news.types';
 
-// Mock data - sẽ thay bằng API call khi backend implement
-const mockNews: News[] = [
-  {
-    id: '1',
-    title: 'Khai trương chi nhánh mới tại Đà Nẵng',
-    slug: 'khai-truong-chi-nhanh-moi-tai-da-nang',
-    content: 'Aurora Hotel vui mừng thông báo khai trương chi nhánh mới...',
-    excerpt: 'Aurora Hotel vui mừng thông báo khai trương chi nhánh mới tại thành phố Đà Nẵng',
-    thumbnailUrl: '/images/news/danang-branch.jpg',
-    category: 'ANNOUNCEMENT',
-    status: 'PUBLISHED',
-    authorId: '1',
-    authorName: 'Admin',
-    publishedAt: '2024-11-20T10:00:00',
-    createdAt: '2024-11-18T08:00:00',
-    updatedAt: '2024-11-20T10:00:00',
-    viewCount: 1250,
-    featured: true,
-  },
-  {
-    id: '2',
-    title: 'Khuyến mãi cuối năm - Giảm 30% cho tất cả phòng',
-    slug: 'khuyen-mai-cuoi-nam-giam-30',
-    content: 'Nhân dịp cuối năm, Aurora Hotel xin gửi tặng...',
-    excerpt: 'Nhân dịp cuối năm, Aurora Hotel xin gửi tặng quý khách ưu đãi đặc biệt',
-    thumbnailUrl: '/images/news/promotion.jpg',
-    category: 'PROMOTION',
-    status: 'PUBLISHED',
-    authorId: '1',
-    authorName: 'Marketing Team',
-    publishedAt: '2024-11-15T09:00:00',
-    createdAt: '2024-11-14T15:00:00',
-    updatedAt: '2024-11-15T09:00:00',
-    viewCount: 3420,
-    featured: true,
-  },
-  {
-    id: '3',
-    title: 'Sự kiện đêm nhạc Jazz tại Aurora Lounge',
-    slug: 'su-kien-dem-nhac-jazz',
-    content: 'Mời quý khách tham dự đêm nhạc Jazz...',
-    excerpt: 'Mời quý khách tham dự đêm nhạc Jazz đặc sắc vào tối thứ 7 hàng tuần',
-    category: 'EVENT',
-    status: 'PUBLISHED',
-    authorId: '2',
-    authorName: 'Event Team',
-    publishedAt: '2024-11-10T14:00:00',
-    createdAt: '2024-11-08T10:00:00',
-    updatedAt: '2024-11-10T14:00:00',
-    viewCount: 890,
-    featured: false,
-  },
-  {
-    id: '4',
-    title: 'Bài viết mới đang soạn thảo',
-    slug: 'bai-viet-moi-dang-soan-thao',
-    content: 'Nội dung đang được cập nhật...',
-    category: 'NEWS',
-    status: 'DRAFT',
-    authorId: '1',
-    authorName: 'Admin',
-    createdAt: '2024-11-25T16:00:00',
-    updatedAt: '2024-11-25T16:00:00',
-    viewCount: 0,
-    featured: false,
-  },
-];
-
 export default function NewsList() {
   const navigate = useNavigate();
+  const dispatch = useAppDispatch();
+  const { allNewsList, loading } = useAppSelector((state) => state.news);
   
   // State
-  const [news, setNews] = useState<News[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [filteredNews, setFilteredNews] = useState<NewsListResponse[]>([]);
   
   // Pagination
   const [currentPage, setCurrentPage] = useState(0);
@@ -127,7 +62,6 @@ export default function NewsList() {
   
   // Filters
   const [searchKeyword, setSearchKeyword] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('');
   const [selectedStatus, setSelectedStatus] = useState('');
   
   // Sorting
@@ -138,68 +72,76 @@ export default function NewsList() {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [selectedNewsId, setSelectedNewsId] = useState<string | null>(null);
 
-  // Fetch news (mock)
-  const fetchNews = useCallback(async () => {
-    try {
-      setIsLoading(true);
-      
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 500));
-      
-      let filteredNews = [...mockNews];
-      
-      // Apply filters
-      if (searchKeyword) {
-        filteredNews = filteredNews.filter(n => 
-          n.title.toLowerCase().includes(searchKeyword.toLowerCase())
-        );
-      }
-      if (selectedCategory) {
-        filteredNews = filteredNews.filter(n => n.category === selectedCategory);
-      }
-      if (selectedStatus) {
-        filteredNews = filteredNews.filter(n => n.status === selectedStatus);
-      }
-      
-      // Sort
-      filteredNews.sort((a, b) => {
-        const aValue = a[sortColumn as keyof News] as string;
-        const bValue = b[sortColumn as keyof News] as string;
-        return sortDirection === 'asc' 
-          ? aValue.localeCompare(bValue) 
-          : bValue.localeCompare(aValue);
-      });
-      
-      setNews(filteredNews);
-      setTotalElements(filteredNews.length);
-      setTotalPages(Math.ceil(filteredNews.length / pageSize));
-    } catch (error) {
-      console.error('Failed to fetch news:', error);
-      toast.error('Không thể tải danh sách tin tức');
-    } finally {
-      setIsLoading(false);
-    }
-  }, [currentPage, pageSize, searchKeyword, selectedCategory, selectedStatus, sortColumn, sortDirection]);
-
+  // Fetch news on component mount
   useEffect(() => {
-    fetchNews();
-  }, [fetchNews]);
+    dispatch(fetchAllNews());
+  }, [dispatch]);
+
+  // Apply filters and sorting
+  useEffect(() => {
+    let result = [...allNewsList];
+    
+    // Apply filters
+    if (searchKeyword) {
+      result = result.filter(n => 
+        n.title.toLowerCase().includes(searchKeyword.toLowerCase()) ||
+        n.description.toLowerCase().includes(searchKeyword.toLowerCase())
+      );
+    }
+    if (selectedStatus) {
+      result = result.filter(n => n.status === selectedStatus);
+    }
+    
+    // Sort
+    result.sort((a, b) => {
+      const aValue = a[sortColumn as keyof NewsListResponse] as string;
+      const bValue = b[sortColumn as keyof NewsListResponse] as string;
+      return sortDirection === 'asc' 
+        ? aValue.localeCompare(bValue) 
+        : bValue.localeCompare(aValue);
+    });
+    
+    setFilteredNews(result);
+    setTotalElements(result.length);
+    setTotalPages(Math.ceil(result.length / pageSize));
+  }, [allNewsList, searchKeyword, selectedStatus, sortColumn, sortDirection, pageSize]);
 
   // Handle delete news
   const handleDeleteNews = async () => {
     if (!selectedNewsId) return;
     
     try {
-      // Mock delete
-      await new Promise(resolve => setTimeout(resolve, 300));
+      await dispatch(deleteNewsById(selectedNewsId)).unwrap();
       toast.success('Xóa tin tức thành công');
       setDeleteDialogOpen(false);
       setSelectedNewsId(null);
-      fetchNews();
     } catch (error) {
       console.error('Failed to delete news:', error);
       toast.error('Không thể xóa tin tức');
     }
+  };
+
+  // Handle toggle visibility (publish/unpublish)
+  const handleToggleVisibility = async (newsItem: NewsListResponse) => {
+    try {
+      await dispatch(
+        updateVisibility({
+          id: newsItem.id,
+          request: { isPublic: !newsItem.isPublic }
+        })
+      ).unwrap();
+      
+      const action = !newsItem.isPublic ? 'công khai' : 'riêng tư';
+      toast.success(`Đã chuyển tin tức sang chế độ ${action}`);
+    } catch (error) {
+      console.error('Failed to update visibility:', error);
+      toast.error('Không thể cập nhật trạng thái công khai');
+    }
+  };
+
+  // Handle refresh
+  const handleRefresh = () => {
+    dispatch(fetchAllNews());
   };
 
   // Handle sort
@@ -215,7 +157,6 @@ export default function NewsList() {
   // Handle clear filters
   const handleClearFilters = () => {
     setSearchKeyword('');
-    setSelectedCategory('');
     setSelectedStatus('');
     setCurrentPage(0);
   };
@@ -232,27 +173,44 @@ export default function NewsList() {
     });
   };
 
+  // Get paginated data
+  const paginatedNews = filteredNews.slice(
+    currentPage * pageSize,
+    (currentPage + 1) * pageSize
+  );
+
   // Table columns
-  const columns: Column<News>[] = [
+  const columns: Column<NewsListResponse>[] = [
     {
       key: 'title',
       header: 'Tiêu đề',
       cell: (item) => (
         <div className="flex items-start gap-3 max-w-[400px]">
-          {item.thumbnailUrl && (
+          {item.thumbnailUrl ? (
             <img 
               src={item.thumbnailUrl} 
               alt={item.title}
               className="w-16 h-12 object-cover rounded"
+              onError={(e) => {
+                const target = e.target as HTMLImageElement;
+                target.style.display = 'none';
+                const fallback = target.nextElementSibling as HTMLElement;
+                if (fallback) fallback.style.display = 'flex';
+              }}
             />
-          )}
+          ) : null}
+          <div 
+            className="w-16 h-12 bg-muted rounded flex items-center justify-center"
+            style={{ display: item.thumbnailUrl ? 'none' : 'flex' }}
+          >
+            <ImageOff className="h-6 w-6 text-muted-foreground" />
+          </div>
           <div className="flex-1 min-w-0">
-            <div className="font-medium line-clamp-1 flex items-center gap-2">
-              {item.featured && <Star className="h-4 w-4 text-yellow-500 fill-yellow-500" />}
+            <div className="font-medium line-clamp-1">
               {item.title}
             </div>
             <div className="text-sm text-muted-foreground line-clamp-1">
-              {item.excerpt || item.content.substring(0, 100)}...
+              {item.description}
             </div>
           </div>
         </div>
@@ -260,24 +218,21 @@ export default function NewsList() {
       sortable: true,
     },
     {
-      key: 'category',
-      header: 'Danh mục',
-      cell: (item) => {
-        const config = NEWS_CATEGORY_CONFIG[item.category];
-        return (
-          <Badge variant="outline" className={config?.color}>
-            {config?.label || item.category}
-          </Badge>
-        );
-      },
+      key: 'isPublic',
+      header: 'Công khai',
+      cell: (item) => (
+        <Badge variant={item.isPublic ? 'default' : 'secondary'}>
+          {item.isPublic ? 'Công khai' : 'Riêng tư'}
+        </Badge>
+      ),
     },
     {
-      key: 'author',
+      key: 'createdBy',
       header: 'Tác giả',
       cell: (item) => (
         <div className="flex items-center gap-2 text-sm">
           <User className="h-4 w-4 text-muted-foreground" />
-          {item.authorName}
+          {item.createdBy}
         </div>
       ),
     },
@@ -287,16 +242,8 @@ export default function NewsList() {
       cell: (item) => (
         <div className="flex items-center gap-2 text-sm">
           <Calendar className="h-4 w-4 text-muted-foreground" />
-          {formatDate(item.publishedAt || item.createdAt)}
+          {formatDate(item.publishedAt)}
         </div>
-      ),
-      sortable: true,
-    },
-    {
-      key: 'viewCount',
-      header: 'Lượt xem',
-      cell: (item) => (
-        <span className="font-medium">{item.viewCount.toLocaleString()}</span>
       ),
       sortable: true,
     },
@@ -321,26 +268,36 @@ export default function NewsList() {
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Thao tác</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => navigate(`/admin/news/${item.id}`)}>
+            <DropdownMenuItem 
+              onClick={() => {
+                if (item.isPublic) {
+                  navigate(`/news/${item.slug}`);
+                } else {
+                  navigate(`/admin/news/preview/${item.slug}`);
+                }
+              }}
+            >
               <Eye className="h-4 w-4 mr-2" />
-              Xem chi tiết
+              {item.isPublic ? 'Xem bài viết' : 'Xem trước'}
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => navigate(`/admin/news/${item.id}/edit`)}>
+            <DropdownMenuItem onClick={() => navigate(`/admin/news/upsert/${item.slug}`)}>
               <Edit className="h-4 w-4 mr-2" />
               Chỉnh sửa
             </DropdownMenuItem>
-            {item.status === 'DRAFT' && (
-              <DropdownMenuItem onClick={() => toast.info('Chức năng đang phát triển')}>
-                <Send className="h-4 w-4 mr-2" />
-                Xuất bản
-              </DropdownMenuItem>
-            )}
-            {item.status === 'PUBLISHED' && (
-              <DropdownMenuItem onClick={() => toast.info('Chức năng đang phát triển')}>
-                <Archive className="h-4 w-4 mr-2" />
-                Lưu trữ
-              </DropdownMenuItem>
-            )}
+            <DropdownMenuSeparator />
+            <DropdownMenuItem onClick={() => handleToggleVisibility(item)}>
+              {item.isPublic ? (
+                <>
+                  <Lock className="h-4 w-4 mr-2" />
+                  Chuyển sang riêng tư
+                </>
+              ) : (
+                <>
+                  <Globe className="h-4 w-4 mr-2" />
+                  Chuyển sang công khai
+                </>
+              )}
+            </DropdownMenuItem>
             <DropdownMenuSeparator />
             <DropdownMenuItem
               className="text-destructive"
@@ -360,11 +317,6 @@ export default function NewsList() {
   ];
 
   // Filter options
-  const categoryOptions = Object.entries(NEWS_CATEGORY_CONFIG).map(([value, config]) => ({
-    value,
-    label: config.label,
-  }));
-
   const statusOptions = Object.entries(NEWS_STATUS_CONFIG).map(([value, config]) => ({
     value,
     label: config.label,
@@ -375,10 +327,10 @@ export default function NewsList() {
       <PageHeader
         title="Quản lý tin tức"
         description="Xem và quản lý tất cả tin tức, bài viết trong hệ thống"
-        onAdd={() => navigate('/admin/news/upsert')}
+        onAdd={() => navigate("/admin/news/upsert")}
         addButtonText="Thêm tin tức"
-        onRefresh={fetchNews}
-        isLoading={isLoading}
+        onRefresh={handleRefresh}
+        isLoading={loading}
       />
 
       <Card>
@@ -389,25 +341,15 @@ export default function NewsList() {
           <SearchFilter
             searchValue={searchKeyword}
             onSearchChange={setSearchKeyword}
-            searchPlaceholder="Tìm theo tiêu đề..."
+            searchPlaceholder="Tìm theo tiêu đề hoặc mô tả..."
             filters={[
               {
-                key: 'category',
-                label: 'Danh mục',
-                value: selectedCategory,
-                options: categoryOptions,
-                onChange: (value) => {
-                  setSelectedCategory(value === 'all' ? '' : value);
-                  setCurrentPage(0);
-                },
-              },
-              {
-                key: 'status',
-                label: 'Trạng thái',
+                key: "status",
+                label: "Trạng thái",
                 value: selectedStatus,
                 options: statusOptions,
                 onChange: (value) => {
-                  setSelectedStatus(value === 'all' ? '' : value);
+                  setSelectedStatus(value === "all" ? "" : value);
                   setCurrentPage(0);
                 },
               },
@@ -418,12 +360,15 @@ export default function NewsList() {
       </Card>
 
       <Card>
+        <CardHeader>
+          <CardTitle className="text-lg font-medium">Danh sách tin tức</CardTitle>
+        </CardHeader>
         <CardContent className="pt-6">
           <DataTable
             columns={columns}
-            data={news}
+            data={paginatedNews}
             keyExtractor={(item) => item.id}
-            isLoading={isLoading}
+            isLoading={loading}
             emptyMessage="Không có tin tức nào"
             sortColumn={sortColumn}
             sortDirection={sortDirection}

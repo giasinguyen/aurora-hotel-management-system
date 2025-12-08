@@ -25,6 +25,7 @@ import ErrorPage from "@/pages/common/ErrorPage";
 import GalleryPage from "@/pages/landing/Gallery";
 import HomePage from "@/pages/landing/Home";
 import NewsPage from "@/pages/landing/News";
+import NewsDetailPage from "@/pages/landing/NewsDetail";
 import ServicePage from "@/pages/landing/Service";
 import UserProfilePage from "@/pages/common/customer/UserProfile";
 import GuestBranchListPage from "@/pages/landing/BranchList";
@@ -57,6 +58,7 @@ import DocumentUpsertPage from "@/pages/document/DocumentUpsert";
 // News
 import NewsListPage from "@/pages/news/NewsList";
 import NewsUpsertPage from "@/pages/news/NewsUpsert";
+import NewsPreview from "@/pages/news/NewsPreview";
 
 // Promotion
 import PromotionListPage from "@/pages/promotion/PromotionList";
@@ -111,15 +113,16 @@ const router = createBrowserRouter([
       { path: "auth", element: <AuthPage /> }, // temp complete
       { path: "about", element: <AboutPage /> }, // temp complete
       { path: "accommodation", element: <AccommodationPage /> }, // temp complete
-      { path: "accommodation/:categoryId", element: <AccommodationCategoryPage /> }, // temp complete
+      { path: "accommodation/:categoryId", element: <AccommodationCategoryPage />, }, // temp complete
       { path: "booking", element: <BookingPage /> }, // temp complete
       { path: "booking/checkout", element: <CheckoutPage /> },
       { path: "booking/success", element: <BookingSuccessPage /> },
-      { path: "booking/user-booking-detail/:id", element: <UserBookingDetailPage /> },
+      { path: "booking/user-booking-detail/:id", element: <UserBookingDetailPage />, },
       { path: "service", element: <ServicePage /> }, // temp complete
       { path: "branches", element: <GuestBranchListPage /> }, //TODO: Giới thiệu chi nhánh => update later
       { path: "gallery", element: <GalleryPage /> }, //TODO: Giới thiệu album => update later
       { path: "news", element: <NewsPage /> }, //TODO: Giới thiệu news website (Trung Nguyen) => update later
+      { path: "news/:slug", element: <NewsDetailPage /> }, //TODO: Giới thiệu news website (Trung Nguyen) => update later
       { path: "contact", element: <ContactPage /> }, //TODO: Giới thiệu Liên hệ => update later
       { path: "payment", element: <PaymentPage /> }, //TODO: Fix URL => thanh toán sau booking (Gia Sĩ) => update later
       { path: "payment/return", element: <PaymentReturnPage /> }, //TODO: Fix URL => thanh toán sau booking (Gia Sĩ) => update later
@@ -180,6 +183,7 @@ const router = createBrowserRouter([
       { path: "promotions/upsert", element: <PromotionUpsertPage /> },
       { path: "news", element: <NewsListPage /> },
       { path: "news/upsert", element: <NewsUpsertPage /> },
+      { path: "news/upsert/:slug", element: <NewsUpsertPage /> },
       { path: "reports/revenue", element: <RevenueReportPage /> },
       { path: "reports/occupancy", element: <OccupancyReportPage /> },
       { path: "profile", element: <UserProfilePage /> },
@@ -206,13 +210,18 @@ const router = createBrowserRouter([
       { path: "room-events", element: <RoomEventListPage /> },
       { path: "room-events/upsert", element: <RoomEventUpsertPage /> },
       { path: "service-categories", element: <ServiceCategoryListPage /> },
-      { path: "service-categories/upsert", element: <ServiceCategoryUpsertPage /> },
+      {
+        path: "service-categories/upsert",
+        element: <ServiceCategoryUpsertPage />,
+      },
       { path: "services", element: <ServiceListPage /> },
       { path: "services/upsert", element: <ServiceUpsertPage /> },
       { path: "promotions", element: <PromotionListPage /> },
       { path: "promotions/upsert", element: <PromotionUpsertPage /> },
       { path: "news", element: <NewsListPage /> },
       { path: "news/upsert", element: <NewsUpsertPage /> },
+      { path: "news/upsert/:slug", element: <NewsUpsertPage /> },
+      { path: "news/preview/:slug", element: <NewsPreview /> },
       { path: "branches", element: <BranchListPage /> },
       { path: "branches/upsert", element: <BranchUpsertPage /> },
       { path: "users", element: <UserListPage /> },
@@ -227,7 +236,10 @@ const router = createBrowserRouter([
       { path: "reports/overview", element: <OverviewReportPage /> },
       { path: "reports/revenue", element: <AdminRevenueReportPage /> },
       { path: "reports/occupancy", element: <AdminOccupancyReportPage /> },
-      { path: "reports/branch-comparison", element: <BranchComparisonReportPage /> },
+      {
+        path: "reports/branch-comparison",
+        element: <BranchComparisonReportPage />,
+      },
       { path: "profile", element: <UserProfilePage /> },
     ],
   },

@@ -29,13 +29,13 @@ interface SidebarProps {
 
 const menuItems = [
   {
-    title: 'Dashboard',
+    title: "Dashboard",
     icon: LayoutDashboard,
-    href: '/admin',
+    href: "/admin",
   },
   // ===== Kế thừa từ Staff =====
   {
-    title: 'Bookings',
+    title: "Bookings",
     icon: CalendarCheck,
     href: '/admin/bookings',
     children: [
@@ -45,9 +45,9 @@ const menuItems = [
   },
   // ===== Kế thừa từ Manager =====
   {
-    title: 'Rooms',
+    title: "Rooms",
     icon: BedDouble,
-    href: '/admin/rooms',
+    href: "/admin/rooms",
     children: [
       { title: 'Room Categories', href: '/admin/room-categories' },
       { title: 'Room Types', href: '/admin/room-types' },
@@ -56,7 +56,7 @@ const menuItems = [
     ],
   },
   {
-    title: 'Services',
+    title: "Services",
     icon: Utensils,
     href: '/admin/services',
     children: [
@@ -65,51 +65,55 @@ const menuItems = [
     ],
   },
   {
-    title: 'Promotions',
+    title: "Promotions",
     icon: Gift,
-    href: '/admin/promotions',
+    href: "/admin/promotions",
   },
   {
-    title: 'News',
+    title: "News",
     icon: Newspaper,
-    href: '/admin/news',
+    href: "/admin/news",
+    children: [
+      { title: "News Management", href: "/admin/news" },
+      { title: "Compose News", href: "/admin/news/upsert" },
+    ],
   },
   // ===== Chức năng riêng của Admin =====
   {
-    title: 'Branches',
+    title: "Branches",
     icon: Building2,
-    href: '/admin/branches',
+    href: "/admin/branches",
   },
   {
-    title: 'Users',
+    title: "Users",
     icon: Users,
-    href: '/admin/users',
+    href: "/admin/users",
   },
   {
-    title: 'Roles',
+    title: "Roles",
     icon: Users,
-    href: '/admin/roles',
+    href: "/admin/roles",
   },
   {
-    title: 'Shifts',
+    title: "Shifts",
     icon: Clock,
-    href: '/admin/shifts',
+    href: "/admin/shifts",
   },
   {
-    title: 'Documents',
+    title: "Documents",
     icon: FileText,
-    href: '/admin/documents',
+    href: "/admin/documents",
   },
   {
-    title: 'Reports',
+    title: "Reports",
     icon: BarChart3,
-    href: '/admin/reports',
+    href: "/admin/reports",
     children: [
-      { title: 'Overview', href: '/admin/reports/overview' },
-      { title: 'Shift Report', href: '/admin/reports/shift' },
-      { title: 'Revenue Report', href: '/admin/reports/revenue' },
-      { title: 'Occupancy Report', href: '/admin/reports/occupancy' },
-      { title: 'Branch Comparison', href: '/admin/reports/branch-comparison' },
+      { title: "Overview", href: "/admin/reports/overview" },
+      { title: "Shift Report", href: "/admin/reports/shift" },
+      { title: "Revenue Report", href: "/admin/reports/revenue" },
+      { title: "Occupancy Report", href: "/admin/reports/occupancy" },
+      { title: "Branch Comparison", href: "/admin/reports/branch-comparison" },
     ],
   },
 ];

@@ -1,36 +1,17 @@
+import { useEffect } from "react";
 import VideoHero from "@/components/custom/VideoHero";
+import NewsItem from "@/components/custom/NewsItem";
+import { useAppDispatch, useAppSelector } from "@/hooks/useRedux";
+import { fetchPublicNews } from "@/features/slices/newsSlice";
+import LoadingScreen from "@/components/custom/LoadingScreen";
 
 export default function NewsPage() {
-  const news = [
-    {
-      id: 1,
-      title: 'Aurora Hotel nhận giải thưởng "Khách sạn tốt nhất 2024"',
-      excerpt: 'Chúng tôi vinh dự nhận giải thưởng danh giá từ Hiệp hội Du lịch Quốc tế...',
-      date: '15/10/2024',
-      category: 'Thành tích'
-    },
-    {
-      id: 2,
-      title: 'Khai trương Spa mới với công nghệ hiện đại nhất',
-      excerpt: 'Spa Aurora với thiết bị và liệu trình chăm sóc đẳng cấp thế giới...',
-      date: '10/10/2024',
-      category: 'Dịch vụ mới'
-    },
-    {
-      id: 3,
-      title: 'Chương trình ưu đãi mùa lễ hội cuối năm',
-      excerpt: 'Giảm giá lên đến 30% cho các gói lưu trú dài ngày trong tháng 12...',
-      date: '5/10/2024',
-      category: 'Khuyến mãi'
-    },
-    {
-      id: 4,
-      title: 'Aurora Hotel mở rộng với tòa nhà mới',
-      excerpt: 'Dự án mở rộng 200 phòng mới dự kiến hoàn thành vào quý 2/2025...',
-      date: '1/10/2024',
-      category: 'Phát triển'
-    }
-  ];
+  const dispatch = useAppDispatch();
+  const { newsList, loading, error } = useAppSelector((state) => state.news);
+
+  useEffect(() => {
+    dispatch(fetchPublicNews());
+  }, [dispatch]);
 
   return (
     <div className="min-h-screen">
@@ -41,25 +22,59 @@ export default function NewsPage() {
       />
 
       {/* News List */}
-      <section className="py-16">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="space-y-8">
-            {news.map((article) => (
-              <div key={article.id} className="bg-white rounded-xl shadow-lg p-6 hover:shadow-xl transition-shadow">
-                <div className="flex items-start justify-between mb-4">
-                  <span className="px-3 py-1 bg-blue-100 text-blue-600 rounded-full text-sm font-medium">
-                    {article.category}
-                  </span>
-                  <span className="text-sm text-gray-500">{article.date}</span>
-                </div>
-                <h2 className="text-xl font-bold text-gray-900 mb-3">{article.title}</h2>
-                <p className="text-gray-600 mb-4">{article.excerpt}</p>
-                <button className="text-blue-600 hover:text-blue-700 font-medium">
-                  Đọc thêm →
-                </button>
+      <section className="py-16 bg-background">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {loading && <LoadingScreen />}
+          
+          {error && (
+            <div className="text-center text-red-500 py-8">
+              <p>Có lỗi xảy ra khi tải tin tức. Vui lòng thử lại sau.</p>
+            </div>
+          )}
+
+          {!loading && !error && newsList.length === 0 && (
+            <div className="text-center py-16">
+              <div className="max-w-md mx-auto">
+                <svg
+                  className="mx-auto h-24 w-24 text-muted-foreground/50"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={1.5}
+                    d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"
+                  />
+                </svg>
+                <h3 className="mt-4 text-lg font-semibold text-foreground">
+                  Chưa có tin tức nào
+                </h3>
+                <p className="mt-2 text-muted-foreground">
+                  Hiện tại chưa có tin tức nào được công bố. Vui lòng quay lại sau.
+                </p>
               </div>
-            ))}
-          </div>
+            </div>
+          )}
+
+          {!loading && !error && newsList.length > 0 && (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {newsList.map((news) => (
+                <NewsItem
+                  key={news.id}
+                  id={news.id}
+                  slug={news.slug}
+                  title={news.title}
+                  description={news.description}
+                  thumbnailUrl={news.thumbnailUrl || ""}
+                  publishedAt={news.publishedAt}
+                  status={news.status}
+                  createdBy={news.createdBy}
+                />
+              ))}
+            </div>
+          )}
         </div>
       </section>
     </div>

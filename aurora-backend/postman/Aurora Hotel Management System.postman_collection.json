@@ -2,7 +2,7 @@
 	"info": {
 		"_postman_id": "142be643-84e0-4f8f-94a3-7ee28c831ec7",
 		"name": "Aurora Hotel Management System",
-		"description": "Comprehensive API Testing Collection for Aurora Hotel System\n\n## Test Flow\n\n1. **Authentication** - Login and get tokens\n    \n2. **User Management** - Register and manage users\n    \n3. **Branch Management** - Create and manage hotel branches\n    \n4. **Amenity Management** - Manage hotel amenities (WiFi, TV, etc.)\n    \n5. **Facility Management** - Manage branch facilities (Pool, Gym, Spa)\n    \n6. **Room Type Management** - Configure room types\n    \n7. **Room Management** - Manage individual rooms\n    \n8. **Service Management** - Hotel services (Laundry, Room service, etc.)\n    \n9. **Promotion Management** - Discounts and promotions\n    \n10. **Booking Management** - Room bookings\n    \n11. **Booking Room** - Booking-Room relationship\n    \n12. **Service Booking** - Service bookings for guests\n    \n13. **Payment Management** - Process payments\n    \n14. **Role & Permission** - Manage access control\n    \n15. **RAG (AI Chat)** - AI-powered chat using hotel knowledge base\n    \n16. **Document Management** - Upload, manage, and download documents\n    \n\n## Authentication\n\nAll endpoints (except register and login) require Bearer token authentication.\n\n## Default Users\n\n- **Admin**: username=`admin`, password=`Admin@123`\n    \n- **Manager**: username=`manager`, password=`Manager@123`\n    \n- **Staff**: username=`staff`, password=`Staff@123`\n    \n- **Customer**: username=`customer`, password=`Customer@123`\n    \n\n## New Features\n\n- **RAG AI Chat**: Intelligent responses using retrieval augmented generation\n    \n- **Document Management**: Full CRUD operations for document handling",
+		"description": "Comprehensive API Testing Collection for Aurora Hotel System\n\n## Test Flow\n\n1. **Authentication** - Login and get tokens\n    \n2. **User Management** - Register and manage users\n    \n3. **Branch Management** - Create and manage hotel branches\n    \n4. **Amenity Management** - Manage hotel amenities (WiFi, TV, etc.)\n    \n5. **Facility Management** - Manage branch facilities (Pool, Gym, Spa)\n    \n6. **Room Type Management** - Configure room types\n    \n7. **Room Management** - Manage individual rooms\n    \n8. **Service Management** - Hotel services (Laundry, Room service, etc.)\n    \n9. **Promotion Management** - Discounts and promotions\n    \n10. **Booking Management** - Room bookings\n    \n11. **Booking Room** - Booking-Room relationship\n    \n12. **Service Booking** - Service bookings for guests\n    \n13. **Payment Management** - Process payments\n    \n14. **Role & Permission** - Manage access control\n    \n15. **RAG (AI Chat)** - AI-powered chat using hotel knowledge base\n    \n16. **Document Management** - Upload, manage, and download documents\n    \n\n## Authentication\n\nAll endpoints (except register and login) require Bearer token authentication.\n\n## Default Users\n\n- **Admin**: username=`admin`, password=`Admin@123`\n    \n- **Manager**: username=`manager`, password=`Manager@123`\n    \n- **Staff**: username=`staff`, password=`Staff@123`\n    \n- **Customer**: username=`customer`, password=`Customer@123`\n    \n\n## New Features\n\n- **RAG AI Chat**: Intelligent responses using retrieval augmented generation\n    \n- **Document Management**: Full CRUD operations for document handling\n    \n- **News Management**: Complete news article management with public/private visibility and image support",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
 		"_exporter_id": "48417652",
 		"_collection_link": "https://nguyenduykhai2-8509419.postman.co/workspace/NguyenDuyKhai's-Workspace~81749740-16ed-49e1-8f0c-0313169dea68/collection/48417652-142be643-84e0-4f8f-94a3-7ee28c831ec7?action=share&source=collection_link&creator=48417652"
@@ -1252,172 +1252,6 @@
 					"response": []
 				},
 				{
-					"name": "Get Branches by City",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"if (pm.response.code === 200) {",
-									"    pm.test('✅ Retrieved branches by city', function() {",
-									"        pm.response.to.have.status(200);",
-									"    });",
-									"}"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{baseUrl}}/branches/city/Ho Chi Minh?page=0&size=10",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"branches",
-								"city",
-								"Ho Chi Minh"
-							],
-							"query": [
-								{
-									"key": "page",
-									"value": "0"
-								},
-								{
-									"key": "size",
-									"value": "10"
-								}
-							]
-						},
-						"description": "Get branches in a specific city"
-					},
-					"response": []
-				},
-				{
-					"name": "Get Branches by Status",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"if (pm.response.code === 200) {",
-									"    pm.test('✅ Retrieved branches by status', function() {",
-									"        pm.response.to.have.status(200);",
-									"    });",
-									"}"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{baseUrl}}/branches/status/ACTIVE?page=0&size=10",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"branches",
-								"status",
-								"ACTIVE"
-							],
-							"query": [
-								{
-									"key": "page",
-									"value": "0"
-								},
-								{
-									"key": "size",
-									"value": "10"
-								}
-							]
-						},
-						"description": "Get branches by status (ACTIVE, INACTIVE, UNDER_MAINTENANCE)"
-					},
-					"response": []
-				},
-				{
-					"name": "Assign Manager to Branch",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"if (pm.response.code === 200) {",
-									"    pm.test('✅ Manager assigned to branch', function() {",
-									"        pm.response.to.have.status(200);",
-									"    });",
-									"}"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "PUT",
-						"header": [],
-						"url": {
-							"raw": "{{baseUrl}}/branches/{{branchId}}/manager?managerId={{userId}}",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"branches",
-								"{{branchId}}",
-								"manager"
-							],
-							"query": [
-								{
-									"key": "managerId",
-									"value": "{{userId}}"
-								}
-							]
-						},
-						"description": "Assign a manager to a branch"
-					},
-					"response": []
-				},
-				{
-					"name": "Remove Manager from Branch",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"if (pm.response.code === 200) {",
-									"    pm.test('✅ Manager removed from branch', function() {",
-									"        pm.response.to.have.status(200);",
-									"    });",
-									"}"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "DELETE",
-						"header": [],
-						"url": {
-							"raw": "{{baseUrl}}/branches/{{branchId}}/manager",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"branches",
-								"{{branchId}}",
-								"manager"
-							]
-						},
-						"description": "Remove manager from a branch"
-					},
-					"response": []
-				},
-				{
 					"name": "Get Branch Statistics",
 					"event": [
 						{
@@ -1784,51 +1618,6 @@
 							]
 						},
 						"description": "Search amenities by name"
-					},
-					"response": []
-				},
-				{
-					"name": "Get Amenities by Type",
-					"event": [
-						{
-							"listen": "test",
-							"script": {
-								"exec": [
-									"if (pm.response.code === 200) {",
-									"    pm.test('✅ Retrieved amenities by type', function() {",
-									"        pm.response.to.have.status(200);",
-									"    });",
-									"}"
-								],
-								"type": "text/javascript"
-							}
-						}
-					],
-					"request": {
-						"method": "GET",
-						"header": [],
-						"url": {
-							"raw": "{{baseUrl}}/amenities/type/TECHNOLOGY?page=0&size=10",
-							"host": [
-								"{{baseUrl}}"
-							],
-							"path": [
-								"amenities",
-								"type",
-								"TECHNOLOGY"
-							],
-							"query": [
-								{
-									"key": "page",
-									"value": "0"
-								},
-								{
-									"key": "size",
-									"value": "10"
-								}
-							]
-						},
-						"description": "Get amenities by type (TECHNOLOGY, BATHROOM, BEDROOM, ENTERTAINMENT, KITCHEN, OTHER)"
 					},
 					"response": []
 				},
@@ -3226,6 +3015,230 @@
 			"description": "Document Management System - Upload, download, update, and delete documents for the hotel system"
 		},
 		{
+			"name": "09. News Management",
+			"item": [
+				{
+					"name": "Get Public News",
+					"request": {
+						"auth": { "type": "noauth" },
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/news/public",
+							"host": ["{{baseUrl}}"],
+							"path": ["api","v1","news","public"]
+						},
+						"description": "Retrieve all public news items (PUBLIC)"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Public News By Slug",
+					"request": {
+						"auth": { "type": "noauth" },
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/news/public/{{slug}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["api","v1","news","public","{{slug}}"]
+						},
+						"description": "Get a public news item by slug (PUBLIC)"
+					},
+					"response": []
+				},
+				{
+					"name": "Get All News (Admin)",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/news",
+							"host": ["{{baseUrl}}"],
+							"path": ["api","v1","news"]
+						},
+						"description": "Get all news (requires authentication)"
+					},
+					"response": []
+				},
+				{
+					"name": "Create News",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"if (pm.response.code === 200 || pm.response.code === 201) {",
+									"  var jsonData = pm.response.json();",
+									"  if (jsonData.result && jsonData.result.id) {",
+									"    pm.collectionVariables.set('newsId', jsonData.result.id);",
+									"  }",
+									"  pm.test('✅ News created', function() { pm.expect(jsonData.result).to.not.be.empty; });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"title\": \"Grand Opening - Aurora Rooftop\",\n    \"description\": \"Join us for the grand opening of our new rooftop bar with stunning city views\",\n    \"thumbnailUrl\": \"https://example.com/images/rooftop-opening.jpg\",\n    \"contentHtml\": \"<h1>Getting started</h1>\",\n    \"contentJson\": {\n        \"type\": \"doc\",\n        \"content\": [\n            {\n                \"type\": \"heading\",\n                \"attrs\": {\n                    \"textAlign\": null,\n                    \"level\": 1\n                },\n                \"content\": [\n                    {\n                        \"type\": \"text\",\n                        \"text\": \"Getting started\"\n                    }\n                ]\n            }\n        ]\n    },\n    \"slug\": \"grand-opening-rooftop-aurora\",\n    \"isPublic\": true\n}",
+							"options": { "raw": { "language": "json" } }
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/news",
+							"host": ["{{baseUrl}}"],
+							"path": ["api","v1","news"]
+						},
+						"description": "Create a news item (Admin). Optional 'id' field can be provided to update existing news instead."
+					},
+					"response": []
+				},
+				{
+					"name": "Update News",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"title\": \"Grand Opening - Aurora Rooftop (Updated)\",\n  \"description\": \"Updated description for the grand opening event\",\n  \"thumbnailUrl\": \"https://example.com/images/rooftop-opening-updated.jpg\",\n  \"contentHtml\": \"<h1>Updated Content</h1>\",\n  \"contentJson\": {\n    \"type\": \"doc\",\n    \"content\": [\n      {\n        \"type\": \"heading\",\n        \"attrs\": { \"level\": 1 },\n        \"content\": [{ \"type\": \"text\", \"text\": \"Updated Content\" }]\n      }\n    ]\n  },\n  \"slug\": \"grand-opening-rooftop-aurora\",\n  \"isPublic\": true\n}",
+							"options": { "raw": { "language": "json" } }
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/news/{{newsId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["api","v1","news","{{newsId}}"]
+						},
+						"description": "Update an existing news item by ID (Admin)"
+					},
+					"response": []
+				},
+				{
+					"name": "Update News Visibility",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{ "key": "Content-Type", "value": "application/json" }
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"isPublic\": false\n}",
+							"options": { "raw": { "language": "json" } }
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/news/{{newsId}}/visibility",
+							"host": ["{{baseUrl}}"],
+							"path": ["api","v1","news","{{newsId}}","visibility"]
+						},
+						"description": "Toggle news visibility (Admin)"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete News",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/news/{{newsId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["api","v1","news","{{newsId}}"]
+						},
+						"description": "Delete a news item (Admin)"
+					},
+					"response": []
+				},
+				{
+					"name": "Upload News Image",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": []
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/news/{{newsId}}/images",
+							"host": ["{{baseUrl}}"],
+							"path": ["api","v1","news","{{newsId}}","images"]
+						},
+						"description": "Upload an image for a news item. Use form-data 'file' field."
+					},
+					"response": []
+				},
+				{
+					"name": "Get News Images",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/news/{{newsId}}/images",
+							"host": ["{{baseUrl}}"],
+							"path": ["api","v1","news","{{newsId}}","images"]
+						},
+						"description": "Get all images for a news item"
+					},
+					"response": []
+				},
+				{
+					"name": "Get News Image By ID",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/news/images/{{imageId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["api","v1","news","images","{{imageId}}"]
+						},
+						"description": "Get a single news image by image ID"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete All News Images",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/news/{{newsId}}/images",
+							"host": ["{{baseUrl}}"],
+							"path": ["api","v1","news","{{newsId}}","images"]
+						},
+						"description": "Delete all images for a news item"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete News Image By PublicId",
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/v1/news/images/public/{{publicId}}",
+							"host": ["{{baseUrl}}"],
+							"path": ["api","v1","news","images","public","{{publicId}}"]
+						},
+						"description": "Delete a news image using its publicId (cloud storage identifier)"
+					},
+					"response": []
+				}
+			],
+			"description": "News management: public listing, admin CRUD, and image asset management"
+		},
+		{
 			"name": "11. Dashboard & Statistics",
 			"item": [
 				{
@@ -3600,8 +3613,8 @@
 									"    const data = pm.response.json().result;\r",
 									"    \r",
 									"    // Check if at least one payment method exists\r",
-									"    const hasPaymentMethod = Object.keys(data).length > 0;\r",
-									"    pm.expect(hasPaymentMethod).to.be.true;\r",
+									"    const hasAtLeastOneSource = Object.keys(data).length > 0;\r",
+									"    pm.expect(hasAtLeastOneSource).to.be.true;\r",
 									"    \r",
 									"    console.log(\"Payment methods:\", Object.keys(data));\r",
 									"});\r",
@@ -4175,3 +4188,5 @@
 		}
 	]
 }
+
+

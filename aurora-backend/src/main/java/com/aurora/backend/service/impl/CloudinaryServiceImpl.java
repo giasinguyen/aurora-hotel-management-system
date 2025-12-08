@@ -12,6 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 @Slf4j
 @Service
@@ -27,7 +28,8 @@ public class CloudinaryServiceImpl implements CloudinaryService {
 
         try {
             Map<String, Object> uploadParams = new HashMap<>();
-            uploadParams.put("resource_type", "auto");
+            uploadParams.put("type", "upload");
+            uploadParams.put("access_mode", "public");
             uploadParams.put("folder", folder);
             uploadParams.put("use_filename", true);
             uploadParams.put("unique_filename", true);
