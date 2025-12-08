@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Hotel, Loader2 } from "lucide-react";
+import { Hotel, Loader2, Sparkles } from "lucide-react";
 import { useMyProfile } from "@/hooks/useMyProfile";
 import axiosClient from "@/config/axiosClient";
 import type { Booking } from "@/types/booking.types";
@@ -195,23 +195,49 @@ const CustomerBookingListPage = () => {
 
                       {booking.rooms.length > 0 && (
                         <div className="mt-4 pt-4 border-t border-gray-100">
-                          <p className="text-sm text-gray-500 mb-2">Phòng đã đặt:</p>
-                          <div className="flex flex-wrap gap-2">
-                            {booking.rooms.map((room, idx) => (
-                              <span
-                                key={idx}
-                                className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-medium"
-                                style={{ 
-                                  backgroundColor: 'oklch(0.902 0.028 56.8)', 
-                                  color: 'oklch(0.502 0.138 56.8)',
-                                  borderWidth: '1px',
-                                  borderColor: 'oklch(0.802 0.048 56.8)'
-                                }}
-                              >
-                                <Hotel className="w-3 h-3" />
-                                {room.roomTypeName} - {room.roomNumber}
-                              </span>
-                            ))}
+                          <p className="text-sm font-medium text-gray-700 mb-3">Phòng và dịch vụ đã đặt:</p>
+                          <div className="space-y-3">
+                            {booking.rooms.map((room, idx) => {
+                              // Get services for this room - must match roomId exactly
+                              const roomServices = booking.services?.filter(
+                                (service) => service.roomId && room.roomId && service.roomId === room.roomId
+                              ) || [];
+
+                              return (
+                                <div
+                                  key={room.roomId || `room-${idx}`}
+                                  className="p-3 bg-gray-50 rounded-lg border border-gray-200"
+                                >
+                                  <div className="flex items-center gap-2 mb-2">
+                                    <Hotel className="w-4 h-4" style={{ color: 'oklch(0.602 0.118 56.8)' }} />
+                                    <span className="text-sm font-semibold text-gray-900">
+                                      {room.roomTypeName || room.roomType || 'Phòng'} - {room.roomNumber || 'Chưa phân phòng'}
+                                    </span>
+                                  </div>
+                                  {roomServices.length > 0 && (
+                                    <div className="ml-6 mt-2 space-y-1">
+                                      {roomServices.map((service) => (
+                                        <div
+                                          key={service.id || `service-${service.serviceId}-${idx}`}
+                                          className="flex items-center justify-between text-xs"
+                                        >
+                                          <div className="flex items-center gap-1">
+                                            <Sparkles className="w-3 h-3 text-pink-600" />
+                                            <span className="text-gray-600">
+                                              {service.serviceName}
+                                              {service.quantity > 1 && ` (x${service.quantity})`}
+                                            </span>
+                                          </div>
+                                          <span className="text-gray-700 font-medium">
+                                            {formatCurrency(service.price * service.quantity)}
+                                          </span>
+                                        </div>
+                                      ))}
+                                    </div>
+                                  )}
+                                </div>
+                              );
+                            })}
                           </div>
                         </div>
                       )}

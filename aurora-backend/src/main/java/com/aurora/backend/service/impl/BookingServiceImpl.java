@@ -20,6 +20,8 @@ import com.aurora.backend.exception.AppException;
 import com.aurora.backend.enums.ErrorCode;
 import com.aurora.backend.mapper.BookingMapper;
 import com.aurora.backend.mapper.BookingRoomMapper;
+import com.aurora.backend.mapper.ServiceBookingMapper;
+import com.aurora.backend.dto.response.ServiceBookingResponse;
 import com.aurora.backend.repository.BookingRepository;
 import com.aurora.backend.repository.BranchRepository;
 import com.aurora.backend.repository.UserRepository;
@@ -44,7 +46,9 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
@@ -62,6 +66,7 @@ public class BookingServiceImpl implements BookingService {
     ServiceBookingRepository serviceBookingRepository;
     PaymentRepository paymentRepository;
     BookingMapper bookingMapper;
+    ServiceBookingMapper serviceBookingMapper;
     RefundService refundService;
     EmailService emailService;
 
@@ -144,10 +149,18 @@ public class BookingServiceImpl implements BookingService {
     public BookingResponse getBookingById(String id) {
         log.debug("Fetching booking with ID: {}", id);
         
-        Booking booking = bookingRepository.findById(id)
+        Booking booking = bookingRepository.findByIdWithRooms(id)
                 .orElseThrow(() -> new AppException(ErrorCode.BOOKING_NOT_FOUND));
         
-        return bookingMapper.toBookingResponse(booking);
+        BookingResponse response = bookingMapper.toBookingResponse(booking);
+        // Load services for this booking with room information
+        List<ServiceBookingResponse> services = serviceBookingRepository.findByBookingWithRoom(booking)
+                .stream()
+                .map(serviceBookingMapper::toServiceBookingResponse)
+                .collect(Collectors.toList());
+        response.setServices(services);
+        
+        return response;
     }
 
     @Override
@@ -155,10 +168,18 @@ public class BookingServiceImpl implements BookingService {
     public BookingResponse getBookingByCode(String code) {
         log.debug("Fetching booking with code: {}", code);
         
-        Booking booking = bookingRepository.findByBookingCode(code)
+        Booking booking = bookingRepository.findByBookingCodeWithRooms(code)
                 .orElseThrow(() -> new AppException(ErrorCode.BOOKING_NOT_FOUND));
         
-        return bookingMapper.toBookingResponse(booking);
+        BookingResponse response = bookingMapper.toBookingResponse(booking);
+        // Load services for this booking with room information
+        List<ServiceBookingResponse> services = serviceBookingRepository.findByBookingWithRoom(booking)
+                .stream()
+                .map(serviceBookingMapper::toServiceBookingResponse)
+                .collect(Collectors.toList());
+        response.setServices(services);
+        
+        return response;
     }
 
     @Override
@@ -614,10 +635,15 @@ public class BookingServiceImpl implements BookingService {
                 // Use check-in date as service date time (can be adjusted later)
                 LocalDateTime serviceDateTime = request.getCheckIn().atStartOfDay();
                 
+                // Find the room for this service
+                Room room = roomRepository.findById(serviceReq.getRoomId())
+                        .orElseThrow(() -> new AppException(ErrorCode.ROOM_NOT_FOUND));
+                
                 ServiceBooking serviceBooking = ServiceBooking.builder()
                         .booking(savedBooking)
                         .service(service)
                         .customer(booking.getCustomer())
+                        .room(room)
                         .serviceDateTime(serviceDateTime)
                         .quantity(serviceReq.getQuantity())
                         .pricePerUnit(pricePerUnit)

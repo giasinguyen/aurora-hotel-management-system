@@ -23,6 +23,9 @@ public class ServiceBookingCreationRequest {
     @NotBlank(message = "CUSTOMER_ID_REQUIRED")
     String customerId;
     
+    @NotBlank(message = "ROOM_ID_REQUIRED")
+    String roomId; // Room that this service is for - REQUIRED for booking services
+    
     @NotNull(message = "DATETIME_REQUIRED")
     LocalDateTime dateTime;
     

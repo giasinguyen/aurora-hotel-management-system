@@ -13,16 +13,22 @@ public interface ServiceBookingMapper {
     @Mapping(target = "booking.id", source = "bookingId")
     @Mapping(target = "service.id", source = "serviceId")
     @Mapping(target = "customer.id", source = "customerId")
+    @Mapping(target = "room.id", source = "roomId")
     @Mapping(target = "id", ignore = true)
     ServiceBooking toServiceBooking(ServiceBookingCreationRequest request);
     
-    @Mapping(target = "bookingId", source = "booking.id")
-    @Mapping(target = "bookingCode", source = "booking.bookingCode")
+    @Mapping(target = "bookingId", expression = "java(serviceBooking.getBooking() != null ? serviceBooking.getBooking().getId() : null)")
+    @Mapping(target = "bookingCode", expression = "java(serviceBooking.getBooking() != null ? serviceBooking.getBooking().getBookingCode() : null)")
     @Mapping(target = "serviceId", source = "service.id")
     @Mapping(target = "serviceName", source = "service.name")
-    @Mapping(target = "serviceType", source = "service.category.name")
+    @Mapping(target = "serviceType", expression = "java(serviceBooking.getService().getCategory() != null ? serviceBooking.getService().getCategory().getName() : null)")
     @Mapping(target = "customerId", source = "customer.id")
     @Mapping(target = "customerName", expression = "java(serviceBooking.getCustomer().getFirstName() + \" \" + serviceBooking.getCustomer().getLastName())")
+    @Mapping(target = "roomId", expression = "java(serviceBooking.getRoom() != null ? serviceBooking.getRoom().getId() : null)")
+    @Mapping(target = "roomNumber", expression = "java(serviceBooking.getRoom() != null ? serviceBooking.getRoom().getRoomNumber() : null)")
+    @Mapping(target = "dateTime", source = "serviceDateTime")
+    @Mapping(target = "price", expression = "java(serviceBooking.getPricePerUnit() != null ? serviceBooking.getPricePerUnit().doubleValue() : 0.0)")
+    @Mapping(target = "status", expression = "java(serviceBooking.getStatus() != null ? serviceBooking.getStatus().name() : null)")
     ServiceBookingResponse toServiceBookingResponse(ServiceBooking serviceBooking);
     
     @Mapping(target = "id", ignore = true)

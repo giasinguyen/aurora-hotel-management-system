@@ -11,10 +11,19 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 @Repository
 public interface ServiceBookingRepository extends JpaRepository<ServiceBooking, String> {
     
     Page<ServiceBooking> findByBooking(Booking booking, Pageable pageable);
+    
+    @Query("SELECT DISTINCT sb FROM ServiceBooking sb " +
+           "LEFT JOIN FETCH sb.room r " +
+           "LEFT JOIN FETCH sb.service s " +
+           "LEFT JOIN FETCH sb.customer c " +
+           "WHERE sb.booking = :booking")
+    List<ServiceBooking> findByBookingWithRoom(@Param("booking") Booking booking);
     
     Page<ServiceBooking> findByService(Service service, Pageable pageable);
     

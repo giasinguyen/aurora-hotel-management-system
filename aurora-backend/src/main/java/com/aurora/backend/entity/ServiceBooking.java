@@ -19,6 +19,7 @@ import java.time.LocalDateTime;
         @Index(name = "idx_service_booking_booking", columnList = "booking_id"),
         @Index(name = "idx_service_booking_service", columnList = "service_id"),
         @Index(name = "idx_service_booking_customer", columnList = "customer_id"),
+        @Index(name = "idx_service_booking_room", columnList = "room_id"),
         @Index(name = "idx_service_booking_status", columnList = "status"),
         @Index(name = "idx_service_booking_datetime", columnList = "serviceDateTime")
 })
@@ -35,6 +36,10 @@ public class ServiceBooking extends BaseEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "customer_id", nullable = false)
     User customer;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "room_id", nullable = false)
+    Room room; // Room that this service is for - REQUIRED for booking services
 
     @Column(nullable = false)
     LocalDateTime serviceDateTime; // Thời gian sử dụng dịch vụ

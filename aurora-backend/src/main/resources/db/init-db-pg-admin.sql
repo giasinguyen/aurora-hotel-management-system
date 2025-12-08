@@ -1268,20 +1268,45 @@ ON CONFLICT DO NOTHING;
 
 -- ============================================================================
 -- 13. SERVICE BOOKINGS (Đặt dịch vụ)
--- Tạo 2 service bookings cho HCM
+-- Tạo service bookings cho HCM - MỚI: Thêm room_id (REQUIRED)
+-- LƯU Ý: room_id là bắt buộc, phải thuộc về một phòng trong booking
 -- ============================================================================
+-- Add room_id column if not exists (should already exist from entity)
+DO $$ 
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'service_bookings' AND column_name = 'room_id') THEN
+        ALTER TABLE service_bookings ADD COLUMN room_id VARCHAR(255);
+        ALTER TABLE service_bookings ADD CONSTRAINT fk_service_booking_room FOREIGN KEY (room_id) REFERENCES rooms(id);
+    END IF;
+    -- Make room_id NOT NULL if it's nullable (update existing data first)
+    IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'service_bookings' AND column_name = 'room_id' AND is_nullable = 'YES') THEN
+        -- Update existing service bookings to assign room from booking_rooms
+        UPDATE service_bookings sb
+        SET room_id = (
+            SELECT br.room_id 
+            FROM booking_rooms br 
+            WHERE br.booking_id = sb.booking_id 
+            LIMIT 1
+        )
+        WHERE sb.room_id IS NULL AND sb.booking_id IS NOT NULL;
+        -- Then make it NOT NULL
+        ALTER TABLE service_bookings ALTER COLUMN room_id SET NOT NULL;
+    END IF;
+END $$;
+
 INSERT INTO service_bookings (
-    id, booking_id, service_id, customer_id,
+    id, booking_id, service_id, customer_id, room_id,
     service_date_time, quantity, price_per_unit, total_price,
     status, special_instructions,
     created_at, updated_at, version, deleted
 ) VALUES 
--- Service booking 1: Airport transfer (4 seater) cho booking HCM 1
+-- Service booking 1: Airport transfer (4 seater) cho booking HCM 1 - thuộc room 502
 (
     'servicebooking-hcm-001',
     'booking-hcm-001',
     'service-hcm-airport-4seat-001',
     (SELECT id FROM users WHERE username = 'customer' LIMIT 1),
+    'room-hcm-502', -- Room từ booking_rooms của booking này
     (CURRENT_DATE + INTERVAL '5 days')::timestamp + TIME '14:00:00',
     1,
     400000.00,
@@ -1290,12 +1315,13 @@ INSERT INTO service_bookings (
     'Pickup at Tan Son Nhat airport - 4 seater car',
     NOW(), NOW(), 0, false
 ),
--- Service booking 2: Massage cho booking HCM 1
+-- Service booking 2: Massage cho booking HCM 1 - thuộc room 502
 (
     'servicebooking-hcm-002',
     'booking-hcm-001',
     'service-hcm-massage-001',
     (SELECT id FROM users WHERE username = 'customer' LIMIT 1),
+    'room-hcm-502', -- Room từ booking_rooms của booking này
     (CURRENT_DATE + INTERVAL '6 days')::timestamp + TIME '15:00:00',
     2,
     600000.00,

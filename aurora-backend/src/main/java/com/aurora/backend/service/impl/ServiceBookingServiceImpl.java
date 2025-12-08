@@ -14,6 +14,8 @@ import com.aurora.backend.repository.BookingRepository;
 import com.aurora.backend.repository.ServiceBookingRepository;
 import com.aurora.backend.repository.ServiceRepository;
 import com.aurora.backend.repository.UserRepository;
+import com.aurora.backend.repository.RoomRepository;
+import com.aurora.backend.entity.Room;
 import com.aurora.backend.service.ServiceBookingService;
 import lombok.AccessLevel;
 import lombok.RequiredArgsConstructor;
@@ -35,6 +37,7 @@ public class ServiceBookingServiceImpl implements ServiceBookingService {
     BookingRepository bookingRepository;
     ServiceRepository serviceRepository;
     UserRepository userRepository;
+    RoomRepository roomRepository;
     ServiceBookingMapper serviceBookingMapper;
 
     @Override
@@ -55,10 +58,15 @@ public class ServiceBookingServiceImpl implements ServiceBookingService {
             throw new AppException(ErrorCode.SERVICE_BOOKING_EXISTED);
         }
         
+        // Load and set room - REQUIRED for booking services
+        Room room = roomRepository.findById(request.getRoomId())
+                .orElseThrow(() -> new AppException(ErrorCode.ROOM_NOT_FOUND));
+        
         ServiceBooking serviceBooking = serviceBookingMapper.toServiceBooking(request);
         serviceBooking.setBooking(booking);
         serviceBooking.setService(service);
         serviceBooking.setCustomer(customer);
+        serviceBooking.setRoom(room); // Set room - REQUIRED
         
         if (request.getStatus() == null || request.getStatus().trim().isEmpty()) {
             serviceBooking.setStatus(ServiceBooking.ServiceBookingStatus.PENDING);
