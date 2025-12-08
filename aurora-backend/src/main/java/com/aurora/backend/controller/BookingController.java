@@ -86,6 +86,24 @@ public class BookingController {
                 .build();
     }
 
+    @GetMapping("/my-bookings")
+    @RequirePermission(PermissionConstants.Customer.BOOKING_VIEW_OWN)
+    public ApiResponse<Page<BookingResponse>> getMyBookings(
+            @RequestParam String customerId,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "checkin") String sortBy,
+            @RequestParam(defaultValue = "desc") String sortDir) {
+        Sort.Direction direction = sortDir.equalsIgnoreCase("desc") ? Sort.Direction.DESC : Sort.Direction.ASC;
+        Pageable pageable = PageRequest.of(page, size, Sort.by(direction, sortBy));
+        Page<BookingResponse> response = bookingService.getBookingsByCustomer(customerId, pageable);
+        return ApiResponse.<Page<BookingResponse>>builder()
+                .code(HttpStatus.OK.value())
+                .message("Customer bookings retrieved successfully")
+                .result(response)
+                .build();
+    }
+
     @GetMapping
     @RequirePermission(PermissionConstants.Staff.BOOKING_VIEW_ALL)
     public ApiResponse<Page<BookingResponse>> getAllBookings(
