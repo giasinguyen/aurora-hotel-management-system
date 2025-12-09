@@ -49,9 +49,13 @@ const BranchUpsertPage = () => {
       setIsLoading(true);
       
       if (isEditMode && branchId) {
-        await branchApi.update(branchId, data as BranchUpdateRequest);
+        // Log data being sent for debugging
+        console.log('Updating branch with data:', data);
+        const response = await branchApi.update(branchId, data as BranchUpdateRequest);
+        console.log('Update response:', response);
         toast.success('Cập nhật chi nhánh thành công');
       } else {
+        console.log('Creating branch with data:', data);
         await branchApi.create(data as BranchCreationRequest);
         toast.success('Tạo chi nhánh thành công');
       }
@@ -59,7 +63,23 @@ const BranchUpsertPage = () => {
       navigate('/admin/branches');
     } catch (error) {
       console.error('Failed to save branch:', error);
-      const errorMessage = (error as { response?: { data?: { message?: string } } })?.response?.data?.message || 'Không thể lưu chi nhánh';
+      const errorResponse = error as { response?: { data?: { message?: string; errors?: any } } };
+      let errorMessage = 'Không thể lưu chi nhánh';
+      
+      if (errorResponse.response?.data) {
+        if (errorResponse.response.data.message) {
+          errorMessage = errorResponse.response.data.message;
+        } else if (errorResponse.response.data.errors) {
+          // Handle validation errors
+          const errors = errorResponse.response.data.errors;
+          const errorList = Object.entries(errors).map(([field, messages]) => {
+            const msgArray = Array.isArray(messages) ? messages : [messages];
+            return `${field}: ${msgArray.join(', ')}`;
+          }).join('\n');
+          errorMessage = `Lỗi validation:\n${errorList}`;
+        }
+      }
+      
       toast.error(errorMessage);
     } finally {
       setIsLoading(false);
@@ -91,7 +111,7 @@ const BranchUpsertPage = () => {
           branch={branch}
           onEdit={() => navigate(`/admin/branches/upsert?id=${branchId}`)}
           onBack={() => navigate('/admin/branches')}
-          onAssignManager={() => navigate(`/admin/users/${branch.managerId}/assign-branch`)}
+          onAssignManager={() => navigate(`/admin/branches/${branch.id}/assign-manager`)}
         />
       </div>
     );
@@ -106,7 +126,7 @@ const BranchUpsertPage = () => {
           <ArrowLeft className="h-5 w-5" />
         </Button>
         <div className="flex items-center gap-3">
-          <div className="p-2 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-lg text-white">
+          <div className="p-2 bg-primary rounded-lg text-white">
             <Building2 className="h-6 w-6" />
           </div>
           <div>

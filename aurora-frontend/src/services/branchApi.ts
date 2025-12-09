@@ -138,6 +138,14 @@ export const branchApi = {
     );
     return response.data;
   },
+
+  // Remove manager from branch
+  removeManager: async (branchId: string) => {
+    const response = await axiosClient.delete<ApiResponse<Branch>>(
+      `${BRANCH_BASE_URL}/${branchId}/manager`
+    );
+    return response.data;
+  },
 };
 
 export default branchApi;

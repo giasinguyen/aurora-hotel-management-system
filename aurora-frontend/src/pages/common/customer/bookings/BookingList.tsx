@@ -184,10 +184,10 @@ const CustomerBookingListPage = () => {
                         </div>
                         
                         <div className="flex flex-col gap-2 items-end">
-                          <Badge variant={statusConfig.variant} className="text-sm">
+                          <Badge variant={statusConfig.variant} className={`text-sm ${statusConfig.className || ''}`}>
                             {statusConfig.label}
                           </Badge>
-                          <Badge variant={paymentConfig.variant} className="text-sm">
+                          <Badge variant={paymentConfig.variant} className={`text-sm ${paymentConfig.className || ''}`}>
                             {paymentConfig.label}
                           </Badge>
                         </div>

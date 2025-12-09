@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
+import { toast } from 'sonner';
 import { Building2, MapPin, Phone, Mail, Clock, CalendarDays, FileText, Loader2, Save, X } from 'lucide-react';
 
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -48,7 +49,6 @@ const STATUS_OPTIONS: { value: BranchStatus; label: string; description: string 
   { value: 'ACTIVE', label: 'Hoạt động', description: 'Chi nhánh đang hoạt động bình thường' },
   { value: 'INACTIVE', label: 'Tạm ngừng', description: 'Chi nhánh tạm thời ngừng hoạt động' },
   { value: 'MAINTENANCE', label: 'Bảo trì', description: 'Chi nhánh đang trong quá trình bảo trì' },
-  { value: 'CLOSED', label: 'Đã đóng cửa', description: 'Chi nhánh đã đóng cửa vĩnh viễn' },
 ];
 
 interface FormData {
@@ -72,6 +72,20 @@ export default function BranchForm({ branch, onSubmit, onCancel, isLoading = fal
   const isEditMode = !!branch;
   const [selectedCity, setSelectedCity] = useState<string>(branch?.city || '');
   const [selectedStatus, setSelectedStatus] = useState<BranchStatus>(branch?.status || 'ACTIVE');
+
+  // Update selectedStatus when branch changes
+  useEffect(() => {
+    if (branch?.status) {
+      setSelectedStatus(branch.status);
+    }
+  }, [branch?.status]);
+
+  // Update selectedCity when branch changes
+  useEffect(() => {
+    if (branch?.city) {
+      setSelectedCity(branch.city);
+    }
+  }, [branch?.city]);
 
   const {
     register,
@@ -107,14 +121,41 @@ export default function BranchForm({ branch, onSubmit, onCancel, isLoading = fal
   };
 
   const handleFormSubmit = async (data: FormData) => {
+    // Validate required fields
+    if (!selectedCity) {
+      toast.error('Vui lòng chọn thành phố');
+      return;
+    }
+
     const formData = {
       ...data,
       city: selectedCity,
       status: isEditMode ? selectedStatus : undefined,
     };
 
+    // Clean up empty strings to undefined for optional fields
+    // But keep status and required fields
+    const cleanData = (obj: any, keepFields: string[] = []) => {
+      const cleaned: any = {};
+      Object.keys(obj).forEach(key => {
+        const value = obj[key];
+        // Always keep fields in keepFields list (like status) even if they might be falsy
+        if (keepFields.includes(key)) {
+          // For status, always include it if it has a value
+          if (value !== null && value !== undefined && value !== '') {
+            cleaned[key] = value;
+          }
+        } else if (value !== '' && value !== null && value !== undefined) {
+          cleaned[key] = value;
+        }
+      });
+      return cleaned;
+    };
+
     if (isEditMode) {
-      await onSubmit({
+      // Ensure status is always included in edit mode
+      // Build update data object with all fields
+      const updateDataObj: any = {
         name: formData.name,
         address: formData.address,
         ward: formData.ward,
@@ -122,14 +163,33 @@ export default function BranchForm({ branch, onSubmit, onCancel, isLoading = fal
         city: formData.city,
         phone: formData.phone,
         email: formData.email,
-        status: formData.status,
-        checkInTime: formData.checkInTime,
-        checkOutTime: formData.checkOutTime,
-        operatingHours: formData.operatingHours,
-        description: formData.description,
-      } as BranchUpdateRequest);
+        status: selectedStatus, // Use selectedStatus directly, always include
+        checkInTime: formData.checkInTime || '14:00',
+        checkOutTime: formData.checkOutTime || '12:00',
+      };
+
+      // Add optional fields only if they have values
+      if (formData.operatingHours) {
+        updateDataObj.operatingHours = formData.operatingHours;
+      }
+      if (formData.description) {
+        updateDataObj.description = formData.description;
+      }
+
+      const updateData = cleanData(updateDataObj, ['status']); // Always keep status field
+      
+      console.log('Submitting update data:', updateData);
+      console.log('Selected status:', selectedStatus);
+      console.log('Form data status:', formData.status);
+      
+      // Ensure status is always present
+      if (!updateData.status && selectedStatus) {
+        updateData.status = selectedStatus;
+      }
+      
+      await onSubmit(updateData as BranchUpdateRequest);
     } else {
-      await onSubmit({
+      const createData = cleanData({
         name: formData.name,
         code: formData.code,
         address: formData.address,
@@ -143,7 +203,10 @@ export default function BranchForm({ branch, onSubmit, onCancel, isLoading = fal
         checkOutTime: formData.checkOutTime,
         operatingHours: formData.operatingHours,
         description: formData.description,
-      } as BranchCreationRequest);
+      });
+      
+      console.log('Submitting create data:', createData);
+      await onSubmit(createData as BranchCreationRequest);
     }
   };
 
@@ -151,14 +214,14 @@ export default function BranchForm({ branch, onSubmit, onCancel, isLoading = fal
     <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-6">
       {/* Basic Information Section */}
       <Card className="overflow-hidden border-0 shadow-lg">
-        <CardHeader className="bg-gradient-to-r from-blue-600 via-blue-500 to-cyan-500 text-white">
+        <CardHeader className="bg-primary text-white">
           <div className="flex items-center gap-3">
             <div className="p-2 bg-white/20 rounded-lg backdrop-blur-sm">
               <Building2 className="h-6 w-6" />
             </div>
             <div>
               <CardTitle className="text-xl">Thông tin cơ bản</CardTitle>
-              <CardDescription className="text-blue-100">
+              <CardDescription className="text-white/80">
                 Nhập thông tin chính của chi nhánh
               </CardDescription>
             </div>
@@ -169,7 +232,7 @@ export default function BranchForm({ branch, onSubmit, onCancel, isLoading = fal
             {/* Branch Name */}
             <div className="space-y-2">
               <Label htmlFor="name" className="text-sm font-medium flex items-center gap-2">
-                <Building2 className="h-4 w-4 text-blue-500" />
+                <Building2 className="h-4 w-4 text-primary" />
                 Tên chi nhánh <span className="text-destructive">*</span>
               </Label>
               <Input
@@ -191,7 +254,7 @@ export default function BranchForm({ branch, onSubmit, onCancel, isLoading = fal
             {/* Branch Code */}
             <div className="space-y-2">
               <Label htmlFor="code" className="text-sm font-medium flex items-center gap-2">
-                <FileText className="h-4 w-4 text-blue-500" />
+                <FileText className="h-4 w-4 text-primary" />
                 Mã chi nhánh <span className="text-destructive">*</span>
               </Label>
               <Input
@@ -230,7 +293,7 @@ export default function BranchForm({ branch, onSubmit, onCancel, isLoading = fal
                           ? 'border-yellow-500 bg-yellow-50'
                           : option.value === 'MAINTENANCE'
                           ? 'border-blue-500 bg-blue-50'
-                          : 'border-red-500 bg-red-50'
+                          : 'border-gray-200 bg-gray-50'
                         : 'border-gray-200 hover:border-gray-300'
                       }
                     `}
@@ -243,7 +306,6 @@ export default function BranchForm({ branch, onSubmit, onCancel, isLoading = fal
                         ${option.value === 'ACTIVE' ? 'bg-green-500' : ''}
                         ${option.value === 'INACTIVE' ? 'bg-yellow-500' : ''}
                         ${option.value === 'MAINTENANCE' ? 'bg-blue-500' : ''}
-                        ${option.value === 'CLOSED' ? 'bg-red-500' : ''}
                       `} />
                     )}
                   </div>
@@ -519,8 +581,8 @@ export default function BranchForm({ branch, onSubmit, onCancel, isLoading = fal
         </Button>
         <Button
           type="submit"
-          disabled={isLoading || (!isDirty && isEditMode)}
-          className="gap-2 bg-gradient-to-r from-blue-600 to-cyan-600 hover:from-blue-700 hover:to-cyan-700"
+          disabled={isLoading}
+          className="gap-2 bg-primary hover:bg-primary/90"
         >
           {isLoading ? (
             <>

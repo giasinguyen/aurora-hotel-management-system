@@ -218,10 +218,10 @@ const BookingDetailPage = () => {
                     </p>
                   </div>
                   <div className="flex gap-3">
-                    <Badge variant={statusConfig.variant} className="text-base px-4 py-2">
+                    <Badge variant={statusConfig.variant} className={`text-base px-4 py-2 ${statusConfig.className || ''}`}>
                       {statusConfig.label}
                     </Badge>
-                    <Badge variant={paymentConfig.variant} className="text-base px-4 py-2">
+                    <Badge variant={paymentConfig.variant} className={`text-base px-4 py-2 ${paymentConfig.className || ''}`}>
                       {paymentConfig.label}
                     </Badge>
                   </div>

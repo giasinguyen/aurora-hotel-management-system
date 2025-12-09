@@ -80,6 +80,9 @@ public class SecurityConfig {
             "/api/v1/news/public/**",
             "/api/v1/payments/vnpay/return",
 
+            // Gallery endpoint - PUBLIC for guest gallery viewing
+            "/api/v1/gallery/**",
+
             // Cloudinary test endpoint
             "/api/v1/cloudinary/test",
 

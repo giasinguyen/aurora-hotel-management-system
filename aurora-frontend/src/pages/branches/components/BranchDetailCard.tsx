@@ -58,13 +58,6 @@ const STATUS_CONFIG: Record<BranchStatus, {
     textColor: 'text-blue-700',
     icon: Wrench
   },
-  CLOSED: { 
-    label: 'Đã đóng cửa', 
-    variant: 'destructive', 
-    bgColor: 'bg-red-100',
-    textColor: 'text-red-700',
-    icon: Ban
-  },
 };
 
 export default function BranchDetailCard({ branch, onEdit, onBack, onAssignManager }: BranchDetailCardProps) {
@@ -101,7 +94,7 @@ export default function BranchDetailCard({ branch, onEdit, onBack, onAssignManag
             </Button>
           )}
           {onEdit && (
-            <Button onClick={onEdit} className="gap-2 bg-gradient-to-r from-blue-600 to-cyan-600">
+            <Button onClick={onEdit} className="gap-2 bg-primary hover:bg-primary/90">
               <Edit className="h-4 w-4" />
               Chỉnh sửa
             </Button>
@@ -111,7 +104,7 @@ export default function BranchDetailCard({ branch, onEdit, onBack, onAssignManag
 
       {/* Main Info Card */}
       <Card className="overflow-hidden border-0 shadow-lg">
-        <CardHeader className="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white p-8">
+        <CardHeader className="bg-primary text-white p-8">
           <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
             <div className="flex items-start gap-4">
               <div className="p-4 bg-white/20 rounded-xl backdrop-blur-sm">
@@ -119,11 +112,11 @@ export default function BranchDetailCard({ branch, onEdit, onBack, onAssignManag
               </div>
               <div>
                 <CardTitle className="text-3xl font-bold">{branch.name}</CardTitle>
-                <CardDescription className="text-blue-100 mt-2 font-mono text-lg">
+                <CardDescription className="text-white/80 mt-2 font-mono text-lg">
                   {branch.code}
                 </CardDescription>
                 {branch.description && (
-                  <p className="text-blue-100 mt-3 max-w-xl">{branch.description}</p>
+                  <p className="text-white/80 mt-3 max-w-xl">{branch.description}</p>
                 )}
               </div>
             </div>
