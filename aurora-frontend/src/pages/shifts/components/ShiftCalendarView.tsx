@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { CalendarHeader } from './CalendarHeader';
 import { CalendarWeekHeader } from './CalendarWeekHeader';
 import { CalendarDay } from './CalendarDay';
-import type { StaffShiftAssignment } from '@/types/shift.types';
+import type { StaffShiftAssignment, WorkShift } from '@/types/shift.types';
 import { Card, CardContent } from '@/components/ui/card';
 import {
   Dialog,
@@ -75,7 +75,7 @@ export function ShiftCalendarView({ assignments, onRefresh }: ShiftCalendarViewP
       })
       .map(assignment => {
         // Map flat fields to workShift object if needed
-        const workShift = assignment.workShift || {
+        const workShift: WorkShift = assignment.workShift || {
           id: assignment.workShiftId,
           name: assignment.workShiftName,
           startTime: assignment.startTime,
@@ -84,6 +84,7 @@ export function ShiftCalendarView({ assignments, onRefresh }: ShiftCalendarViewP
           description: '',
           active: true,
           branchId: assignment.branchId,
+          durationHours: 8,
           createdAt: assignment.createdAt,
           updatedAt: assignment.updatedAt,
         };
@@ -259,7 +260,7 @@ export function ShiftCalendarView({ assignments, onRefresh }: ShiftCalendarViewP
                           <div className="flex-1">
                             <h3 className="font-semibold text-lg">{event.title}</h3>
                             <p className="text-sm text-gray-500">
-                              {event.assignment.workShift.description || 'Không có mô tả'}
+                              {event.assignment.workShift?.description || 'Không có mô tả'}
                             </p>
                           </div>
                           <div className="flex items-center gap-2">
@@ -282,10 +283,10 @@ export function ShiftCalendarView({ assignments, onRefresh }: ShiftCalendarViewP
                           <div className="flex items-center gap-2">
                             <Clock className="h-4 w-4 text-gray-500" />
                             <span>
-                              {event.assignment.workShift.startTime} - {event.assignment.workShift.endTime}
+                              {event.assignment.workShift?.startTime} - {event.assignment.workShift?.endTime}
                             </span>
                             <span className="text-gray-500">
-                              ({event.assignment.workShift.durationHours}h)
+                              ({event.assignment.workShift?.durationHours}h)
                             </span>
                           </div>
 

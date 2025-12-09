@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
-import { MoreHorizontal, Trash2, Edit, Plus, Check, X } from 'lucide-react';
+import { MoreHorizontal, Trash2, Edit, Check, X } from 'lucide-react';
 import fallbackImage from '@/assets/images/commons/fallback.png';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';

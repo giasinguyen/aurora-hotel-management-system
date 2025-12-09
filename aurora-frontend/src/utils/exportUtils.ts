@@ -8,7 +8,6 @@
  * Uses jsPDF with Vietnamese font support, html2canvas, exceljs, and file-saver
  */
 
-import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import ExcelJS from 'exceljs';
 import { saveAs } from 'file-saver';
@@ -142,14 +141,6 @@ const captureChart = async (element: HTMLElement): Promise<string> => {
     console.error('Failed to capture chart:', error);
     return '';
   }
-};
-
-/**
- * Capture multiple chart elements
- */
-const captureCharts = async (chartRefs: HTMLElement[]): Promise<string[]> => {
-  const promises = chartRefs.map(ref => captureChart(ref));
-  return Promise.all(promises);
 };
 
 //=== Logo==//
@@ -1104,7 +1095,6 @@ export const exportShiftReport = async (
   const totalCheckIns = shifts.reduce((sum, s) => sum + s.checkIns, 0);
   const totalCheckOuts = shifts.reduce((sum, s) => sum + s.checkOuts, 0);
   const totalBookings = shifts.reduce((sum, s) => sum + s.bookings, 0);
-  const totalRevenue = shifts.reduce((sum, s) => sum + s.revenue, 0);
 
   // Create shift summary by type
   const shiftSummary = Object.values(

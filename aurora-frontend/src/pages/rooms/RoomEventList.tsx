@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { Eye, MoreHorizontal, Edit, Trash2, Calendar, TrendingUp } from 'lucide-react';
@@ -13,7 +13,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Badge } from '@/components/ui/badge';
 
 import {
   PageHeader,
@@ -88,12 +87,11 @@ export default function RoomEventList() {
   // State
   const [events, setEvents] = useState<Event[]>(mockEvents);
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
 
   // Pagination
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(10);
-  const [totalElements, setTotalElements] = useState(mockEvents.length);
+  const [totalElements] = useState(mockEvents.length);
 
   // Search & Filter
   const [searchQuery, setSearchQuery] = useState('');
@@ -224,7 +222,7 @@ export default function RoomEventList() {
       setEvents(events.filter((e) => e.id !== eventToDelete.id));
       setDeleteDialogOpen(false);
       setEventToDelete(null);
-    } catch (error) {
+    } catch {
       toast.error('Không thể xóa sự kiện');
     }
   };
@@ -240,26 +238,15 @@ export default function RoomEventList() {
         isLoading={isLoading}
       />
 
-      {/* Error Message */}
-      {error && (
-        <Card>
-          <CardContent className="pt-6">
-            <div className="text-center text-red-600">
-              <p>{error}</p>
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
       {/* Filters */}
       <Card>
         <CardContent className="pt-6">
           <div className="flex flex-col sm:flex-row gap-4">
             <div className="flex-1">
               <SearchFilter
-                value={searchQuery}
-                onChange={setSearchQuery}
-                placeholder="Tìm kiếm sự kiện..."
+                searchValue={searchQuery}
+                onSearchChange={setSearchQuery}
+                searchPlaceholder="Tìm kiếm sự kiện..."
               />
             </div>
             <div className="w-full sm:w-48">
@@ -293,6 +280,7 @@ export default function RoomEventList() {
         currentPage={currentPage}
         pageSize={pageSize}
         totalElements={totalElements}
+        totalPages={Math.ceil(totalElements / pageSize)}
         onPageChange={setCurrentPage}
         onPageSizeChange={setPageSize}
       />

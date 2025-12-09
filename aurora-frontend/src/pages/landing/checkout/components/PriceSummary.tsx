@@ -1,4 +1,4 @@
-import { Calendar, Users } from "lucide-react";
+import { Calendar } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { formatCurrency } from "@/utils/exportUtils";
@@ -39,7 +39,7 @@ export default function PriceSummary({ checkoutData }: PriceSummaryProps) {
     });
   };
 
-  const formatTime = (dateString: string, isCheckOut: boolean = false) => {
+  const formatTime = (_dateString: string, isCheckOut: boolean = false) => {
     return isCheckOut ? "12:00" : "15:00";
   };
 

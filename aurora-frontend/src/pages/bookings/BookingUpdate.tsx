@@ -3,20 +3,16 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import {
   ArrowLeft,
-  Calendar,
   BedDouble,
   Sparkles,
   DollarSign,
   Save,
   X,
-  Plus,
   Trash2,
-  RefreshCw,
 } from 'lucide-react';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 import { Separator } from '@/components/ui/separator';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -65,6 +61,7 @@ interface ServiceChange {
   quantity?: number;
   price?: number;
   dateTime?: string;
+  status?: string;
 }
 
 const BookingUpdatePage = () => {
@@ -273,7 +270,7 @@ const BookingUpdatePage = () => {
     if (!service) return;
 
     // Validate service price
-    const servicePrice = service.basePrice && service.basePrice > 0 ? service.basePrice : service.priceFinal && service.priceFinal > 0 ? service.priceFinal : null;
+    const servicePrice = service.basePrice && service.basePrice > 0 ? service.basePrice : null;
     if (!servicePrice) {
       toast.error('Không thể thêm dịch vụ: Giá dịch vụ không hợp lệ');
       return;
@@ -801,7 +798,7 @@ const BookingUpdatePage = () => {
                       </SelectContent>
                     </Select>
                     {bookingRooms.length > 1 && (
-                      <Select onValueChange={(roomId) => {
+                      <Select onValueChange={(_roomId) => {
                         // This will be used when adding service
                       }}>
                         <SelectTrigger>

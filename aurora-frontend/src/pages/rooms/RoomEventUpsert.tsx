@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { toast } from 'sonner';
-import { Calendar, Plus, Trash2, Save, X } from 'lucide-react';
+import { Plus, Trash2, Save, X } from 'lucide-react';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -18,7 +18,6 @@ import {
 
 import type {
   Event,
-  EventStatus,
   PriceAdjustment,
   PriceAdjustmentType,
   PriceAdjustmentTarget,

@@ -9,7 +9,7 @@ import {
   checkIsCheckedIn,
   checkHasActiveShift,
 } from '@/features/slices/shiftSlice';
-import { staffShiftApi, shiftCheckInApi } from '@/services/shiftApi';
+import { staffShiftApi } from '@/services/shiftApi';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -22,16 +22,9 @@ import {
   Timer,
   LogIn,
   LogOut,
-  History,
-  TrendingUp,
-  CheckCircle2,
-  XCircle,
-  CalendarDays,
 } from 'lucide-react';
-import { format, differenceInMinutes, startOfMonth, endOfMonth, eachDayOfInterval, isSameDay, parseISO } from 'date-fns';
+import { format, differenceInMinutes } from 'date-fns';
 import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Progress } from '@/components/ui/progress';
 
 const StaffCheckIn = () => {
   const dispatch = useAppDispatch();
@@ -43,10 +36,6 @@ const StaffCheckIn = () => {
   const [currentTime, setCurrentTime] = useState(new Date());
   const [location, setLocation] = useState<string>('');
   const [upcomingShifts, setUpcomingShifts] = useState<any[]>([]);
-  const [shiftHistory, setShiftHistory] = useState<any[]>([]);
-  const [monthlyStats, setMonthlyStats] = useState<any>(null);
-  const [selectedMonth, setSelectedMonth] = useState(new Date());
-  const [calendarShifts, setCalendarShifts] = useState<any[]>([]);
 
   // Update current time every second
   useEffect(() => {

@@ -8,7 +8,7 @@ import {
   checkIsCheckedIn,
   checkHasActiveShift,
 } from '@/features/slices/shiftSlice';
-import { staffShiftApi, shiftCheckInApi } from '@/services/shiftApi';
+import { staffShiftApi } from '@/services/shiftApi';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -24,7 +24,6 @@ import {
   History,
   TrendingUp,
   CheckCircle2,
-  XCircle,
   CalendarDays,
   ChevronLeft,
   ChevronRight,
@@ -78,7 +77,7 @@ const StaffShiftDashboard = () => {
         (position) => {
           setLocation(`${position.coords.latitude.toFixed(4)}, ${position.coords.longitude.toFixed(4)}`);
         },
-        (error) => {
+        (_error) => {
           // Silently handle GPS errors - it's optional
           setLocation('Không có GPS');
         },

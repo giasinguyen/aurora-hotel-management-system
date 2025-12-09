@@ -233,9 +233,6 @@ export default function RoomTypeForm({
     } finally {
       setIsUploadingImage(false);
     }
-    if (errors[field as keyof FormErrors]) {
-      setErrors(prev => ({ ...prev, [field]: undefined }));
-    }
   };
 
   const validateForm = (): boolean => {
@@ -286,7 +283,6 @@ export default function RoomTypeForm({
 
     if (isEditMode) {
       const updateData: RoomTypeUpdateRequest = {
-        categoryId: formState.categoryId,
         name: formState.name,
         code: formState.code,
         priceFrom: formState.priceFrom,
@@ -303,7 +299,6 @@ export default function RoomTypeForm({
     } else {
       const createData: RoomTypeCreationRequest = {
         branchId: formState.branchId,
-        categoryId: formState.categoryId,
         name: formState.name,
         code: formState.code,
         priceFrom: formState.priceFrom,

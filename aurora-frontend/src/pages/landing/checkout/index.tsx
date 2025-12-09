@@ -12,7 +12,6 @@ import PaymentStep from "./steps/PaymentStep";
 import { BookingSummary } from "@/components/booking";
 import type { BookingRoom } from "./types";
 import type { Promotion } from "@/types/promotion.types";
-import type { Promotion } from "@/types/promotion.types";
 
 export type CheckoutStep = 1 | 2 | 3 | 4;
 

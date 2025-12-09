@@ -46,7 +46,7 @@ export function AssignmentListView({ assignments, selectedDate, onRefresh }: Ass
     .filter(assignment => assignment.workShift || (assignment.workShiftId && assignment.startTime))
     .reduce((acc, assignment) => {
       // Map flat fields to workShift object if needed
-      const workShift = assignment.workShift || {
+      const workShift: WorkShift = {
         id: assignment.workShiftId,
         name: assignment.workShiftName,
         startTime: assignment.startTime,
@@ -55,6 +55,7 @@ export function AssignmentListView({ assignments, selectedDate, onRefresh }: Ass
         description: '',
         active: true,
         branchId: assignment.branchId,
+        durationHours: 8,
         createdAt: assignment.createdAt,
         updatedAt: assignment.updatedAt,
       };

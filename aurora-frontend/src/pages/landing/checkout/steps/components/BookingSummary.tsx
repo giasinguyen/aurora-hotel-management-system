@@ -1,11 +1,10 @@
 import { Calendar, Users, X, Trash2 } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
 import { formatCurrency } from "@/utils/exportUtils";
 import fallbackImage from "@/assets/images/commons/fallback.png";
 import type { CheckoutData } from "../../index";
-import type { BookingRoom } from "../../../types";
+import type { BookingRoom } from "../../types";
 
 interface BookingSummaryProps {
   checkoutData: CheckoutData;

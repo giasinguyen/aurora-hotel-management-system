@@ -3,9 +3,9 @@
 // ============================================
 
 import { useEffect, useState } from 'react';
-import { Loader2, Building2, DoorOpen, Users, Maximize, Layers, DollarSign, Eye, Percent, Image as ImageIcon, Plus, X, Upload } from 'lucide-react';
+import { Loader2, Building2, DoorOpen, Layers, DollarSign, Eye, Percent, Image as ImageIcon, X, Upload } from 'lucide-react';
 import fallbackImage from '@/assets/images/commons/fallback.png';
-import { uploadToCloudinary, uploadMultipleToCloudinary } from '@/config/cloudinary';
+import { uploadMultipleToCloudinary } from '@/config/cloudinary';
 import { toast } from 'sonner';
 
 import { Button } from '@/components/ui/button';
@@ -95,7 +95,6 @@ export default function RoomForm({
     images: room?.images || [],
   });
   
-  const [newImageUrl, setNewImageUrl] = useState('');
   const [isUploadingImage, setIsUploadingImage] = useState(false);
 
   // ========== Effects ==========
@@ -114,7 +113,6 @@ export default function RoomForm({
         salePercent: room.salePercent || 0,
         images: room.images || [],
       });
-      setNewImageUrl('');
       setErrors({});
     }
   }, [room]);
@@ -198,16 +196,6 @@ export default function RoomForm({
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
-  };
-
-  const handleAddImage = () => {
-    if (newImageUrl.trim() && !formState.images.includes(newImageUrl.trim())) {
-      setFormState(prev => ({
-        ...prev,
-        images: [...prev.images, newImageUrl.trim()]
-      }));
-      setNewImageUrl('');
-    }
   };
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {

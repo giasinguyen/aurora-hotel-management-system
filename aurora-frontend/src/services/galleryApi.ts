@@ -1,5 +1,5 @@
 import axiosClient from "@/config/axiosClient";
-import type { ApiResponse } from "@/types/api.types";
+import type { ApiResponse } from "@/types/apiResponse";
 
 export interface GalleryImage {
   imageUrl: string;

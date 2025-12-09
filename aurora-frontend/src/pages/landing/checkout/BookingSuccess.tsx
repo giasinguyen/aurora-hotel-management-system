@@ -12,7 +12,6 @@ import {
   Hotel, 
   Clock,
   CreditCard,
-  Users,
   Loader2,
   AlertCircle,
   Download,
@@ -39,7 +38,6 @@ export default function BookingSuccessPage() {
   const isLogin = useSelector((state: RootState) => state.auth.isLogin);
   
   const bookingId = searchParams.get("bookingId");
-  const bookingCode = searchParams.get("bookingCode");
 
   useEffect(() => {
     const fetchBookingDetails = async () => {

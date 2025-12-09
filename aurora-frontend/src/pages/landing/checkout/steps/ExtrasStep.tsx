@@ -1,11 +1,8 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import { Loader2 } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Separator } from "@/components/ui/separator";
 import { RoomCard, ServiceSelectionModal, RoomDetailModal } from "@/components/booking";
 import { roomApi, roomTypeApi } from "@/services/roomApi";
 import type { CheckoutData, RoomExtras } from "../index";
@@ -20,9 +17,7 @@ interface ExtrasStepProps {
 export default function ExtrasStep({
   checkoutData,
   updateCheckoutData,
-  rolePrefix = '',
 }: ExtrasStepProps) {
-  const navigate = useNavigate();
   const { rooms, roomExtras } = checkoutData;
   const branchId = localStorage.getItem("branchId") || "branch-hcm-001";
 

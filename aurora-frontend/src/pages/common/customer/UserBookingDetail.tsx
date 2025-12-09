@@ -5,8 +5,6 @@ import type { RootState } from "@/features/store";
 import { 
   Calendar, 
   MapPin, 
-  Phone, 
-  Mail, 
   FileText, 
   Hotel, 
   Clock,

@@ -12,12 +12,10 @@ import {
   Sparkles,
   Image as ImageIcon,
   X,
-  Plus,
   Clock,
   Users,
   Calendar,
   CheckCircle2,
-  XCircle,
   Timer,
   Upload
 } from 'lucide-react';

@@ -84,7 +84,7 @@ export function DayDetailsDialog({
                     <div>
                       <h3 className="font-semibold text-lg">{event.title}</h3>
                       <p className="text-sm text-gray-500">
-                        {event.assignment.workShift.description || 'Không có mô tả'}
+                        {event.assignment.workShift?.description || 'Không có mô tả'}
                       </p>
                     </div>
                     {getStatusBadge(event.assignment.status)}
@@ -94,10 +94,10 @@ export function DayDetailsDialog({
                     <div className="flex items-center gap-2">
                       <Clock className="h-4 w-4 text-gray-500" />
                       <span>
-                        {event.assignment.workShift.startTime} - {event.assignment.workShift.endTime}
+                        {event.assignment.workShift?.startTime} - {event.assignment.workShift?.endTime}
                       </span>
                       <span className="text-gray-500">
-                        ({event.assignment.workShift.durationHours}h)
+                        ({event.assignment.workShift?.durationHours}h)
                       </span>
                     </div>
 

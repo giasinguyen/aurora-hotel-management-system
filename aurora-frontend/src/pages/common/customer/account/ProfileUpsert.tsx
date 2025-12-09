@@ -1,6 +1,6 @@
 import { useState, useEffect, type ChangeEvent } from "react";
-import { User, Mail, Phone, MapPin, Calendar, Save, X, Camera, ArrowLeft, Loader2 } from "lucide-react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { User, Mail, Phone, MapPin, Calendar, Save, X, Camera, Loader2 } from "lucide-react";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import VideoHero from "@/components/custom/VideoHero";
