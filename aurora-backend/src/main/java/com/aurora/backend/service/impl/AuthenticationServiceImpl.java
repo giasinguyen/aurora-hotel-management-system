@@ -82,7 +82,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             throw new DataIntegrityViolationException("Username already exists");
         }
         
-        userRepository.findByUsername(request.getEmail()).ifPresent(u -> {
+        userRepository.findByEmail(request.getEmail()).ifPresent(u -> {
             throw new DataIntegrityViolationException("Email already exists");
         });
 

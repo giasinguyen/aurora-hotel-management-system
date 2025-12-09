@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "@/hooks/useRedux";
-import { setLanguage } from "@/features/slices/languageSlice";
+// import { setLanguage } from "@/features/slices/languageSlice";
 import { setBranchDetails } from "@/features/slices/branchSlice";
 import { branchApi } from "@/services/branchApi";
 import type { Branch } from "@/types/branch.types";
@@ -14,34 +14,34 @@ import {
 } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { X, Loader2 } from "lucide-react";
-import englishFlag from "@/assets/images/commons/english.png";
-import vietnamFlag from "@/assets/images/commons/vietnam.png";
+// import englishFlag from "@/assets/images/commons/english.png";
+// import vietnamFlag from "@/assets/images/commons/vietnam.png";
 
 // Language option component
-const LanguageOption = ({ value }: { value: string }) => {
-  const flags = {
-    en: englishFlag,
-    vi: vietnamFlag,
-  };
-  return (
-    <img
-      src={flags[value as keyof typeof flags]}
-      alt="languages"
-      className="w-5 h-5 object-cover rounded-sm"
-    />
-  );
-};
+// const LanguageOption = ({ value }: { value: string }) => {
+//   const flags = {
+//     en: englishFlag,
+//     vi: vietnamFlag,
+//   };
+//   return (
+//     <img
+//       src={flags[value as keyof typeof flags]}
+//       alt="languages"
+//       className="w-5 h-5 object-cover rounded-sm"
+//     />
+//   );
+// };
 
 export default function SelectionModal() {
   const dispatch = useAppDispatch();
-  const currentLanguage = useAppSelector(
-    (state) => state.language.currentLanguage
-  );
+  // const currentLanguage = useAppSelector(
+  //   (state) => state.language.currentLanguage
+  // );
   const currentBranch = useAppSelector(
     (state) => state.branch.currentBranch
   );
 
-  const [selectedLanguage, setSelectedLanguage] = useState(currentLanguage);
+  // const [selectedLanguage, setSelectedLanguage] = useState(currentLanguage);
   const [selectedBranch, setSelectedBranch] = useState(currentBranch?.id || '');
   const [branches, setBranches] = useState<Branch[]>([]);
   const [isLoadingBranches, setIsLoadingBranches] = useState(true);
@@ -75,22 +75,22 @@ export default function SelectionModal() {
   }, []);
 
   useEffect(() => {
-    setSelectedLanguage(currentLanguage);
+    // setSelectedLanguage(currentLanguage);
     if (currentBranch?.id) {
       setSelectedBranch(currentBranch.id);
     }
-  }, [currentLanguage, currentBranch]);
+  }, [currentBranch]);
 
   const handleClose = () => {
     // Set default: en and first active branch
-    dispatch(setLanguage("en"));
+    // dispatch(setLanguage("en"));
     if (branches.length > 0) {
       dispatch(setBranchDetails(branches[0]));
     }
   };
 
   const handleConfirm = () => {
-    dispatch(setLanguage(selectedLanguage));
+    // dispatch(setLanguage(selectedLanguage));
     
     // Find and set full branch details
     const selectedBranchData = branches.find(b => b.id === selectedBranch);
@@ -116,13 +116,13 @@ export default function SelectionModal() {
 
         <CardHeader>
           <CardTitle className="text-2xl text-center">
-            Chọn ngôn ngữ và chi nhánh
+            Chọn chi nhánh
           </CardTitle>
         </CardHeader>
 
         <CardContent className="space-y-6">
           {/* Language Selection */}
-          <div className="space-y-2">
+          {/* <div className="space-y-2">
             <label className="text-sm font-medium text-gray-700">
               Ngôn ngữ / Language
             </label>
@@ -143,7 +143,7 @@ export default function SelectionModal() {
                 </SelectItem>
               </SelectContent>
             </Select>
-          </div>
+          </div> */}
 
           {/* Branch Selection */}
           <div className="space-y-2">

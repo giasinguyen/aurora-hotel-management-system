@@ -101,15 +101,16 @@ const LoginPage = () => {
     }
   };
 
-  const handleFacebookLogin = () => {
-    // TODO: Implement Facebook login
-    console.log("Facebook login clicked");
-  };
+  // Temporarily disabled: Google and Facebook login
+  // const handleFacebookLogin = () => {
+  //   // TODO: Implement Facebook login
+  //   console.log("Facebook login clicked");
+  // };
 
-  const handleGoogleLogin = () => {
-    // TODO: Implement Google login
-    console.log("Google login clicked");
-  };
+  // const handleGoogleLogin = () => {
+  //   // TODO: Implement Google login
+  //   console.log("Google login clicked");
+  // };
 
   return (
     <VideoHero height="full">
@@ -212,7 +213,8 @@ const LoginPage = () => {
             </Button>
           </form>
 
-          <div className="relative">
+          {/* Temporarily hidden: Google and Facebook login */}
+          {/* <div className="relative">
             <div className="absolute inset-0 flex items-center">
               <div className="w-full border-t border-gray-300"></div>
             </div>
@@ -250,7 +252,7 @@ const LoginPage = () => {
               </svg>
               Google
             </Button>
-          </div>
+          </div> */}
         </CardContent>
 
         <CardFooter className="flex justify-center">

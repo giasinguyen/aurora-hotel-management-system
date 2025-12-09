@@ -87,10 +87,12 @@ const RegisterPage = () => {
         dob: formData.dob || undefined,
       };
 
-      await registerApi(registerRequest);
+      const response = await registerApi(registerRequest);
       
-      toast.success("Đăng ký thành công! Vui lòng đăng nhập.");
-      navigate("/auth?mode=login");
+      if (response.data.result) {
+        toast.success("Đăng ký thành công! Vui lòng đăng nhập.");
+        navigate("/auth?mode=login");
+      }
     } catch (err) {
       const errorMessage = getErrorMessage(err, "Đăng ký thất bại. Vui lòng thử lại.");
       setError(errorMessage);
@@ -100,15 +102,16 @@ const RegisterPage = () => {
     }
   };
 
-  const handleFacebookRegister = () => {
-    // TODO: Implement Facebook registration
-    console.log("Facebook register clicked");
-  };
+  // Temporarily disabled: Google and Facebook registration
+  // const handleFacebookRegister = () => {
+  //   // TODO: Implement Facebook registration
+  //   console.log("Facebook register clicked");
+  // };
 
-  const handleGoogleRegister = () => {
-    // TODO: Implement Google registration
-    console.log("Google register clicked");
-  };
+  // const handleGoogleRegister = () => {
+  //   // TODO: Implement Google registration
+  //   console.log("Google register clicked");
+  // };
 
 
   return (
@@ -268,7 +271,7 @@ const RegisterPage = () => {
                   id="password"
                   name="password"
                   type={showPassword ? "text" : "password"}
-                  placeholder="Nhập mật khẩu (tối thiểu 6 ký tự)"
+                  placeholder="Nhập mật khẩu (tối thiểu 8 ký tự)"
                   value={formData.password}
                   onChange={handleChange}
                   disabled={isLoading}
@@ -352,7 +355,8 @@ const RegisterPage = () => {
             </Button>
           </form>
 
-          <div className="relative">
+          {/* Temporarily hidden: Google and Facebook registration */}
+          {/* <div className="relative">
             <div className="absolute inset-0 flex items-center">
               <div className="w-full border-t border-gray-300"></div>
             </div>
@@ -390,7 +394,7 @@ const RegisterPage = () => {
               </svg>
               Google
             </Button>
-          </div>
+          </div> */}
         </CardContent>
 
         <CardFooter className="flex justify-center">
