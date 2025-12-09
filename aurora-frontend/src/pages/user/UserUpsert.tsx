@@ -1,18 +1,29 @@
 import { useState, useEffect } from 'react';
-import { useSearchParams, useNavigate } from 'react-router-dom';
+import { useSearchParams, useNavigate, useLocation } from 'react-router-dom';
 import { toast } from 'sonner';
 import { ArrowLeft, Loader2, User as UserIcon } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 
 import { UserForm } from './components';
-import { getUserById, createUser, updateUser } from '@/services/userApi';
+import { getUserById, createUser, createUserLimited, updateUser } from '@/services/userApi';
+import { useAppSelector } from '@/hooks/useRedux';
 import type { User, UserCreationRequest, UserUpdateRequest } from '@/types/user.types';
 import { APP_COLOR } from '@/utils/constant';
 
 export default function UserUpsert() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const location = useLocation();
+  
+  // Get base path from current location
+  const basePath = '/' + location.pathname.split('/')[1];
+  
+  // Get current user to check role
+  const currentUser = useAppSelector((state) => state.auth.user);
+  const isAdmin = currentUser?.roles?.some(
+    (role) => role === 'ROLE_ADMIN' || role === 'ADMIN'
+  );
   
   const userId = searchParams.get('id');
   const isViewMode = searchParams.get('view') === 'true';
@@ -25,10 +36,10 @@ export default function UserUpsert() {
   // If we have userId, redirect to UserDetail for view mode
   useEffect(() => {
     if (isViewMode && userId) {
-      // Redirect to proper detail page
-      navigate(`/admin/users/detail?id=${userId}`, { replace: true });
+      // Redirect to proper detail page using dynamic base path
+      navigate(`${basePath}/users/detail?id=${userId}`, { replace: true });
     }
-  }, [isViewMode, userId, navigate]);
+  }, [isViewMode, userId, navigate, basePath]);
 
   // Fetch user data for edit mode
   const fetchUser = async () => {
@@ -41,7 +52,7 @@ export default function UserUpsert() {
     } catch (error) {
       console.error('Failed to fetch user:', error);
       toast.error('Không thể tải thông tin người dùng');
-      navigate('/admin/users');
+      navigate(`${basePath}/users`);
     } finally {
       setIsLoading(false);
     }
@@ -63,13 +74,23 @@ export default function UserUpsert() {
         await updateUser(userId, data as UserUpdateRequest);
         toast.success('Cập nhật người dùng thành công');
       } else {
-        // Create new user
-        await createUser(data as UserCreationRequest);
+        // Create new user - use different API based on role
+        if (isAdmin) {
+          await createUser(data as UserCreationRequest);
+        } else {
+          // Manager/Staff use limited endpoint
+          await createUserLimited(data as UserCreationRequest);
+        }
         toast.success('Tạo người dùng thành công');
       }
       
-      // Navigate back and force refresh with state
-      navigate('/admin/users', { state: { refresh: true }, replace: true });
+      // Navigate back - Staff goes to dashboard, others go to users list
+      const isStaff = basePath === '/staff';
+      if (isStaff && !isEditMode) {
+        navigate(basePath, { replace: true });
+      } else {
+        navigate(`${basePath}/users`, { state: { refresh: true }, replace: true });
+      }
     } catch (error: any) {
       console.error('Failed to save user:', error);
       const errorMessage = error.response?.data?.message || 'Không thể lưu người dùng';
@@ -81,7 +102,7 @@ export default function UserUpsert() {
 
   // Handle cancel
   const handleCancel = () => {
-    navigate('/admin/users');
+    navigate(`${basePath}/users`);
   };
 
   if (isLoading) {
@@ -108,7 +129,7 @@ export default function UserUpsert() {
         <div className="relative z-10">
           <Button 
             variant="ghost" 
-            onClick={() => navigate('/admin/users')}
+            onClick={() => navigate(`${basePath}/users`)}
             className="gap-2 text-white hover:bg-white/20 mb-4"
           >
             <ArrowLeft className="h-4 w-4" />

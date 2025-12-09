@@ -2,6 +2,7 @@ package com.aurora.backend.controller;
 
 
 import java.util.List;
+import java.util.Set;
 
 import com.aurora.backend.config.annotation.RequirePermission;
 import com.aurora.backend.constant.PermissionConstants;
@@ -83,6 +84,66 @@ public class UserController {
     @RequirePermission(PermissionConstants.Admin.USER_CREATE)
     ApiResponse<UserResponse> createUser(@RequestBody @Valid UserCreationRequest userCreationRequest) {
         log.info("Creating new user with username: {}", userCreationRequest.getUsername());
+        return ApiResponse.<UserResponse>builder()
+                .message("User created successfully")
+                .result(userService.createUser(userCreationRequest))
+                .build();
+    }
+
+    /**
+     * Manager can create STAFF and CUSTOMER users
+     * Staff can only create CUSTOMER users
+     */
+    @PostMapping("/create-limited")
+    @ResponseStatus(HttpStatus.CREATED)
+    @RequirePermission(value = {
+            PermissionConstants.Manager.STAFF_CREATE,
+            PermissionConstants.Manager.CUSTOMER_CREATE,
+            PermissionConstants.Staff.CUSTOMER_CREATE
+    }, logic = RequirePermission.LogicType.OR)
+    ApiResponse<UserResponse> createUserLimited(
+            @RequestBody @Valid UserCreationRequest userCreationRequest,
+            Authentication authentication) {
+        log.info("Creating new user (limited) with username: {}", userCreationRequest.getUsername());
+        
+        // Validate role restrictions - get first role from Set
+        Set<String> requestedRoles = userCreationRequest.getRoles();
+        String requestedRole = null;
+        if (requestedRoles != null && !requestedRoles.isEmpty()) {
+            requestedRole = requestedRoles.iterator().next().toUpperCase().replace("ROLE_", "");
+        }
+        
+        boolean isManager = authentication.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_MANAGER"));
+        boolean isStaff = authentication.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_STAFF"));
+        boolean isAdmin = authentication.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+        
+        // Admin can create any role
+        if (isAdmin) {
+            return ApiResponse.<UserResponse>builder()
+                    .message("User created successfully")
+                    .result(userService.createUser(userCreationRequest))
+                    .build();
+        }
+        
+        // Manager can create STAFF and CUSTOMER
+        if (isManager) {
+            if (requestedRole != null && !requestedRole.equals("STAFF") && !requestedRole.equals("CUSTOMER")) {
+                log.warn("Manager attempted to create user with role: {} - forbidden", requestedRole);
+                throw new AppException(ErrorCode.UNAUTHORIZED);
+            }
+        }
+        
+        // Staff can only create CUSTOMER
+        if (isStaff && !isManager) {
+            if (requestedRole == null || !requestedRole.equals("CUSTOMER")) {
+                log.warn("Staff attempted to create user with role: {} - forbidden", requestedRole);
+                throw new AppException(ErrorCode.UNAUTHORIZED);
+            }
+        }
+        
         return ApiResponse.<UserResponse>builder()
                 .message("User created successfully")
                 .result(userService.createUser(userCreationRequest))

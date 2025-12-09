@@ -180,6 +180,39 @@ public class BranchController {
                 .build();
     }
 
+    @PutMapping("/{branchId}/staff")
+    @RequirePermission(value = {
+            PermissionConstants.Admin.BRANCH_ASSIGN_MANAGER,
+            PermissionConstants.Manager.BRANCH_ASSIGN_STAFF
+    }, logic = RequirePermission.LogicType.OR)
+    public ApiResponse<BranchResponse> assignStaff(
+            @PathVariable String branchId,
+            @RequestBody Map<String, String> request) {
+        String staffId = request.get("staffId");
+        log.info("Assigning staff {} to branch {}", staffId, branchId);
+        return ApiResponse.<BranchResponse>builder()
+                .code(HttpStatus.OK.value())
+                .message("Staff assigned to branch successfully")
+                .result(branchService.assignStaffToBranch(branchId, staffId))
+                .build();
+    }
+
+    @DeleteMapping("/{branchId}/staff/{staffId}")
+    @RequirePermission(value = {
+            PermissionConstants.Admin.BRANCH_ASSIGN_MANAGER,
+            PermissionConstants.Manager.BRANCH_ASSIGN_STAFF
+    }, logic = RequirePermission.LogicType.OR)
+    public ApiResponse<BranchResponse> removeStaff(
+            @PathVariable String branchId,
+            @PathVariable String staffId) {
+        log.info("Removing staff {} from branch {}", staffId, branchId);
+        return ApiResponse.<BranchResponse>builder()
+                .code(HttpStatus.OK.value())
+                .message("Staff removed from branch successfully")
+                .result(branchService.removeStaffFromBranch(branchId, staffId))
+                .build();
+    }
+
     @GetMapping("/{id}/statistics")
     @RequirePermission(PermissionConstants.Manager.BRANCH_VIEW_STATS)
     public ApiResponse<BranchResponse> getBranchStatistics(@PathVariable String id) {

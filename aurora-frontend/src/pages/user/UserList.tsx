@@ -52,6 +52,9 @@ export default function UserList() {
   const navigate = useNavigate();
   const location = useLocation();
   
+  // Get base path from current location (e.g., /admin, /manager, /staff)
+  const basePath = '/' + location.pathname.split('/')[1];
+  
   // Get current user to check role
   const currentUser = useAppSelector((state) => state.auth.user);
   
@@ -396,11 +399,11 @@ export default function UserList() {
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Thao tác</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => navigate(`/admin/users/upsert?id=${item.id}&view=true`)}>
+            <DropdownMenuItem onClick={() => navigate(`${basePath}/users/upsert?id=${item.id}&view=true`)}>
               <Eye className="h-4 w-4 mr-2" />
               Xem chi tiết
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => navigate(`/admin/users/upsert?id=${item.id}`)}>
+            <DropdownMenuItem onClick={() => navigate(`${basePath}/users/upsert?id=${item.id}`)}>
               <Edit className="h-4 w-4 mr-2" />
               Chỉnh sửa
             </DropdownMenuItem>
@@ -445,7 +448,7 @@ export default function UserList() {
       <PageHeader
         title="Quản lý người dùng"
         description="Xem và quản lý tất cả người dùng trong hệ thống"
-        onAdd={() => navigate('/admin/users/upsert')}
+        onAdd={() => navigate(`${basePath}/users/upsert`)}
         addButtonText="Thêm người dùng"
         onRefresh={fetchUsers}
         isLoading={isLoading}

@@ -26,6 +26,7 @@ spring:
         - classpath:db/init-auto/fix-email-verified.sql
         - classpath:db/init-auto/init-vector-store.sql
         - classpath:db/init-auto/init-roles-permissions.sql
+        - classpath:db/init-auto/add-manager-staff-permissions.sql
   jpa:
     hibernate:
       ddl-auto: update

@@ -19,5 +19,7 @@ public interface BranchService {
     Page<BranchResponse> searchBranches(String keyword, Pageable pageable);
     BranchResponse assignManager(String branchId, String managerId);
     BranchResponse removeManager(String branchId);
+    BranchResponse assignStaffToBranch(String branchId, String staffId);
+    BranchResponse removeStaffFromBranch(String branchId, String staffId);
     BranchResponse getBranchStatistics(String branchId);
 }

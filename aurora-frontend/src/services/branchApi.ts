@@ -146,6 +146,23 @@ export const branchApi = {
     );
     return response.data;
   },
+
+  // Assign staff to branch
+  assignStaff: async (branchId: string, staffId: string) => {
+    const response = await axiosClient.put<ApiResponse<Branch>>(
+      `${BRANCH_BASE_URL}/${branchId}/staff`,
+      { staffId }
+    );
+    return response.data;
+  },
+
+  // Remove staff from branch
+  removeStaff: async (branchId: string, staffId: string) => {
+    const response = await axiosClient.delete<ApiResponse<Branch>>(
+      `${BRANCH_BASE_URL}/${branchId}/staff/${staffId}`
+    );
+    return response.data;
+  },
 };
 
 export default branchApi;

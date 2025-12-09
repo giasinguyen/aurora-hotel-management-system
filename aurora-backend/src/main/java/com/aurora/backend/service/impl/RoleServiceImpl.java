@@ -16,10 +16,18 @@ import lombok.RequiredArgsConstructor;
 import lombok.experimental.FieldDefaults;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
-import org.springframework.stereotype.Component;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -94,6 +102,51 @@ public class RoleServiceImpl implements RoleService {
         
         Page<Role> roles = roleRepository.findAll(pageable);
         return roles.map(roleMapper::toRoleResponse);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<RoleResponse> getAllowedRoles(Pageable pageable) {
+        log.debug("Fetching allowed roles based on caller's authority");
+        
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
+        
+        // Check if caller is Admin (can see all roles)
+        boolean isAdmin = authorities.stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+        
+        // Check if caller is Manager (can see STAFF and CUSTOMER roles)
+        boolean isManager = authorities.stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_MANAGER"));
+        
+        List<String> allowedRoleNames;
+        if (isAdmin) {
+            // Admin can assign any role
+            allowedRoleNames = Arrays.asList("ADMIN", "MANAGER", "STAFF", "CUSTOMER");
+        } else if (isManager) {
+            // Manager can only assign STAFF and CUSTOMER roles
+            allowedRoleNames = Arrays.asList("STAFF", "CUSTOMER");
+        } else {
+            // Staff can only assign CUSTOMER role
+            allowedRoleNames = Arrays.asList("CUSTOMER");
+        }
+        
+        List<Role> allRoles = roleRepository.findAll();
+        List<Role> filteredRoles = allRoles.stream()
+                .filter(role -> allowedRoleNames.contains(role.getName()))
+                .collect(Collectors.toList());
+        
+        // Apply pagination manually
+        int start = (int) pageable.getOffset();
+        int end = Math.min(start + pageable.getPageSize(), filteredRoles.size());
+        
+        List<Role> pagedRoles = start < filteredRoles.size() 
+                ? filteredRoles.subList(start, end) 
+                : List.of();
+        
+        Page<Role> rolePage = new PageImpl<>(pagedRoles, pageable, filteredRoles.size());
+        return rolePage.map(roleMapper::toRoleResponse);
     }
 
     @Override

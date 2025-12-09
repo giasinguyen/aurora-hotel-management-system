@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { toast } from 'sonner';
 import { Eye, MoreHorizontal, Trash2, Edit, Percent, Calendar, Copy, Check } from 'lucide-react';
 
@@ -50,6 +50,10 @@ const promotionStatusConfig: Record<PromotionStatus, { label: string; variant: '
 
 export default function PromotionList() {
   const navigate = useNavigate();
+  const location = useLocation();
+  
+  // Get base path from current location (e.g., /admin, /manager, /staff)
+  const basePath = '/' + location.pathname.split('/')[1];
   
   // State
   const [promotions, setPromotions] = useState<Promotion[]>([]);
@@ -251,11 +255,11 @@ export default function PromotionList() {
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Thao tác</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => navigate(`/admin/promotions/upsert?id=${promotion.id}&view=true`)}>
+            <DropdownMenuItem onClick={() => navigate(`${basePath}/promotions/upsert?id=${promotion.id}&view=true`)}>
               <Eye className="h-4 w-4 mr-2" />
               Xem chi tiết
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => navigate(`/admin/promotions/upsert?id=${promotion.id}`)}>
+            <DropdownMenuItem onClick={() => navigate(`${basePath}/promotions/upsert?id=${promotion.id}`)}>
               <Edit className="h-4 w-4 mr-2" />
               Chỉnh sửa
             </DropdownMenuItem>
@@ -288,7 +292,7 @@ export default function PromotionList() {
       <PageHeader
         title="Quản lý khuyến mãi"
         description="Xem và quản lý tất cả khuyến mãi trong hệ thống"
-        onAdd={() => navigate('/admin/promotions/upsert')}
+        onAdd={() => navigate(`${basePath}/promotions/upsert`)}
         addButtonText="Thêm khuyến mãi"
         onRefresh={fetchPromotions}
         isLoading={isLoading}

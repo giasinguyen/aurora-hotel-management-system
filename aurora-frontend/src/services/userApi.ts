@@ -93,6 +93,16 @@ export const createUser = async (data: UserCreationRequest): Promise<ApiResponse
 };
 
 /**
+ * Create new user with limited roles (Manager/Staff)
+ * Manager can create STAFF and CUSTOMER
+ * Staff can only create CUSTOMER
+ */
+export const createUserLimited = async (data: UserCreationRequest): Promise<ApiResponse<User>> => {
+  const response = await axiosClient.post(`${BASE_URL}/create-limited`, data);
+  return response.data;
+};
+
+/**
  * Register new user (Public)
  */
 export const registerUser = async (data: UserCreationRequest): Promise<ApiResponse<User>> => {

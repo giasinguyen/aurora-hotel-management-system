@@ -81,12 +81,30 @@ export default function PermissionManager({ user, onUpdate }: PermissionManagerP
     const fetchData = async () => {
       setIsLoading(true);
       try {
-        // Fetch all available permissions
-        const permResponse = await getPermissions({ page: 0, size: 1000 });
-        const permissions = permResponse.result?.content || [];
+        // Try to fetch all available permissions (Admin only)
+        let permissions: Permission[] = [];
+        try {
+          const permResponse = await getPermissions({ page: 0, size: 1000 });
+          permissions = permResponse.result?.content || [];
+        } catch (error: any) {
+          // If 403, use permissions from user's roles instead
+          if (error.response?.status === 403) {
+            console.log('No permission to fetch all permissions, using role permissions');
+            // Extract unique permissions from user's roles
+            const rolePermsMap = new Map<string, Permission>();
+            user.roles?.forEach(role => {
+              role.permissions?.forEach(perm => {
+                rolePermsMap.set(perm.id, perm);
+              });
+            });
+            permissions = Array.from(rolePermsMap.values());
+          } else {
+            throw error;
+          }
+        }
         
         if (permissions.length === 0) {
-          console.warn('No permissions found in system');
+          console.warn('No permissions found');
         }
         
         setAllPermissions(permissions);

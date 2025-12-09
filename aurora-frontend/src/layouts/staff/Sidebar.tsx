@@ -3,7 +3,6 @@ import {
   LayoutDashboard,
   CalendarCheck,
   Users,
-  BarChart3,
   ChevronLeft,
   ChevronRight,
   Hotel,
@@ -45,14 +44,6 @@ const menuItems = [
     title: 'My Shifts',
     icon: Clock,
     href: '/staff/shifts',
-  },
-  {
-    title: 'Reports',
-    icon: BarChart3,
-    href: '/staff/reports/shift',
-    children: [
-      { title: 'Shift Report', href: '/staff/reports/shift' },
-    ],
   },
 ];
 

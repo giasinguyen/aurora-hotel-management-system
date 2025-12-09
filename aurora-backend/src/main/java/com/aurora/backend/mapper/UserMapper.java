@@ -25,6 +25,8 @@ public interface UserMapper {
     User toUser(UserCreationRequest request);
 
     @Mapping(target = "roles", source = "roles", qualifiedByName = "rolesToRoleResponses")
+    @Mapping(target = "assignedBranchId", source = "assignedBranch.id")
+    @Mapping(target = "assignedBranchName", source = "assignedBranch.name")
     UserResponse toUserResponse(User user);
 
     @Mapping(target = "id", ignore = true)

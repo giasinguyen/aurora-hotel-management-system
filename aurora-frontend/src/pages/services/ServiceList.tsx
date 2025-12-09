@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { toast } from 'sonner';
 import { Eye, MoreHorizontal, Trash2, Edit, DollarSign } from 'lucide-react';
 import fallbackImage from '@/assets/images/commons/fallback.png';
@@ -34,6 +34,10 @@ import type { ServiceCategory } from '@/types/serviceCategory.types';
 
 export default function ServiceList() {
   const navigate = useNavigate();
+  const location = useLocation();
+  
+  // Get base path from current location (e.g., /admin, /manager, /staff)
+  const basePath = '/' + location.pathname.split('/')[1];
   
   // State
   const [services, setServices] = useState<HotelService[]>([]);
@@ -236,11 +240,11 @@ export default function ServiceList() {
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Thao tác</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => navigate(`/admin/services/upsert?id=${service.id}&view=true`)}>
+            <DropdownMenuItem onClick={() => navigate(`${basePath}/services/upsert?id=${service.id}&view=true`)}>
               <Eye className="h-4 w-4 mr-2" />
               Xem chi tiết
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => navigate(`/admin/services/upsert?id=${service.id}`)}>
+            <DropdownMenuItem onClick={() => navigate(`${basePath}/services/upsert?id=${service.id}`)}>
               <Edit className="h-4 w-4 mr-2" />
               Chỉnh sửa
             </DropdownMenuItem>
@@ -281,7 +285,7 @@ export default function ServiceList() {
       <PageHeader
         title="Quản lý dịch vụ"
         description="Xem và quản lý tất cả dịch vụ trong hệ thống"
-        onAdd={() => navigate('/admin/services/upsert')}
+        onAdd={() => navigate(`${basePath}/services/upsert`)}
         addButtonText="Thêm dịch vụ"
         onRefresh={fetchServices}
         isLoading={isLoading}

@@ -223,6 +223,55 @@ public class BranchServiceImpl implements BranchService {
     }
 
     @Override
+    @Transactional
+    public BranchResponse assignStaffToBranch(String branchId, String staffId) {
+        log.info("Assigning staff {} to branch {}", staffId, branchId);
+        
+        Branch branch = branchRepository.findById(branchId)
+            .orElseThrow(() -> new AppException(ErrorCode.BRANCH_NOT_EXISTED));
+        
+        User staff = userRepository.findById(staffId)
+            .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+        
+        // Check if user is a staff
+        boolean isStaff = staff.getRoles().stream()
+                .anyMatch(role -> role.getName().equals("STAFF"));
+        if (!isStaff) {
+            throw new AppException(ErrorCode.INVALID_ROLE);
+        }
+        
+        // Assign staff to branch
+        staff.setAssignedBranch(branch);
+        userRepository.save(staff);
+        
+        log.info("Staff assigned successfully");
+        return branchMapper.toBranchResponse(branch);
+    }
+
+    @Override
+    @Transactional
+    public BranchResponse removeStaffFromBranch(String branchId, String staffId) {
+        log.info("Removing staff {} from branch {}", staffId, branchId);
+        
+        Branch branch = branchRepository.findById(branchId)
+            .orElseThrow(() -> new AppException(ErrorCode.BRANCH_NOT_EXISTED));
+        
+        User staff = userRepository.findById(staffId)
+            .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_EXISTED));
+        
+        // Check if staff is assigned to this branch
+        if (staff.getAssignedBranch() == null || !staff.getAssignedBranch().getId().equals(branchId)) {
+            throw new AppException(ErrorCode.STAFF_NOT_ASSIGNED_TO_BRANCH);
+        }
+        
+        staff.setAssignedBranch(null);
+        userRepository.save(staff);
+        
+        log.info("Staff removed from branch successfully");
+        return branchMapper.toBranchResponse(branch);
+    }
+
+    @Override
     public BranchResponse getBranchStatistics(String branchId) {
         log.debug("Fetching statistics for branch: {}", branchId);
         

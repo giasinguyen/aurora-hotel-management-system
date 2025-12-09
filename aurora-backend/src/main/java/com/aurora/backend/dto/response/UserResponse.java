@@ -24,6 +24,8 @@ public class UserResponse {
     String address;
     String avatarUrl;
     Boolean active;
+    String assignedBranchId;
+    String assignedBranchName;
     Set<RoleResponse> roles;
     List<String> disabledPermissions;
 }

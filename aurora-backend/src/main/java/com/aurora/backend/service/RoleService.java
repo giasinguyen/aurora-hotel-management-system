@@ -12,6 +12,7 @@ public interface RoleService {
     void deleteRole(String id);
     RoleResponse getRoleById(String id);
     Page<RoleResponse> getAllRoles(Pageable pageable);
+    Page<RoleResponse> getAllowedRoles(Pageable pageable);
     RoleResponse addPermissionToRole(String roleId, String permissionId);
     RoleResponse removePermissionFromRole(String roleId, String permissionId);
 }

@@ -70,7 +70,9 @@ VALUES (gen_random_uuid(), 'BOOKING_VIEW_ALL', 'Xem tất cả đặt phòng', C
        (gen_random_uuid(), 'PAYMENT_VIEW_ALL', 'Xem tất cả thanh toán', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, false),
        (gen_random_uuid(), 'SERVICE_MANAGE', 'Quản lý dịch vụ bổ sung', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, false),
        (gen_random_uuid(), 'DASHBOARD_VIEW_STAFF', 'Truy cập dashboard cho nhân viên', CURRENT_TIMESTAMP,
-        CURRENT_TIMESTAMP, 0, false)
+        CURRENT_TIMESTAMP, 0, false),
+       (gen_random_uuid(), 'CUSTOMER_CREATE', 'Tạo tài khoản khách hàng mới', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0,
+        false)
 ON CONFLICT (name) DO NOTHING;
 
 
@@ -101,7 +103,15 @@ VALUES (gen_random_uuid(), 'BOOKING_APPROVE', 'Phê duyệt đặt phòng đặc
        (gen_random_uuid(), 'REPORT_EXPORT', 'Xuất báo cáo', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, false),
        (gen_random_uuid(), 'STAFF_VIEW', 'Xem danh sách nhân viên', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0, false),
        (gen_random_uuid(), 'DASHBOARD_VIEW_MANAGER', 'Truy cập dashboard quản lý branch', CURRENT_TIMESTAMP,
-        CURRENT_TIMESTAMP, 0, false)
+        CURRENT_TIMESTAMP, 0, false),
+       (gen_random_uuid(), 'STAFF_CREATE', 'Tạo tài khoản nhân viên mới', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0,
+        false),
+       (gen_random_uuid(), 'STAFF_UPDATE', 'Cập nhật thông tin nhân viên', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0,
+        false),
+       (gen_random_uuid(), 'BRANCH_ASSIGN_STAFF', 'Phân chi nhánh cho nhân viên', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0,
+        false),
+       (gen_random_uuid(), 'PERMISSION_VIEW', 'Xem danh sách quyền hạn', CURRENT_TIMESTAMP, CURRENT_TIMESTAMP, 0,
+        false)
 ON CONFLICT (name) DO NOTHING;
 
 
@@ -238,7 +248,8 @@ WHERE r.name = 'STAFF'
                  'CUSTOMER_VIEW',
                  'PAYMENT_VIEW_ALL',
                  'SERVICE_MANAGE',
-                 'DASHBOARD_VIEW_STAFF'
+                 'DASHBOARD_VIEW_STAFF',
+                 'CUSTOMER_CREATE'
     )
 ON CONFLICT DO NOTHING;
 
@@ -298,7 +309,12 @@ WHERE r.name = 'MANAGER'
                  'REPORT_VIEW',
                  'REPORT_EXPORT',
                  'STAFF_VIEW',
-                 'DASHBOARD_VIEW_MANAGER'
+                 'DASHBOARD_VIEW_MANAGER',
+                 'STAFF_CREATE',
+                 'STAFF_UPDATE',
+                 'CUSTOMER_CREATE',
+                 'BRANCH_ASSIGN_STAFF',
+                 'PERMISSION_VIEW'
     )
 ON CONFLICT DO NOTHING;
 

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useSearchParams, useNavigate } from 'react-router-dom';
+import { useSearchParams, useNavigate, useLocation } from 'react-router-dom';
 import { toast } from 'sonner';
 import { 
   ArrowLeft, 
@@ -7,14 +7,15 @@ import {
   Loader2, 
   UserX, 
   UserCheck,
-  Settings
+  Settings,
+  Building2
 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ConfirmDialog } from '@/components/custom';
 
-import { UserDetailCard, PermissionManager } from './components';
+import { UserDetailCard, PermissionManager, BranchAssignment } from './components';
 import { getUserById, toggleUserStatus } from '@/services/userApi';
 import type { User } from '@/types/user.types';
 import { APP_COLOR } from '@/utils/constant';
@@ -22,7 +23,11 @@ import { APP_COLOR } from '@/utils/constant';
 export default function UserDetail() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const userId = searchParams.get('id');
+  
+  // Get base path from current location
+  const basePath = '/' + location.pathname.split('/')[1];
 
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -34,7 +39,7 @@ export default function UserDetail() {
   const fetchUser = async () => {
     if (!userId) {
       toast.error('Không tìm thấy ID người dùng');
-      navigate('/admin/users');
+      navigate(`${basePath}/users`);
       return;
     }
 
@@ -45,7 +50,7 @@ export default function UserDetail() {
     } catch (error) {
       console.error('Failed to fetch user:', error);
       toast.error('Không thể tải thông tin người dùng');
-      navigate('/admin/users');
+      navigate(`${basePath}/users`);
     } finally {
       setIsLoading(false);
     }
@@ -90,7 +95,7 @@ export default function UserDetail() {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] gap-4">
         <p className="text-muted-foreground">Không tìm thấy người dùng</p>
-        <Button onClick={() => navigate('/admin/users')}>
+        <Button onClick={() => navigate(`${basePath}/users`)}>
           <ArrowLeft className="h-4 w-4 mr-2" />
           Quay lại danh sách
         </Button>
@@ -105,7 +110,7 @@ export default function UserDetail() {
         <div className="flex items-center gap-4">
           <Button 
             variant="ghost" 
-            onClick={() => navigate('/admin/users')}
+            onClick={() => navigate(`${basePath}/users`)}
             className="gap-2"
           >
             <ArrowLeft className="h-4 w-4" />
@@ -146,7 +151,7 @@ export default function UserDetail() {
             </Button>
           )}
           <Button 
-            onClick={() => navigate(`/admin/users/upsert?id=${userId}`)}
+            onClick={() => navigate(`${basePath}/users/upsert?id=${userId}`)}
             className="gap-2"
             style={{
               background: `linear-gradient(135deg, ${APP_COLOR.ADMIN} 0%, #8B0000 100%)`,
@@ -166,7 +171,7 @@ export default function UserDetail() {
 
       {/* Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab}>
-        <TabsList className="grid w-full max-w-md grid-cols-2">
+        <TabsList className="grid w-full max-w-lg grid-cols-3">
           <TabsTrigger value="info" className="gap-2">
             <Settings className="h-4 w-4" />
             Thông tin
@@ -174,6 +179,10 @@ export default function UserDetail() {
           <TabsTrigger value="permissions" className="gap-2">
             <Settings className="h-4 w-4" />
             Quyền hạn
+          </TabsTrigger>
+          <TabsTrigger value="branch" className="gap-2">
+            <Building2 className="h-4 w-4" />
+            Chi nhánh
           </TabsTrigger>
         </TabsList>
 
@@ -183,6 +192,10 @@ export default function UserDetail() {
 
         <TabsContent value="permissions" className="mt-6">
           <PermissionManager user={user} onUpdate={fetchUser} />
+        </TabsContent>
+
+        <TabsContent value="branch" className="mt-6">
+          <BranchAssignment user={user} onUpdate={fetchUser} />
         </TabsContent>
       </Tabs>
 

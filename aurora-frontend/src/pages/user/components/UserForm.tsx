@@ -23,7 +23,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
 
-import { getRoles } from '@/services/roleApi';
+import { getAllowedRoles } from '@/services/roleApi';
 import type { User, UserCreationRequest, UserUpdateRequest, Role } from '@/types/user.types';
 import { ROLE_CONFIG } from '@/types/user.types';
 
@@ -75,11 +75,13 @@ export default function UserForm({ user, onSubmit, onCancel, isLoading = false }
 
   const password = watch('password');
 
-  // Fetch roles
+  // Fetch allowed roles based on caller's authority
   useEffect(() => {
     const fetchRoles = async () => {
       try {
-        const response = await getRoles({ page: 0, size: 100 });
+        // Use getAllowedRoles which returns roles based on caller's permission
+        // Staff: only CUSTOMER, Manager: STAFF + CUSTOMER, Admin: all roles
+        const response = await getAllowedRoles({ page: 0, size: 100 });
         setRoles(response.result.content);
       } catch (error) {
         console.error('Failed to fetch roles:', error);

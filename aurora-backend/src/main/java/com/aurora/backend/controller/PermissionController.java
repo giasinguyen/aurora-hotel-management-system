@@ -75,9 +75,12 @@ public class PermissionController {
                 .build();
     }
 
-    // ADMIN ONLY - Xem tất cả permissions
+    // Admin and Manager can view all permissions
     @GetMapping
-    @RequirePermission(PermissionConstants.Admin.PERMISSION_MANAGE)
+    @RequirePermission(value = {
+            PermissionConstants.Admin.PERMISSION_MANAGE,
+            PermissionConstants.Manager.PERMISSION_VIEW
+    }, logic = RequirePermission.LogicType.OR)
     public ApiResponse<Page<PermissionResponse>> getAllPermissions(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,

@@ -92,4 +92,27 @@ public class RoleController {
                 .result(response)
                 .build();
     }
+
+    // STAFF/MANAGER - Get allowed roles for customer creation
+    // Staff can only assign CUSTOMER role, Manager can assign STAFF and CUSTOMER roles
+    @GetMapping("/allowed")
+    @RequirePermission(value = {
+            PermissionConstants.Staff.CUSTOMER_VIEW,
+            PermissionConstants.Manager.STAFF_VIEW
+    }, logic = RequirePermission.LogicType.OR)
+    public ApiResponse<Page<RoleResponse>> getAllowedRoles(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "name") String sortBy,
+            @RequestParam(defaultValue = "asc") String sortDir) {
+        Sort.Direction direction = sortDir.equalsIgnoreCase("desc") ? Sort.Direction.DESC : Sort.Direction.ASC;
+        Pageable pageable = PageRequest.of(page, size, Sort.by(direction, sortBy));
+        // This will return filtered roles based on caller's permission
+        Page<RoleResponse> response = roleService.getAllowedRoles(pageable);
+        return ApiResponse.<Page<RoleResponse>>builder()
+                .code(HttpStatus.OK.value())
+                .message("Allowed roles retrieved successfully")
+                .result(response)
+                .build();
+    }
 }

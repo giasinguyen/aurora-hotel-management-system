@@ -19,13 +19,31 @@ const PERMISSION_BASE_URL = '/api/v1/permissions';
 // =====================
 
 /**
- * Get all roles with pagination
+ * Get all roles with pagination (Admin only)
  */
 export const getRoles = async (params?: RoleSearchParams): Promise<ApiResponse<PageResponseDto<Role>>> => {
   const response = await axiosClient.get(ROLE_BASE_URL, { 
     params: {
       page: params?.page ?? 0,
       size: params?.size ?? 10,
+      sortBy: params?.sortBy ?? 'name',
+      sortDir: params?.sortDir ?? 'asc',
+    }
+  });
+  return response.data;
+};
+
+/**
+ * Get allowed roles based on caller's authority (Staff/Manager/Admin)
+ * - Staff: only CUSTOMER role
+ * - Manager: STAFF and CUSTOMER roles
+ * - Admin: all roles
+ */
+export const getAllowedRoles = async (params?: RoleSearchParams): Promise<ApiResponse<PageResponseDto<Role>>> => {
+  const response = await axiosClient.get(`${ROLE_BASE_URL}/allowed`, { 
+    params: {
+      page: params?.page ?? 0,
+      size: params?.size ?? 100,
       sortBy: params?.sortBy ?? 'name',
       sortDir: params?.sortDir ?? 'asc',
     }
