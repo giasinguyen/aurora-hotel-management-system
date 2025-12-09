@@ -208,10 +208,10 @@ export default function BookingSuccessPage() {
                   </p>
                   
                   <div className="flex flex-wrap gap-2 justify-center md:justify-start">
-                    <Badge variant={statusConfig.variant} className="text-sm px-4 py-1">
+                    <Badge variant={statusConfig.variant} className={`text-sm px-4 py-1 ${statusConfig.className || ''}`}>
                       {statusConfig.label}
                     </Badge>
-                    <Badge variant={paymentConfig.variant} className="text-sm px-4 py-1">
+                    <Badge variant={paymentConfig.variant} className={`text-sm px-4 py-1 ${paymentConfig.className || ''}`}>
                       {paymentConfig.label}
                     </Badge>
                   </div>

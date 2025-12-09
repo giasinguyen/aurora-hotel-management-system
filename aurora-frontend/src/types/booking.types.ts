@@ -118,21 +118,21 @@ export interface BookingSearchParams {
   sortDir?: 'asc' | 'desc';
 }
 
-// Status badge configurations
-export const BOOKING_STATUS_CONFIG: Record<BookingStatus, { label: string; variant: 'default' | 'secondary' | 'destructive' | 'outline' | 'success' | 'warning' }> = {
-  PENDING: { label: 'Chờ xác nhận', variant: 'warning' },
-  CONFIRMED: { label: 'Đã xác nhận', variant: 'success' },
-  CHECKED_IN: { label: 'Đã nhận phòng', variant: 'default' },
-  CHECKED_OUT: { label: 'Đã trả phòng', variant: 'secondary' },
-  COMPLETED: { label: 'Hoàn thành', variant: 'success' },
-  CANCELLED: { label: 'Đã hủy', variant: 'destructive' },
-  NO_SHOW: { label: 'Không đến', variant: 'outline' },
+// Status badge configurations with unique colors
+export const BOOKING_STATUS_CONFIG: Record<BookingStatus, { label: string; variant: 'default' | 'secondary' | 'destructive' | 'outline' | 'success' | 'warning'; className?: string }> = {
+  PENDING: { label: 'Chờ xác nhận', variant: 'default', className: 'bg-yellow-500 text-white hover:bg-yellow-600 border-transparent' },
+  CONFIRMED: { label: 'Đã xác nhận', variant: 'default', className: 'bg-blue-500 text-white hover:bg-blue-600 border-transparent' },
+  CHECKED_IN: { label: 'Đã nhận phòng', variant: 'default', className: 'bg-cyan-500 text-white hover:bg-cyan-600 border-transparent' },
+  CHECKED_OUT: { label: 'Đã trả phòng', variant: 'default', className: 'bg-indigo-500 text-white hover:bg-indigo-600 border-transparent' },
+  COMPLETED: { label: 'Hoàn thành', variant: 'default', className: 'bg-green-500 text-white hover:bg-green-600 border-transparent' },
+  CANCELLED: { label: 'Đã hủy', variant: 'destructive', className: 'bg-red-500 text-white hover:bg-red-600 border-transparent' },
+  NO_SHOW: { label: 'Không đến', variant: 'default', className: 'bg-gray-500 text-white hover:bg-gray-600 border-transparent' },
 };
 
-export const PAYMENT_STATUS_CONFIG: Record<PaymentStatus, { label: string; variant: 'default' | 'secondary' | 'destructive' | 'outline' | 'success' | 'warning' }> = {
-  PENDING: { label: 'Chờ thanh toán', variant: 'warning' },
-  DEPOSIT_PAID: { label: 'Đã đặt cọc', variant: 'secondary' },
-  PARTIALLY_PAID: { label: 'Thanh toán một phần', variant: 'secondary' },
-  PAID: { label: 'Đã thanh toán', variant: 'success' },
-  REFUNDED: { label: 'Đã hoàn tiền', variant: 'outline' },
+export const PAYMENT_STATUS_CONFIG: Record<PaymentStatus, { label: string; variant: 'default' | 'secondary' | 'destructive' | 'outline' | 'success' | 'warning'; className?: string }> = {
+  PENDING: { label: 'Chờ thanh toán', variant: 'default', className: 'bg-orange-500 text-white hover:bg-orange-600 border-transparent' },
+  DEPOSIT_PAID: { label: 'Đã đặt cọc', variant: 'default', className: 'bg-purple-500 text-white hover:bg-purple-600 border-transparent' },
+  PARTIALLY_PAID: { label: 'Thanh toán một phần', variant: 'default', className: 'bg-pink-500 text-white hover:bg-pink-600 border-transparent' },
+  PAID: { label: 'Đã thanh toán', variant: 'default', className: 'bg-emerald-500 text-white hover:bg-emerald-600 border-transparent' },
+  REFUNDED: { label: 'Đã hoàn tiền', variant: 'default', className: 'bg-teal-500 text-white hover:bg-teal-600 border-transparent' },
 };

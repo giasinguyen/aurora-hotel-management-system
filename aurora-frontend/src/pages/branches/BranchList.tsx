@@ -4,7 +4,6 @@ import { toast } from 'sonner';
 import { 
   Eye, 
   MoreHorizontal, 
-  Trash2, 
   Edit, 
   MapPin, 
   Phone, 
@@ -32,7 +31,6 @@ import {
   Pagination, 
   SearchFilter, 
   StatusBadge, 
-  ConfirmDialog,
   type Column 
 } from '@/components/custom';
 
@@ -44,7 +42,6 @@ const branchStatusConfig: Record<BranchStatus, { label: string; variant: 'defaul
   ACTIVE: { label: 'Hoạt động', variant: 'success' },
   INACTIVE: { label: 'Tạm ngừng', variant: 'warning' },
   MAINTENANCE: { label: 'Bảo trì', variant: 'secondary' },
-  CLOSED: { label: 'Đã đóng cửa', variant: 'destructive' },
 };
 
 export default function BranchList() {
@@ -69,9 +66,7 @@ export default function BranchList() {
   const [sortColumn, setSortColumn] = useState('name');
   const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
   
-  // Dialogs
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
-  const [selectedBranchId, setSelectedBranchId] = useState<string | null>(null);
+  // Dialogs - Removed delete dialog state (delete functionality is hidden)
 
   // Get unique cities from branches
   const cities = [...new Set(branches.map(b => b.city))];
@@ -122,21 +117,7 @@ export default function BranchList() {
     fetchBranches();
   }, [fetchBranches]);
 
-  // Handle delete branch
-  const handleDeleteBranch = async () => {
-    if (!selectedBranchId) return;
-    
-    try {
-      await branchApi.delete(selectedBranchId);
-      toast.success('Xóa chi nhánh thành công');
-      setDeleteDialogOpen(false);
-      setSelectedBranchId(null);
-      fetchBranches();
-    } catch (error) {
-      console.error('Failed to delete branch:', error);
-      toast.error('Không thể xóa chi nhánh. Có thể chi nhánh đang có phòng hoặc nhân viên.');
-    }
-  };
+  // Handle delete branch - Removed (delete functionality is hidden)
 
   // Handle sort
   const handleSort = (column: string) => {
@@ -174,7 +155,7 @@ export default function BranchList() {
       header: 'Địa chỉ',
       cell: (branch) => (
         <div className="flex items-start gap-2 max-w-[300px]">
-          <MapPin className="h-4 w-4 text-muted-foreground shrink-0 mt-0.5" />
+          <MapPin className="h-4 w-4 text-primary shrink-0 mt-0.5" />
           <span className="text-sm line-clamp-2">{branch.fullAddress}</span>
         </div>
       ),
@@ -185,11 +166,11 @@ export default function BranchList() {
       cell: (branch) => (
         <div className="space-y-1">
           <div className="flex items-center gap-2 text-sm">
-            <Phone className="h-3 w-3 text-muted-foreground" />
+            <Phone className="h-3 w-3 text-primary" />
             {branch.phone}
           </div>
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
-            <Mail className="h-3 w-3" />
+            <Mail className="h-3 w-3 text-primary" />
             {branch.email}
           </div>
         </div>
@@ -201,7 +182,7 @@ export default function BranchList() {
       cell: (branch) => (
         branch.managerName ? (
           <div className="flex items-center gap-2">
-            <UserCog className="h-4 w-4 text-muted-foreground" />
+            <UserCog className="h-4 w-4 text-primary" />
             <span>{branch.managerName}</span>
           </div>
         ) : (
@@ -214,8 +195,8 @@ export default function BranchList() {
       header: 'Phòng',
       cell: (branch) => (
         <div className="flex items-center gap-2">
-          <BedDouble className="h-4 w-4 text-muted-foreground" />
-          <span className="text-green-600 font-medium">{branch.availableRooms}</span>
+          <BedDouble className="h-4 w-4 text-primary" />
+          <span className="text-primary font-medium">{branch.availableRooms}</span>
           <span className="text-muted-foreground">/</span>
           <span>{branch.totalRooms}</span>
         </div>
@@ -226,7 +207,7 @@ export default function BranchList() {
       header: 'Nhân viên',
       cell: (branch) => (
         <div className="flex items-center gap-2">
-          <Users className="h-4 w-4 text-muted-foreground" />
+          <Users className="h-4 w-4 text-primary" />
           <span>{branch.totalStaff}</span>
         </div>
       ),
@@ -236,7 +217,7 @@ export default function BranchList() {
       header: 'Giờ hoạt động',
       cell: (branch) => (
         <div className="flex items-center gap-2 text-sm">
-          <Clock className="h-4 w-4 text-muted-foreground" />
+          <Clock className="h-4 w-4 text-primary" />
           <span>{branch.operatingHours || `${branch.checkInTime} - ${branch.checkOutTime}`}</span>
         </div>
       ),
@@ -259,35 +240,33 @@ export default function BranchList() {
       cell: (branch) => (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon">
+            <Button variant="ghost" size="icon" className="text-primary hover:text-primary hover:bg-primary/10">
               <MoreHorizontal className="h-4 w-4" />
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuLabel>Thao tác</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => navigate(`/admin/branches/upsert?id=${branch.id}&view=true`)}>
+            <DropdownMenuItem 
+              onClick={() => navigate(`/admin/branches/upsert?id=${branch.id}&view=true`)}
+              className="text-primary focus:text-primary focus:bg-primary/10"
+            >
               <Eye className="h-4 w-4 mr-2" />
               Xem chi tiết
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => navigate(`/admin/branches/upsert?id=${branch.id}`)}>
+            <DropdownMenuItem 
+              onClick={() => navigate(`/admin/branches/upsert?id=${branch.id}`)}
+              className="text-primary focus:text-primary focus:bg-primary/10"
+            >
               <Edit className="h-4 w-4 mr-2" />
               Chỉnh sửa
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => navigate(`/admin/users/${branch.managerId}/assign-branch`)}>
+            <DropdownMenuItem 
+              onClick={() => navigate(`/admin/branches/${branch.id}/assign-manager`)}
+              className="text-primary focus:text-primary focus:bg-primary/10"
+            >
               <UserCog className="h-4 w-4 mr-2" />
               Phân công quản lý
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem
-              className="text-destructive"
-              onClick={() => {
-                setSelectedBranchId(branch.id);
-                setDeleteDialogOpen(true);
-              }}
-            >
-              <Trash2 className="h-4 w-4 mr-2" />
-              Xóa chi nhánh
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -320,7 +299,7 @@ export default function BranchList() {
 
       <Card>
         <CardHeader>
-          <CardTitle className="text-lg font-medium">Bộ lọc</CardTitle>
+          <CardTitle className="text-lg font-medium text-primary">Bộ lọc</CardTitle>
         </CardHeader>
         <CardContent>
           <SearchFilter
@@ -381,17 +360,7 @@ export default function BranchList() {
         </CardContent>
       </Card>
 
-      {/* Delete Confirmation Dialog */}
-      <ConfirmDialog
-        open={deleteDialogOpen}
-        onOpenChange={setDeleteDialogOpen}
-        title="Xác nhận xóa chi nhánh"
-        description="Bạn có chắc chắn muốn xóa chi nhánh này? Hành động này không thể hoàn tác và sẽ ảnh hưởng đến tất cả phòng và nhân viên thuộc chi nhánh."
-        confirmText="Xóa"
-        cancelText="Hủy"
-        onConfirm={handleDeleteBranch}
-        variant="destructive"
-      />
+      {/* Delete Confirmation Dialog - Removed (delete functionality is hidden) */}
     </div>
   );
 }

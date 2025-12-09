@@ -39,7 +39,7 @@ export interface Branch {
   availableRooms: number;
 }
 
-export type BranchStatus = 'ACTIVE' | 'INACTIVE' | 'MAINTENANCE' | 'CLOSED';
+export type BranchStatus = 'ACTIVE' | 'INACTIVE' | 'MAINTENANCE';
 
 export interface BranchCreationRequest {
   name: string;
@@ -86,5 +86,4 @@ export const BRANCH_STATUS_CONFIG: Record<BranchStatus, { label: string; variant
   ACTIVE: { label: 'Hoạt động', variant: 'success' },
   INACTIVE: { label: 'Tạm ngừng', variant: 'warning' },
   MAINTENANCE: { label: 'Bảo trì', variant: 'secondary' },
-  CLOSED: { label: 'Đã đóng cửa', variant: 'destructive' },
 };

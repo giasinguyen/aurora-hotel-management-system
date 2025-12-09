@@ -238,13 +238,13 @@ const BookingDetailPage = () => {
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <p className="text-sm text-gray-500 mb-2">Trạng thái đặt phòng</p>
-                    <Badge variant={BOOKING_STATUS_CONFIG[booking.status].variant}>
+                    <Badge variant={BOOKING_STATUS_CONFIG[booking.status].variant} className={BOOKING_STATUS_CONFIG[booking.status].className}>
                       {BOOKING_STATUS_CONFIG[booking.status].label}
                     </Badge>
                   </div>
                   <div>
                     <p className="text-sm text-gray-500 mb-2">Trạng thái thanh toán</p>
-                    <Badge variant={PAYMENT_STATUS_CONFIG[booking.paymentStatus].variant}>
+                    <Badge variant={PAYMENT_STATUS_CONFIG[booking.paymentStatus].variant} className={PAYMENT_STATUS_CONFIG[booking.paymentStatus].className}>
                       {PAYMENT_STATUS_CONFIG[booking.paymentStatus].label}
                     </Badge>
                   </div>

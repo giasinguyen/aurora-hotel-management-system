@@ -6,7 +6,6 @@ import {
   Utensils,
   UserCog,
   Gift,
-  Newspaper,
   BarChart3,
   ChevronLeft,
   ChevronRight,
@@ -70,11 +69,6 @@ const menuItems = [
     title: 'Promotions',
     icon: Gift,
     href: '/manager/promotions',
-  },
-  {
-    title: 'News',
-    icon: Newspaper,
-    href: '/manager/news',
   },
   {
     title: 'Reports',
