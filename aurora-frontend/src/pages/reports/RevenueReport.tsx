@@ -52,7 +52,9 @@ import {
   getRevenueStatistics, 
   getRevenueByPaymentMethod,
   getAdminOverview,
+  getManagerBranchOverview,
 } from '@/services/dashboardApi';
+import { useAppSelector } from '@/hooks/useRedux';
 import { exportRevenueReport, type RevenueExportData } from '@/utils/exportUtils';
 import type { ReportDateRange } from '@/types/report.types';
 import type { 
@@ -83,6 +85,17 @@ const formatFullCurrency = (value: number) => {
 };
 
 export default function RevenueReport() {
+  // Get current user from Redux store
+  const currentUser = useAppSelector((state) => state.auth.user);
+  
+  // Check if user is Manager (not Admin)
+  // Note: roles in UserSessionResponse is string[] not array of objects
+  const isManager = currentUser?.roles?.some(
+    (role) => role === 'ROLE_MANAGER' || role === 'MANAGER'
+  ) && !currentUser?.roles?.some(
+    (role) => role === 'ROLE_ADMIN' || role === 'ADMIN'
+  );
+  
   // State
   const [dateRange, setDateRange] = useState<ReportDateRange>({
     dateFrom: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
@@ -97,18 +110,42 @@ export default function RevenueReport() {
   const [revenueStats, setRevenueStats] = useState<RevenueStatistics[]>([]);
   const [paymentMethods, setPaymentMethods] = useState<PaymentMethodRevenue | null>(null);
 
-  // Fetch data
+  // Fetch data - use appropriate API based on user role
   const fetchData = useCallback(async () => {
     try {
       setLoading(true);
       
-      const [overviewRes, revenueRes, paymentRes] = await Promise.all([
-        getAdminOverview(dateRange.dateFrom || undefined, dateRange.dateTo || undefined),
-        getRevenueStatistics(dateRange.dateFrom || undefined, dateRange.dateTo || undefined, groupBy, branchId || undefined),
+      // Determine which branch to use
+      const effectiveBranchId = isManager ? currentUser?.branchId : branchId;
+      
+      // Get overview based on role
+      let overviewRes: DashboardOverview;
+      if (isManager && currentUser?.branchId) {
+        // Manager uses branch-specific API
+        overviewRes = await getManagerBranchOverview(
+          currentUser.branchId,
+          dateRange.dateFrom || undefined,
+          dateRange.dateTo || undefined
+        );
+      } else {
+        // Admin uses admin overview API
+        overviewRes = await getAdminOverview(
+          dateRange.dateFrom || undefined,
+          dateRange.dateTo || undefined
+        );
+      }
+      
+      const [revenueRes, paymentRes] = await Promise.all([
+        getRevenueStatistics(
+          dateRange.dateFrom || undefined,
+          dateRange.dateTo || undefined,
+          groupBy,
+          effectiveBranchId || undefined
+        ),
         getRevenueByPaymentMethod(
           dateRange.dateFrom || undefined, 
           dateRange.dateTo || undefined, 
-          branchId || undefined
+          effectiveBranchId || undefined
         ),
       ]);
 
@@ -121,7 +158,7 @@ export default function RevenueReport() {
     } finally {
       setLoading(false);
     }
-  }, [dateRange.dateFrom, dateRange.dateTo, branchId, groupBy]);
+  }, [dateRange.dateFrom, dateRange.dateTo, branchId, groupBy, isManager, currentUser?.branchId]);
 
   useEffect(() => {
     fetchData();
@@ -135,11 +172,16 @@ export default function RevenueReport() {
     average: point.bookingCount > 0 ? Math.round(point.revenue / point.bookingCount) : 0,
   }));
 
+  // Map backend payment method enum to display names
+  // Backend returns: { "CASH": 1000, "CARD": 2000, "BANK_TRANSFER": 3000, "VNPAY": 4000, ... }
   const paymentMethodData = paymentMethods ? [
-    { name: 'Tiền mặt', value: paymentMethods.cash || 0, icon: Wallet, color: '#10b981' },
-    { name: 'Thẻ', value: paymentMethods.card || 0, icon: CreditCard, color: '#3b82f6' },
-    { name: 'Chuyển khoản', value: paymentMethods.transfer || 0, icon: ArrowUpRight, color: '#f59e0b' },
-    { name: 'VNPay', value: paymentMethods.vnpay || 0, icon: Receipt, color: '#8b5cf6' },
+    { name: 'Tiền mặt', value: paymentMethods.CASH || 0, icon: Wallet, color: '#10b981' },
+    { name: 'Thẻ', value: paymentMethods.CARD || 0, icon: CreditCard, color: '#3b82f6' },
+    { name: 'Chuyển khoản', value: paymentMethods.BANK_TRANSFER || 0, icon: ArrowUpRight, color: '#f59e0b' },
+    { name: 'VNPay', value: paymentMethods.VNPAY || 0, icon: Receipt, color: '#8b5cf6' },
+    { name: 'MoMo', value: paymentMethods.MOMO || 0, icon: Wallet, color: '#d946ef' },
+    { name: 'ZaloPay', value: paymentMethods.ZALOPAY || 0, icon: Wallet, color: '#0ea5e9' },
+    { name: 'PayPal', value: paymentMethods.PAYPAL || 0, icon: CreditCard, color: '#6366f1' },
   ].filter(item => item.value > 0) : [];
 
   const totalPayment = paymentMethodData.reduce((sum, item) => sum + item.value, 0);

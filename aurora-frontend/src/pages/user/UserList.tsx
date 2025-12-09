@@ -43,13 +43,25 @@ import {
   type Column 
 } from '@/components/custom';
 
-import { getUsersPaginated, toggleUserStatus, searchUsers } from '@/services/userApi';
+import { getUsersPaginated, toggleUserStatus, searchUsers, getUsersByRole } from '@/services/userApi';
+import { useAppSelector } from '@/hooks/useRedux';
 import type { User } from '@/types/user.types';
 import { ROLE_CONFIG } from '@/types/user.types';
 
 export default function UserList() {
   const navigate = useNavigate();
   const location = useLocation();
+  
+  // Get current user to check role
+  const currentUser = useAppSelector((state) => state.auth.user);
+  
+  // Check if user is Manager (not Admin)
+  // Note: roles in UserSessionResponse is string[] not array of objects
+  const isManager = currentUser?.roles?.some(
+    (role) => role === 'ROLE_MANAGER' || role === 'MANAGER'
+  ) && !currentUser?.roles?.some(
+    (role) => role === 'ROLE_ADMIN' || role === 'ADMIN'
+  );
   
   // State
   const [users, setUsers] = useState<User[]>([]);
@@ -75,11 +87,65 @@ export default function UserList() {
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [statusAction, setStatusAction] = useState<'activate' | 'deactivate'>('deactivate');
 
-  // Fetch users
+  // Fetch users - different logic for Manager vs Admin
   const fetchUsers = useCallback(async () => {
     try {
       setIsLoading(true);
       
+      // Manager can only see STAFF and CUSTOMER
+      if (isManager) {
+        // Fetch both STAFF and CUSTOMER users
+        const [staffRes, customerRes] = await Promise.all([
+          getUsersByRole('STAFF', { page: 0, size: 1000 }),
+          getUsersByRole('CUSTOMER', { page: 0, size: 1000 }),
+        ]);
+        
+        let allUsers: User[] = [];
+        if (staffRes.result?.content) {
+          allUsers = [...allUsers, ...staffRes.result.content];
+        }
+        if (customerRes.result?.content) {
+          allUsers = [...allUsers, ...customerRes.result.content];
+        }
+        
+        // Apply client-side filters
+        let filteredUsers = allUsers;
+        
+        // Filter by search keyword
+        if (searchKeyword) {
+          filteredUsers = filteredUsers.filter(u => 
+            u.username.toLowerCase().includes(searchKeyword.toLowerCase()) ||
+            u.email?.toLowerCase().includes(searchKeyword.toLowerCase()) ||
+            u.firstName?.toLowerCase().includes(searchKeyword.toLowerCase()) ||
+            u.lastName?.toLowerCase().includes(searchKeyword.toLowerCase())
+          );
+        }
+        
+        // Filter by role
+        if (selectedRole) {
+          filteredUsers = filteredUsers.filter(u => 
+            u.roles?.some(r => r.name === selectedRole)
+          );
+        }
+        
+        // Filter by status
+        if (selectedStatus === 'active') {
+          filteredUsers = filteredUsers.filter(u => u.active === true);
+        } else if (selectedStatus === 'inactive') {
+          filteredUsers = filteredUsers.filter(u => u.active === false);
+        }
+        
+        // Paginate client-side
+        const startIndex = currentPage * pageSize;
+        const paginatedUsers = filteredUsers.slice(startIndex, startIndex + pageSize);
+        
+        setUsers(paginatedUsers);
+        setTotalElements(filteredUsers.length);
+        setTotalPages(Math.ceil(filteredUsers.length / pageSize));
+        return;
+      }
+      
+      // Admin flow - original logic
       let response;
       if (searchKeyword) {
         response = await searchUsers({
@@ -123,7 +189,7 @@ export default function UserList() {
     } finally {
       setIsLoading(false);
     }
-  }, [currentPage, pageSize, searchKeyword, selectedRole, selectedStatus, sortColumn, sortDirection]);
+  }, [currentPage, pageSize, searchKeyword, selectedRole, selectedStatus, sortColumn, sortDirection, isManager]);
 
   useEffect(() => {
     fetchUsers();

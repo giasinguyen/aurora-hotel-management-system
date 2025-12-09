@@ -138,11 +138,16 @@ export default function AdminRevenueReport() {
     average: point.bookingCount > 0 ? Math.round(point.revenue / point.bookingCount) : 0,
   }));
 
+  // Map backend payment method enum to display names
+  // Backend returns: { "CASH": 1000, "CARD": 2000, "BANK_TRANSFER": 3000, "VNPAY": 4000, ... }
   const paymentMethodData = paymentMethods ? [
-    { name: 'Tiền mặt', value: paymentMethods.cash || 0, color: '#10b981' },
-    { name: 'Thẻ', value: paymentMethods.card || 0, color: '#3b82f6' },
-    { name: 'Chuyển khoản', value: paymentMethods.transfer || 0, color: '#f59e0b' },
-    { name: 'VNPay', value: paymentMethods.vnpay || 0, color: '#8b5cf6' },
+    { name: 'Tiền mặt', value: paymentMethods.CASH || 0, color: '#10b981' },
+    { name: 'Thẻ', value: paymentMethods.CARD || 0, color: '#3b82f6' },
+    { name: 'Chuyển khoản', value: paymentMethods.BANK_TRANSFER || 0, color: '#f59e0b' },
+    { name: 'VNPay', value: paymentMethods.VNPAY || 0, color: '#8b5cf6' },
+    { name: 'MoMo', value: paymentMethods.MOMO || 0, color: '#d946ef' },
+    { name: 'ZaloPay', value: paymentMethods.ZALOPAY || 0, color: '#0ea5e9' },
+    { name: 'PayPal', value: paymentMethods.PAYPAL || 0, color: '#6366f1' },
   ].filter(item => item.value > 0) : [];
 
   const branchRevenueData = branchData.map((b, index) => ({

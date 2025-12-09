@@ -53,13 +53,15 @@ public interface BookingRepository extends JpaRepository<Booking, String> {
     // (STATISTICS & DASHBOARD)
     // =================================================================
 
-    @Query("SELECT b FROM Booking b WHERE b.checkin >= :start AND b.checkout <= :end " +
+    // Bookings that overlap with the date range (checkin <= end AND checkout >= start)
+    @Query("SELECT b FROM Booking b WHERE b.checkin <= :end AND b.checkout >= :start " +
             "AND (:branchId IS NULL OR b.branch.id = :branchId)")
     List<Booking> findAllWithinDateRange(@Param("start") LocalDate start,
                                          @Param("end") LocalDate end,
                                          @Param("branchId") String branchId);
 
-    @Query("SELECT COUNT(b) FROM Booking b WHERE b.checkin >= :start AND b.checkout <= :end " +
+    // Count bookings that overlap with the date range
+    @Query("SELECT COUNT(b) FROM Booking b WHERE b.checkin <= :end AND b.checkout >= :start " +
             "AND (:branchId IS NULL OR b.branch.id = :branchId) " +
             "AND (:status IS NULL OR b.status = :status)")
     long countBookingsWithinDateRange(@Param("start") LocalDate start,
@@ -67,7 +69,8 @@ public interface BookingRepository extends JpaRepository<Booking, String> {
                                       @Param("status") Booking.BookingStatus status,
                                       @Param("branchId") String branchId);
 
-    @Query("SELECT COALESCE(SUM(b.totalPrice), 0) FROM Booking b WHERE b.checkin >= :start AND b.checkout <= :end " +
+    // Sum total price of bookings that overlap with the date range
+    @Query("SELECT COALESCE(SUM(b.totalPrice), 0) FROM Booking b WHERE b.checkin <= :end AND b.checkout >= :start " +
             "AND (:branchId IS NULL OR b.branch.id = :branchId)")
     BigDecimal sumBookingTotalPrice(@Param("start") LocalDate start,
                                     @Param("end") LocalDate end,

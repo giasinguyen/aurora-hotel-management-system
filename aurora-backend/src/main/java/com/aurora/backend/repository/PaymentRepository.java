@@ -65,20 +65,25 @@ public interface PaymentRepository extends JpaRepository<Payment, String> {
 
        List<Payment> findByBookingAndStatus(Booking booking, Payment.PaymentStatus status);
 
+       // Revenue based on payment date (paidAt) - more accurate for financial reporting
+       // Cast LocalDateTime to DATE for comparison with LocalDate parameters
        @Query("SELECT COALESCE(SUM(p.amount), 0) FROM Payment p " +
                "WHERE p.status = :status " +
-               "AND p.booking.checkin >= :start " +
-               "AND p.booking.checkout <= :end " +
+               "AND p.paidAt IS NOT NULL " +
+               "AND CAST(p.paidAt AS DATE) >= :start " +
+               "AND CAST(p.paidAt AS DATE) <= :end " +
                "AND (:branchId IS NULL OR p.booking.branch.id = :branchId)")
        BigDecimal sumPaymentsByStatusAndRange(@Param("status") Payment.PaymentStatus status,
                                               @Param("start") LocalDate start,
                                               @Param("end") LocalDate end,
                                               @Param("branchId") String branchId);
 
+       // Revenue by payment method based on payment date
        @Query("SELECT p.method AS method, COALESCE(SUM(p.amount), 0) AS totalAmount FROM Payment p " +
                "WHERE p.status = :status " +
-               "AND p.booking.checkin >= :start " +
-               "AND p.booking.checkout <= :end " +
+               "AND p.paidAt IS NOT NULL " +
+               "AND CAST(p.paidAt AS DATE) >= :start " +
+               "AND CAST(p.paidAt AS DATE) <= :end " +
                "AND (:branchId IS NULL OR p.booking.branch.id = :branchId) " +
                "GROUP BY p.method")
        List<PaymentMethodRevenueProjection> sumPaymentsByMethod(@Param("status") Payment.PaymentStatus status,

@@ -11,6 +11,8 @@ import com.aurora.backend.dto.request.UserRegistrationRequest;
 import com.aurora.backend.dto.request.UserUpdateRequest;
 import com.aurora.backend.dto.response.ApiResponse;
 import com.aurora.backend.dto.response.UserResponse;
+import com.aurora.backend.exception.AppException;
+import com.aurora.backend.enums.ErrorCode;
 import com.aurora.backend.service.UserService;
 import jakarta.validation.Valid;
 
@@ -121,15 +123,36 @@ public class UserController {
     }
 
     @GetMapping("/role/{roleName}")
-    @RequirePermission({PermissionConstants.Admin.ROLE_CREATE})
+    @RequirePermission({
+        PermissionConstants.Admin.ROLE_CREATE,
+        PermissionConstants.Manager.STAFF_VIEW,
+        PermissionConstants.Staff.CUSTOMER_VIEW
+    })
     ApiResponse<Page<UserResponse>> getUsersByRole(
             @PathVariable("roleName") String roleName,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "username") String sortBy,
-            @RequestParam(defaultValue = "asc") String sortDirection) {
+            @RequestParam(defaultValue = "asc") String sortDirection,
+            Authentication authentication) {
         
         log.info("Fetching users with role: {} - page: {}, size: {}", roleName, page, size);
+        
+        // Validate Manager can only access STAFF and CUSTOMER roles
+        if (authentication != null) {
+            boolean isManager = authentication.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_MANAGER"));
+            boolean isAdmin = authentication.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+            
+            if (isManager && !isAdmin) {
+                String normalizedRole = roleName.toUpperCase().replace("ROLE_", "");
+                if (!normalizedRole.equals("STAFF") && !normalizedRole.equals("CUSTOMER")) {
+                    log.warn("Manager attempted to access role: {} - forbidden", roleName);
+                    throw new AppException(ErrorCode.UNAUTHORIZED);
+                }
+            }
+        }
         
         Sort sort = sortDirection.equalsIgnoreCase("desc") 
                 ? Sort.by(sortBy).descending() 

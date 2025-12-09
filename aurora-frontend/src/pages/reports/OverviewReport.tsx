@@ -137,11 +137,16 @@ export default function OverviewReport() {
     bookings: point.bookingCount,
   }));
 
+  // Map backend payment method enum to display names
+  // Backend returns: { "CASH": 1000, "CARD": 2000, "BANK_TRANSFER": 3000, "VNPAY": 4000, ... }
   const paymentMethodData = paymentMethods ? [
-    { name: 'Tiền mặt', value: paymentMethods.cash || 0 },
-    { name: 'Thẻ', value: paymentMethods.card || 0 },
-    { name: 'Chuyển khoản', value: paymentMethods.transfer || 0 },
-    { name: 'VNPay', value: paymentMethods.vnpay || 0 },
+    { name: 'Tiền mặt', value: paymentMethods.CASH || 0 },
+    { name: 'Thẻ', value: paymentMethods.CARD || 0 },
+    { name: 'Chuyển khoản', value: paymentMethods.BANK_TRANSFER || 0 },
+    { name: 'VNPay', value: paymentMethods.VNPAY || 0 },
+    { name: 'MoMo', value: paymentMethods.MOMO || 0 },
+    { name: 'ZaloPay', value: paymentMethods.ZALOPAY || 0 },
+    { name: 'PayPal', value: paymentMethods.PAYPAL || 0 },
   ].filter(item => item.value > 0) : [];
 
   const bookingSourceData = bookingSources ? [

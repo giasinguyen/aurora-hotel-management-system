@@ -34,7 +34,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { workShiftApi, staffShiftApi } from '@/services/shiftApi';
-import { getUsers } from '@/services/userApi';
+import { getUsersByRole } from '@/services/userApi';
 import { branchApi } from '@/services/branchApi';
 import type { WorkShift, WorkShiftCreationRequest, StaffShiftAssignmentRequest, StaffShiftAssignment } from '@/types/shift.types';
 import type { User } from '@/types/user.types';
@@ -142,24 +142,13 @@ export default function ShiftManagement() {
 
   const loadUsers = async () => {
     try {
-      // Lấy tất cả users, sau đó filter chỉ lấy STAFF role
-      const response = await getUsers();
-      if (response.result) {
-        // Debug: Log all users and their roles
-        console.log('All users with roles:');
-        response.result.forEach((u: User) => {
-          console.log(`- ${u.username}:`, u.roles?.map(r => r.name).join(', ') || 'No roles');
-        });
-        
-        // Chỉ lấy nhân viên có role STAFF, loại bỏ các role khác (MANAGER, ADMIN, CUSTOMER)
-        const staffUsers = response.result.filter((user: User) => 
-          user.roles && 
-          user.roles.length > 0 && 
-          user.roles.some(role => role.name === 'ROLE_STAFF' || role.name === 'STAFF') &&
-          user.active
-        );
+      // Use getUsersByRole API for STAFF - Manager has permission for this
+      const response = await getUsersByRole('STAFF', { page: 0, size: 1000 });
+      if (response.result?.content) {
+        // Filter only active staff
+        const staffUsers = response.result.content.filter((user: User) => user.active);
         setUsers(staffUsers);
-        console.log('Loaded STAFF users:', staffUsers.length, 'from total:', response.result.length);
+        console.log('Loaded STAFF users:', staffUsers.length);
       }
     } catch (error) {
       console.error('Không thể tải danh sách nhân viên:', error);
