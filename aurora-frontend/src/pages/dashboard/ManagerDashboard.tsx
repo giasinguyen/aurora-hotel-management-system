@@ -253,10 +253,10 @@ const ManagerDashboard = () => {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold text-purple-600">
-              {((overview?.occupancyRate || 0) * 100).toFixed(1)}%
+              {(overview?.occupancyRate || 0).toFixed(1)}%
             </div>
             <Progress 
-              value={(overview?.occupancyRate || 0) * 100} 
+              value={overview?.occupancyRate || 0} 
               className="h-2 mt-2"
             />
             <p className="text-xs text-muted-foreground mt-1">

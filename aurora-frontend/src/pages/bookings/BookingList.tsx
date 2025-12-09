@@ -1,7 +1,8 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'sonner';
 import { Eye, MoreHorizontal, CheckCircle, XCircle, Edit, LogIn, LogOut } from 'lucide-react';
+import { useAppSelector } from '@/hooks/useRedux';
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -51,12 +52,28 @@ const paymentStatusConfig: Record<PaymentStatus, { label: string; variant: 'defa
 export default function BookingList() {
   const navigate = useNavigate();
   
+  // Get current user from auth state
+  const authUser = useAppSelector((state) => state.auth.user);
+  
   // Detect current role prefix from URL
   const currentPath = window.location.pathname;
   const rolePrefix = currentPath.startsWith('/admin') ? '/admin' 
     : currentPath.startsWith('/manager') ? '/manager'
     : currentPath.startsWith('/staff') ? '/staff'
     : '';
+  
+  // Check if user is Admin (can see all branches) or Manager/Staff (limited to their branch)
+  const isAdmin = useMemo(() => {
+    return authUser?.roles?.some(role => 
+      role.toUpperCase() === 'ADMIN' || role.toUpperCase() === 'ROLE_ADMIN'
+    ) ?? false;
+  }, [authUser?.roles]);
+  
+  // Get user's branch ID for filtering (Manager/Staff only see their branch)
+  const userBranchId = useMemo(() => {
+    if (isAdmin) return null; // Admin can see all
+    return authUser?.branchId || null;
+  }, [isAdmin, authUser?.branchId]);
   
   // State
   const [bookings, setBookings] = useState<Booking[]>([]);
@@ -70,10 +87,17 @@ export default function BookingList() {
   const [totalPages, setTotalPages] = useState(0);
   const [totalElements, setTotalElements] = useState(0);
   
-  // Filters
+  // Filters - For Manager/Staff, auto-set to their branch
   const [searchKeyword, setSearchKeyword] = useState('');
   const [selectedBranch, setSelectedBranch] = useState('');
   const [selectedStatus, setSelectedStatus] = useState('');
+  
+  // Effect to set initial branch filter for Manager/Staff
+  useEffect(() => {
+    if (userBranchId && !isAdmin) {
+      setSelectedBranch(userBranchId);
+    }
+  }, [userBranchId, isAdmin]);
   
   // Sorting
   const [sortColumn, setSortColumn] = useState('checkin');
@@ -106,8 +130,11 @@ export default function BookingList() {
       setIsLoading(true);
       setError(null);
       
+      // For Manager/Staff, always use their branchId even if selectedBranch is empty
+      const branchIdToUse = !isAdmin && userBranchId ? userBranchId : (selectedBranch || undefined);
+      
       const response = await bookingApi.search({
-        branchId: selectedBranch || undefined,
+        branchId: branchIdToUse,
         status: selectedStatus as BookingStatus || undefined,
         page: currentPage,
         size: pageSize,
@@ -161,7 +188,7 @@ export default function BookingList() {
     } finally {
       setIsLoading(false);
     }
-  }, [currentPage, pageSize, selectedBranch, selectedStatus, sortColumn, sortDirection]);
+  }, [currentPage, pageSize, selectedBranch, selectedStatus, sortColumn, sortDirection, isAdmin, userBranchId]);
 
   useEffect(() => {
     fetchBookings();
@@ -234,7 +261,10 @@ export default function BookingList() {
   // Handle clear filters
   const handleClearFilters = () => {
     setSearchKeyword('');
-    setSelectedBranch('');
+    // For Manager/Staff, don't clear branch filter - keep their branch
+    if (isAdmin) {
+      setSelectedBranch('');
+    }
     setSelectedStatus('');
     setCurrentPage(0);
   };
@@ -446,22 +476,30 @@ export default function BookingList() {
             onSearchChange={setSearchKeyword}
             searchPlaceholder="Tìm theo mã đặt phòng, tên khách..."
             filters={[
-              {
+              // Only show branch filter for Admin, Manager/Staff see their branch name as info
+              ...(isAdmin ? [{
                 key: 'branch',
                 label: 'Chi nhánh',
                 value: selectedBranch,
                 options: branchOptions,
-                onChange: (value) => {
+                onChange: (value: string) => {
                   setSelectedBranch(value === 'all' ? '' : value);
                   setCurrentPage(0);
                 },
-              },
+              }] : [{
+                key: 'branch',
+                label: 'Chi nhánh',
+                value: userBranchId || '',
+                options: branches.filter(b => b.id === userBranchId).map(b => ({ value: b.id, label: b.name })),
+                onChange: () => {}, // Disabled - cannot change
+                disabled: true,
+              }]),
               {
                 key: 'status',
                 label: 'Trạng thái',
                 value: selectedStatus,
                 options: statusOptions,
-                onChange: (value) => {
+                onChange: (value: string) => {
                   setSelectedStatus(value === 'all' ? '' : value);
                   setCurrentPage(0);
                 },
