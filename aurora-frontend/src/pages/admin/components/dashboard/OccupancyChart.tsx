@@ -3,9 +3,8 @@
 // ============================================
 
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Progress } from '@/components/ui/progress';
 import { Skeleton } from '@/components/ui/skeleton';
-import { BedDouble, CheckCircle2, XCircle, Building2, Percent, TrendingUp } from 'lucide-react';
+import { BedDouble, CheckCircle2, XCircle, Building2, Percent } from 'lucide-react';
 import type { OccupancyStatistics } from '@/types/dashboard.types';
 
 interface OccupancyChartProps {

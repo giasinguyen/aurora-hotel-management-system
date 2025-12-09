@@ -6,7 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Crown, TrendingUp, BedDouble } from 'lucide-react';
+import { Crown, BedDouble } from 'lucide-react';
 import type { TopRoomType } from '@/types/dashboard.types';
 
 interface TopRoomTypesChartProps {

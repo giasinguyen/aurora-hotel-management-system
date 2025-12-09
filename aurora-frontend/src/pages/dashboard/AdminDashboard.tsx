@@ -2,7 +2,7 @@
 // Admin Dashboard Page - Aurora Hotel Management
 // ============================================
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback } from 'react';
 import { format, subDays } from 'date-fns';
 import { vi } from 'date-fns/locale';
 import { useNavigate } from 'react-router-dom';
@@ -19,7 +19,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import { Skeleton } from '@/components/ui/skeleton';
+
 import {
   DollarSign,
   CalendarCheck,
@@ -34,14 +34,12 @@ import {
   RefreshCw,
   BarChart3,
   UserCog,
-  Settings,
   Clock,
   CheckCircle2,
   XCircle,
   AlertCircle,
   Loader2,
   Activity,
-  Target,
   Percent,
   Wallet,
 } from 'lucide-react';
@@ -85,8 +83,6 @@ const AdminDashboard = () => {
     occupancyStats,
     topRoomTypes,
     paymentMethods,
-    bookingSources,
-    customerGrowth,
     loading,
     error,
     refresh,
@@ -162,7 +158,7 @@ const AdminDashboard = () => {
           </h1>
           <p className="text-gray-500 mt-1 flex items-center gap-2">
             <Shield className="h-4 w-4" />
-            Xin chào, {currentUser?.fullName || 'Admin'}! Đây là tổng quan hệ thống Aurora Hotel.
+            Xin chào, {currentUser?.firstName || 'Admin'}! Đây là tổng quan hệ thống Aurora Hotel.
           </p>
         </div>
         <Button
