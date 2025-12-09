@@ -1,11 +1,12 @@
 // ============================================
-// Occupancy Gauge Chart - Admin Dashboard
+// Occupancy Chart - Admin Dashboard
 // ============================================
 
-import { PieChart, Pie, Cell, ResponsiveContainer } from 'recharts';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Progress } from '@/components/ui/progress';
+import { Skeleton } from '@/components/ui/skeleton';
+import { BedDouble, CheckCircle2, XCircle, Building2, Percent, TrendingUp } from 'lucide-react';
 import type { OccupancyStatistics } from '@/types/dashboard.types';
-import ChartCard from './ChartCard';
-import { BedDouble, CheckCircle, XCircle } from 'lucide-react';
 
 interface OccupancyChartProps {
   data: OccupancyStatistics | null;
@@ -19,87 +20,135 @@ export default function OccupancyChart({ data, loading, error }: OccupancyChartP
   const occupiedRooms = data?.occupiedRooms ?? 0;
   const availableRooms = data?.availableRooms ?? 0;
 
-  // Data for the gauge chart
-  const gaugeData = [
-    { name: 'Occupied', value: occupancyRate },
-    { name: 'Available', value: 100 - occupancyRate },
-  ];
-
-  const getOccupancyColor = (rate: number) => {
-    if (rate >= 80) return '#10b981'; // Green - Good
-    if (rate >= 50) return '#f59e0b'; // Yellow - Medium
-    return '#ef4444'; // Red - Low
+  const getOccupancyStatus = (rate: number) => {
+    if (rate >= 80) return { label: 'Xuất sắc', color: 'text-green-600', bgColor: 'bg-green-500', lightBg: 'bg-green-50' };
+    if (rate >= 60) return { label: 'Tốt', color: 'text-blue-600', bgColor: 'bg-blue-500', lightBg: 'bg-blue-50' };
+    if (rate >= 40) return { label: 'Trung bình', color: 'text-amber-600', bgColor: 'bg-amber-500', lightBg: 'bg-amber-50' };
+    return { label: 'Cần cải thiện', color: 'text-red-600', bgColor: 'bg-red-500', lightBg: 'bg-red-50' };
   };
 
-  const occupancyColor = getOccupancyColor(occupancyRate);
+  const status = getOccupancyStatus(occupancyRate);
+
+  if (loading) {
+    return (
+      <Card>
+        <CardHeader>
+          <Skeleton className="h-6 w-48" />
+          <Skeleton className="h-4 w-32" />
+        </CardHeader>
+        <CardContent>
+          <Skeleton className="h-48 w-full" />
+        </CardContent>
+      </Card>
+    );
+  }
 
   return (
-    <ChartCard
-      title="Room Occupancy"
-      subtitle="Current occupancy status"
-      loading={loading}
-      error={error}
-    >
-      {!data ? (
-        <div className="flex items-center justify-center h-64 text-gray-500">
-          No data available
-        </div>
-      ) : (
-        <div className="flex flex-col items-center">
-          {/* Gauge Chart */}
-          <div className="relative w-48 h-32">
-            <ResponsiveContainer width="100%" height={160}>
-              <PieChart>
-                <Pie
-                  data={gaugeData}
-                  cx="50%"
-                  cy="100%"
-                  startAngle={180}
-                  endAngle={0}
-                  innerRadius={60}
-                  outerRadius={80}
-                  paddingAngle={0}
-                  dataKey="value"
-                >
-                  <Cell fill={occupancyColor} />
-                  <Cell fill="#e5e7eb" />
-                </Pie>
-              </PieChart>
-            </ResponsiveContainer>
-            {/* Center Text */}
-            <div className="absolute inset-0 flex flex-col items-center justify-end pb-2">
-              <span className="text-3xl font-bold" style={{ color: occupancyColor }}>
-                {occupancyRate.toFixed(1)}%
-              </span>
-            </div>
+    <Card className="overflow-hidden">
+      <CardHeader className="bg-gradient-to-r from-purple-50 to-pink-50 border-b">
+        <CardTitle className="flex items-center gap-2">
+          <Percent className="h-5 w-5 text-purple-500" />
+          Tỷ lệ lấp đầy phòng
+        </CardTitle>
+        <CardDescription>Trạng thái sử dụng phòng hôm nay</CardDescription>
+      </CardHeader>
+      <CardContent className="pt-6">
+        {error ? (
+          <div className="flex items-center justify-center h-64 text-red-500">
+            {error}
           </div>
+        ) : !data ? (
+          <div className="flex flex-col items-center justify-center h-64 text-gray-500">
+            <BedDouble className="h-12 w-12 mb-2 text-gray-300" />
+            <p>Không có dữ liệu</p>
+          </div>
+        ) : (
+          <div className="space-y-6">
+            {/* Main Occupancy Display */}
+            <div className="flex items-center justify-center">
+              <div className="relative w-40 h-40">
+                {/* Circular Progress Background */}
+                <svg className="w-full h-full transform -rotate-90">
+                  <circle
+                    cx="80"
+                    cy="80"
+                    r="70"
+                    fill="none"
+                    stroke="#e5e7eb"
+                    strokeWidth="12"
+                  />
+                  <circle
+                    cx="80"
+                    cy="80"
+                    r="70"
+                    fill="none"
+                    stroke="url(#occupancyGradient)"
+                    strokeWidth="12"
+                    strokeLinecap="round"
+                    strokeDasharray={`${(occupancyRate / 100) * 440} 440`}
+                  />
+                  <defs>
+                    <linearGradient id="occupancyGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                      <stop offset="0%" stopColor="#8b5cf6" />
+                      <stop offset="100%" stopColor="#ec4899" />
+                    </linearGradient>
+                  </defs>
+                </svg>
+                {/* Center Content */}
+                <div className="absolute inset-0 flex flex-col items-center justify-center">
+                  <span className="text-4xl font-bold bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+                    {occupancyRate.toFixed(1)}%
+                  </span>
+                  <span className={`text-sm font-medium ${status.color}`}>
+                    {status.label}
+                  </span>
+                </div>
+              </div>
+            </div>
 
-          {/* Stats Grid */}
-          <div className="grid grid-cols-3 gap-4 w-full mt-6 pt-4 border-t">
-            <div className="flex flex-col items-center">
-              <div className="flex items-center gap-1 text-gray-500">
-                <BedDouble className="h-4 w-4" />
-                <span className="text-xs">Total</span>
+            {/* Stats Grid */}
+            <div className="grid grid-cols-3 gap-3">
+              <div className="flex flex-col items-center p-4 rounded-xl bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-100">
+                <div className="p-2 rounded-full bg-blue-100 mb-2">
+                  <Building2 className="h-5 w-5 text-blue-600" />
+                </div>
+                <span className="text-2xl font-bold text-blue-700">{totalRooms}</span>
+                <span className="text-xs text-blue-600 font-medium">Tổng phòng</span>
               </div>
-              <span className="text-lg font-semibold text-gray-900">{totalRooms}</span>
+
+              <div className="flex flex-col items-center p-4 rounded-xl bg-gradient-to-br from-red-50 to-rose-50 border border-red-100">
+                <div className="p-2 rounded-full bg-red-100 mb-2">
+                  <XCircle className="h-5 w-5 text-red-600" />
+                </div>
+                <span className="text-2xl font-bold text-red-700">{occupiedRooms}</span>
+                <span className="text-xs text-red-600 font-medium">Đang sử dụng</span>
+              </div>
+
+              <div className="flex flex-col items-center p-4 rounded-xl bg-gradient-to-br from-green-50 to-emerald-50 border border-green-100">
+                <div className="p-2 rounded-full bg-green-100 mb-2">
+                  <CheckCircle2 className="h-5 w-5 text-green-600" />
+                </div>
+                <span className="text-2xl font-bold text-green-700">{availableRooms}</span>
+                <span className="text-xs text-green-600 font-medium">Còn trống</span>
+              </div>
             </div>
-            <div className="flex flex-col items-center">
-              <div className="flex items-center gap-1 text-red-500">
-                <XCircle className="h-4 w-4" />
-                <span className="text-xs">Occupied</span>
+
+            {/* Progress Bar */}
+            <div className="space-y-2">
+              <div className="flex justify-between text-sm">
+                <span className="text-gray-600">Tiến độ lấp đầy</span>
+                <span className="font-medium">{occupiedRooms}/{totalRooms} phòng</span>
               </div>
-              <span className="text-lg font-semibold text-red-600">{occupiedRooms}</span>
-            </div>
-            <div className="flex flex-col items-center">
-              <div className="flex items-center gap-1 text-green-500">
-                <CheckCircle className="h-4 w-4" />
-                <span className="text-xs">Available</span>
+              <div className="h-3 bg-gray-100 rounded-full overflow-hidden">
+                <div 
+                  className="h-full bg-gradient-to-r from-purple-500 to-pink-500 rounded-full transition-all duration-500"
+                  style={{ width: `${occupancyRate}%` }}
+                />
               </div>
-              <span className="text-lg font-semibold text-green-600">{availableRooms}</span>
             </div>
           </div>
-        </div>
-      )}
-    </ChartCard>
+        )}
+      </CardContent>
+    </Card>
   );
 }
