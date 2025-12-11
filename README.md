@@ -7,7 +7,7 @@
 <!-- Logo & Title -->
 <img src="aurora-frontend/src/assets/images/commons/aurora-logo.png" alt="Aurora Hotel" width="180" style="border-radius: 20px;"/>
 
-# ✨ Aurora Hotel Management System
+# ✨ Aurora Hotel Management System ✨
 
 <p>
 <strong>A modern, full-featured hotel management platform powered by AI</strong>
