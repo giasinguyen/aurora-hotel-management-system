@@ -75,18 +75,17 @@ services:
       - aurora-network
 
   # ============================================================
-  # React Frontend (Nginx)
+  # React Frontend (Nginx) - image pull từ Docker Hub, KHÔNG build trên server
+  # Build local: docker build -t <DOCKERHUB_USERNAME>/aurora-frontend:latest ./aurora-frontend
+  # Push:        docker push <DOCKERHUB_USERNAME>/aurora-frontend:latest
   # ============================================================
   aurora-frontend:
-    build:
-      context: ./aurora-frontend
-      dockerfile: Dockerfile
+    image: ${FRONTEND_IMAGE}
     container_name: aurora-frontend
     restart: unless-stopped
     ports:
-      - "${FRONTEND_PORT:-80}:${FRONTEND_PORT:-80}"
+      - "${FRONTEND_PORT:-3001}:8080"
     environment:
-      PORT: ${FRONTEND_PORT:-80}
       VITE_API_BASE_URL: ${VITE_API_BASE_URL}
       VITE_CLOUDINARY_CLOUD_NAME: ${VITE_CLOUDINARY_CLOUD_NAME}
       VITE_CLOUDINARY_UPLOAD_PRESET: ${VITE_CLOUDINARY_UPLOAD_PRESET:-aurora_hotel}
