@@ -77,8 +77,7 @@ langchain4j:
       log-requests-and-responses: true
     embedding-model:
       api-key: ${GEMINI_AI_KEY}
-      model-name: text-embedding-004
-      output-dimensionality: 768
+      model-name: embedding-001
       log-requests-and-responses: false
 
 # VNPay Configuration

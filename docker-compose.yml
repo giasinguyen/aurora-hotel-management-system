@@ -46,9 +46,7 @@ services:
   # Spring Boot Backend
   # ============================================================
   aurora-backend:
-    build:
-      context: ./aurora-backend
-      dockerfile: Dockerfile
+    image: ${BACKEND_IMAGE:-iamgiasi/aurora-backend:latest}
     container_name: aurora-backend
     restart: unless-stopped
     ports:
