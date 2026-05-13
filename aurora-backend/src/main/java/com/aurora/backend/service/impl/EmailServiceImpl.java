@@ -223,6 +223,7 @@ public class EmailServiceImpl implements EmailService {
 
     private String getBookingStatusText(Booking.BookingStatus status) {
         return switch (status) {
+            case AWAITING_PAYMENT -> "Chờ thanh toán VNPay";
             case PENDING -> "Chờ xác nhận";
             case CONFIRMED -> "Đã xác nhận";
             case CHECKED_IN -> "Đã check-in";
