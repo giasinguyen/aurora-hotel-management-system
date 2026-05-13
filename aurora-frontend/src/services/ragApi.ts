@@ -1,12 +1,4 @@
-/**
- * Get API base URL from runtime config or fallback to build-time env or default
- */
-const getApiBaseUrl = (): string => {
-  if (typeof window !== 'undefined' && window._env_?.VITE_API_BASE_URL) {
-    return window._env_.VITE_API_BASE_URL;
-  }
-  return import.meta.env.VITE_API_BASE_URL || "http://localhost:8080";
-};
+import { getApiBaseUrl } from "@/config/api";
 
 /**
  * Build WebSocket URL for RAG streaming

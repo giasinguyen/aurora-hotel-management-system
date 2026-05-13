@@ -5,6 +5,7 @@ import { updateTokenManually } from "@/features/slices/auth/authSlice";
 import type { AppDispatch } from "@/features/store";
 import { logout } from "@/features/slices/auth/authThunk";
 import { refreshTokenApi } from "@/services/authApi";
+import { getApiBaseUrl } from "@/config/api";
 
 // Setup dispatch from store to use
 // in this file
@@ -12,14 +13,6 @@ let dispatchRef: AppDispatch;
 
 export const setupAxiosInterceptors = (dispatch: AppDispatch) => {
   dispatchRef = dispatch;
-};
-
-// Get API base URL from runtime config or fallback to build-time env or default
-const getApiBaseUrl = () => {
-  if (typeof window !== 'undefined' && window._env_?.VITE_API_BASE_URL) {
-    return window._env_.VITE_API_BASE_URL;
-  }
-  return import.meta.env.VITE_API_BASE_URL || "http://localhost:8080";
 };
 
 // Default configuration for requests

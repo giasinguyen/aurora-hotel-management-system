@@ -6,6 +6,7 @@ import type {
   BranchStatus
 } from '@/types/branch.types';
 import axiosClient from '@/config/axiosClient';
+import publicAxiosClient from '@/config/publicAxiosClient';
 
 const BRANCH_BASE_URL = '/api/v1/branches';
 
@@ -97,11 +98,22 @@ export const branchApi = {
     size?: number;
   } = {}) => {
     const { page = 0, size = 100 } = params;
-    const response = await axiosClient.get<ApiResponse<SpringPage<Branch>>>(
+    const response = await publicAxiosClient.get<ApiResponse<SpringPage<Branch>>>(
       `${BRANCH_BASE_URL}/public/active`,
       { params: { page, size } }
     );
     return response.data;
+  },
+
+  // Get branch by ID for guest pages using the public active-branches endpoint
+  getPublicById: async (id: string) => {
+    const response = await branchApi.getActivePublic({ page: 0, size: 100 });
+    const branch = response.result?.content.find((item) => item.id === id);
+
+    return {
+      ...response,
+      result: branch,
+    } as ApiResponse<Branch | undefined>;
   },
 
   // Create branch

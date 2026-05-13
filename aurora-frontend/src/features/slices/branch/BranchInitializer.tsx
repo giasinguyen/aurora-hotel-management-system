@@ -14,7 +14,7 @@ export default function BranchInitializer() {
     const fetchBranchDetails = async (branchId: string) => {
       try {
         console.log('Fetching branch details for:', branchId);
-        const response = await branchApi.getById(branchId);
+        const response = await branchApi.getPublicById(branchId);
         if (response.result) {
           console.log('Branch details fetched:', response.result);
           dispatch(setBranchDetails(response.result));

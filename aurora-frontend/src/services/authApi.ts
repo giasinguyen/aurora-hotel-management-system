@@ -11,15 +11,16 @@ import type {
 } from "@/types/user.d.ts";
 import { getSessionMeta } from "@/utils/sessionHelper";
 import axios from "axios";
+import { getApiBaseUrl } from "@/config/api";
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8080";
+const apiUrl = (path: string) => `${getApiBaseUrl()}${path}`;
 
 /**
  * Register a new user account (no authentication required)
  */
 export const registerApi = (data: RegisterRequest) => {
   return axios.post<ApiResponse<UserSessionResponse>>(
-    `${API_BASE_URL}/api/v1/auth/register`,
+    apiUrl("/api/v1/auth/register"),
     data,
     {
       withCredentials: true,
@@ -48,7 +49,7 @@ export const loginApi = (data: LoginRequest) => {
  */
 export const logoutApi = () => {
   return axios.post<ApiResponse<void>>(
-    `${API_BASE_URL}/api/v1/auth/logout`,
+    apiUrl("/api/v1/auth/logout"),
     {},
     {
       withCredentials: true,
@@ -80,7 +81,7 @@ export const refreshTokenApi = () => {
   const data: SessionMetaRequest = getSessionMeta();
 
   return axios.post<ApiResponse<AuthTokenResponse>>(
-    `${API_BASE_URL}/api/v1/auth/refresh-token`,
+    apiUrl("/api/v1/auth/refresh-token"),
     data,
     {
       withCredentials: true,
