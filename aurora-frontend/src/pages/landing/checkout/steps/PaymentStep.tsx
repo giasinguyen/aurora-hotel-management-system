@@ -316,20 +316,23 @@ export default function PaymentStep({
               toast.success("Đang chuyển đến cổng thanh toán VNPay...");
               window.location.href = paymentResponse.result.paymentUrl;
               return;
-            }
-          } catch (vnpayError) {
-            console.error("VNPay payment creation failed:", vnpayError);
-            toast.error("Không thể tạo thanh toán VNPay. Booking đã được tạo với mã " + bookingCode);
-            setIsSubmitting(false);
-            
-            // Navigate based on role
-            if (rolePrefix) {
-              // Admin/Manager/Staff: go to bookings list
-              navigate(`${rolePrefix}/bookings`);
             } else {
-              // Client: go to success page
-              navigate(`/booking/success?bookingId=${bookingId}&bookingCode=${bookingCode}`);
+              // Backend responded but no paymentUrl in result
+              throw new Error("Không nhận được URL thanh toán từ VNPay. Response: " + JSON.stringify(paymentResponse));
             }
+          } catch (vnpayError: unknown) {
+            // Extract the actual error message from API response
+            let vnpayErrorMsg = "Không thể tạo thanh toán VNPay";
+            if (vnpayError && typeof vnpayError === 'object' && 'response' in vnpayError) {
+              const axErr = vnpayError as { response?: { data?: { message?: string; code?: number } } };
+              if (axErr.response?.data?.message) {
+                vnpayErrorMsg = axErr.response.data.message;
+              }
+            } else if (vnpayError instanceof Error) {
+              vnpayErrorMsg = vnpayError.message;
+            }
+            toast.error(`Lỗi tạo thanh toán VNPay: ${vnpayErrorMsg}. Booking đã được tạo: ${bookingCode}`);
+            setIsSubmitting(false);
             return;
           }
         }
