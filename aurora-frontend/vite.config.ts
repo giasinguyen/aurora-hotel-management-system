@@ -15,4 +15,11 @@ export default defineConfig({
     open: true,
     port: 3000,
   },
+  build: {
+    // Xóa toàn bộ console.* và debugger trong production build
+    minify: 'esbuild',
+  },
+  esbuild: {
+    drop: ['console', 'debugger'],
+  },
 })
