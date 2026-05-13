@@ -22,7 +22,6 @@ spring:
         - classpath:db/init-auto/fix-email-verified.sql
         - classpath:db/init-auto/init-vector-store.sql
         - classpath:db/init-auto/init-roles-permissions.sql
-        - classpath:db/init-auto/fix-booking-status-constraint.sql
   jpa:
     hibernate:
       ddl-auto: update
