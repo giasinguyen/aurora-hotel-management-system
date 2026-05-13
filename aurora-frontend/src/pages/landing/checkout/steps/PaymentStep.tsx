@@ -331,7 +331,12 @@ export default function PaymentStep({
             } else if (vnpayError instanceof Error) {
               vnpayErrorMsg = vnpayError.message;
             }
-            toast.error(`Lỗi tạo thanh toán VNPay: ${vnpayErrorMsg}. Booking đã được tạo: ${bookingCode}`);
+            // Booking đã được tạo với trạng thái AWAITING_PAYMENT.
+            // Nếu không thanh toán trong 20 phút, hệ thống sẽ tự động huỷ.
+            toast.error(`Lỗi tạo thanh toán VNPay: ${vnpayErrorMsg}`, {
+              description: `Mã đặt phòng: ${bookingCode}. Đặt phòng sẽ tự động huỷ sau 20 phút nếu không thanh toán.`,
+              duration: 8000,
+            });
             setIsSubmitting(false);
             return;
           }

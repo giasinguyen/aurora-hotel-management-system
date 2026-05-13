@@ -101,6 +101,7 @@ public class RoomAvailabilityServiceImpl implements RoomAvailabilityService {
     public List<String> detectConflicts(String roomId, LocalDate checkinDate, LocalDate checkoutDate, String excludeBookingId) {
         // Status that occupy the room
         List<Booking.BookingStatus> occupyingStatuses = Arrays.asList(
+                Booking.BookingStatus.AWAITING_PAYMENT, // VNPay pending - holds the room for 20 min
                 Booking.BookingStatus.PENDING,
                 Booking.BookingStatus.CONFIRMED,
                 Booking.BookingStatus.CHECKED_IN,

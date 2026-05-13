@@ -12,6 +12,7 @@ import org.springframework.stereotype.Repository;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -98,7 +99,11 @@ public interface BookingRepository extends JpaRepository<Booking, String> {
                                          @Param("end") LocalDate end,
                                          @Param("branchId") String branchId);
 //------
-    
+
+    List<Booking> findByStatusAndCreatedAtBefore(
+            Booking.BookingStatus status,
+            LocalDateTime createdBefore);
+
     @Query("SELECT b.id FROM Booking b JOIN b.rooms br WHERE " +
            "br.room.id = :roomId AND " +
            "b.status IN :statuses AND " +

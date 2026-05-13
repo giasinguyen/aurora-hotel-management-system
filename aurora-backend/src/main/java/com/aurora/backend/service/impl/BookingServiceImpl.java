@@ -482,10 +482,11 @@ public class BookingServiceImpl implements BookingService {
                 .orElseThrow(() -> new AppException(ErrorCode.BRANCH_NOT_EXISTED));
         
         // Set initial booking status based on payment method
-        // For VNPay: Set CONFIRMED so payment can be created, will be updated after payment result
+        // For VNPay: AWAITING_PAYMENT - room is held but not confirmed until payment is received
+        //            Auto-cancelled after 20 minutes if payment not completed
         // For Cash: Set PENDING initially
         Booking.BookingStatus initialStatus = "vnpay".equals(request.getPaymentMethod()) 
-                ? Booking.BookingStatus.CONFIRMED 
+                ? Booking.BookingStatus.AWAITING_PAYMENT 
                 : Booking.BookingStatus.PENDING;
         
         Booking booking = Booking.builder()

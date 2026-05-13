@@ -62,8 +62,9 @@ public class VnPayServiceImpl implements VnPayService {
         Booking booking = bookingRepository.findById(bookingId)
             .orElseThrow(() -> new AppException(ErrorCode.BOOKING_NOT_FOUND));
         
-        // 2. Validate booking status (must be CONFIRMED)
-        if (booking.getStatus() != Booking.BookingStatus.CONFIRMED) {
+        // 2. Validate booking status (must be AWAITING_PAYMENT or CONFIRMED)
+        if (booking.getStatus() != Booking.BookingStatus.AWAITING_PAYMENT &&
+            booking.getStatus() != Booking.BookingStatus.CONFIRMED) {
             throw new AppException(ErrorCode.BOOKING_NOT_CONFIRMED);
         }
         

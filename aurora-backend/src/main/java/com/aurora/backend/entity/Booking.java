@@ -107,6 +107,7 @@ public class Booking extends BaseEntity {
     Set<BookingRoom> rooms;
 
     public enum BookingStatus {
+        AWAITING_PAYMENT, // Chờ thanh toán VNPay (tự huỷ sau 20 phút)
         PENDING,        // Chờ xác nhận
         CONFIRMED,      // Đã xác nhận
         CHECKED_IN,     // Đã check-in
