@@ -26,7 +26,12 @@ public class DocumentSeeder {
     public CommandLineRunner initRagDocument() {
         return args -> {
             if (documentService.isDocumentHasFile()) {
-                log.info("Documents already exist in database. Skipping document seeding.");
+                if (!documentService.hasEmbeddedDocumentChunks()) {
+                    log.info("Documents exist but no embedded chunks were found. Reindexing documents for RAG.");
+                    documentService.reindexAllFiles();
+                } else {
+                    log.info("Documents already exist and embedded chunks are present. Skipping document seeding.");
+                }
                 return;
             }
 

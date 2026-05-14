@@ -256,6 +256,15 @@ public class DocumentService {
         return documentRepository.count() > 0;
     }
 
+    public boolean hasEmbeddedDocumentChunks() {
+        return documentRepository.findAll().stream()
+                .anyMatch(document ->
+                        Boolean.TRUE.equals(document.getIsEmbed())
+                                && document.getTotalChunks() != null
+                                && document.getTotalChunks() > 0
+                );
+    }
+
     @Transactional
     public void reindexAllFiles() {
         List<Document> allFiles = documentRepository.findAll();

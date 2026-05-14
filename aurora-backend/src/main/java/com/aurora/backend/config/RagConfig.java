@@ -6,27 +6,46 @@ import dev.langchain4j.memory.chat.ChatMemoryProvider;
 import dev.langchain4j.memory.chat.MessageWindowChatMemory;
 import dev.langchain4j.model.embedding.EmbeddingModel;
 import dev.langchain4j.model.googleai.GoogleAiGeminiChatModel;
+import dev.langchain4j.model.googleai.GoogleAiGeminiStreamingChatModel;
+import dev.langchain4j.rag.content.Content;
 import dev.langchain4j.rag.content.retriever.ContentRetriever;
 import dev.langchain4j.rag.content.retriever.EmbeddingStoreContentRetriever;
 import dev.langchain4j.service.AiServices;
 import dev.langchain4j.store.embedding.EmbeddingStore;
 import dev.langchain4j.store.embedding.pgvector.PgVectorEmbeddingStore;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.util.List;
+
+@Slf4j
 @Configuration
 @RequiredArgsConstructor
 public class RagConfig {
     @Value("${langchain4j.google-ai-gemini.embedding-model.output-dimensionality:768}")
     private int outputDimension;
 
+    @Value("${rag.retriever.max-results:8}")
+    private int retrieverMaxResults;
+
+    @Value("${rag.retriever.min-score:0.25}")
+    private double retrieverMinScore;
+
     @Bean
-    public RagService geminiRagService(ContentRetriever contentRetriever, GoogleAiGeminiChatModel googleAiGeminiChatModel) {
+    public RagService geminiRagService(
+            ContentRetriever contentRetriever,
+            GoogleAiGeminiChatModel googleAiGeminiChatModel,
+            GoogleAiGeminiStreamingChatModel googleAiGeminiStreamingChatModel,
+            ChatMemoryProvider chatMemoryProvider
+    ) {
         return AiServices.builder(RagService.class)
                 .chatModel(googleAiGeminiChatModel)
+                .streamingChatModel(googleAiGeminiStreamingChatModel)
+                .chatMemoryProvider(chatMemoryProvider)
                 .contentRetriever(contentRetriever)
                 .build();
     }
@@ -59,13 +78,28 @@ public class RagConfig {
 
     @Bean
     public ContentRetriever contentRetriever(EmbeddingStore<TextSegment> embeddingStore, EmbeddingModel embeddingModel) {
-        return EmbeddingStoreContentRetriever
+        ContentRetriever retriever = EmbeddingStoreContentRetriever
                 .builder()
                 .embeddingStore(embeddingStore)
                 .embeddingModel(embeddingModel)
-                .maxResults(5)
-                .minScore(0.7)
+                .maxResults(retrieverMaxResults)
+                .minScore(retrieverMinScore)
                 .build();
+
+        return query -> {
+            List<Content> contents = retriever.retrieve(query);
+            log.info(
+                    "RAG retrieved {} chunks for query '{}' (maxResults={}, minScore={})",
+                    contents.size(),
+                    query.text(),
+                    retrieverMaxResults,
+                    retrieverMinScore
+            );
+            contents.stream()
+                    .limit(3)
+                    .forEach(content -> log.debug("RAG chunk preview: {}", preview(content)));
+            return contents;
+        };
     }
 
     @Bean
@@ -74,5 +108,14 @@ public class RagConfig {
                 .id(memoryId)
                 .maxMessages(10)
                 .build();
+    }
+
+    private String preview(Content content) {
+        if (content == null || content.textSegment() == null || content.textSegment().text() == null) {
+            return "";
+        }
+
+        String text = content.textSegment().text().replaceAll("\\s+", " ").trim();
+        return text.substring(0, Math.min(200, text.length()));
     }
 }

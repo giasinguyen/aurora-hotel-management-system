@@ -246,6 +246,7 @@ export default function ChatWidget() {
       dispatch(setStreaming(true));
       wsRef.current.send(
         JSON.stringify({
+          type: "message",
           message: inputToSend,
           chatId: chatId,
         })
