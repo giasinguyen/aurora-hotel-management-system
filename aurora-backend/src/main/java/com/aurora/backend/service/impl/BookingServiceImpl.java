@@ -457,10 +457,16 @@ public class BookingServiceImpl implements BookingService {
             booking.getPaymentStatus() == Booking.PaymentStatus.PAID) {
             
             booking.setStatus(Booking.BookingStatus.CONFIRMED);
-            booking.setEmailSent(true); // TODO: Send confirmation email
             
             bookingRepository.save(booking);
             log.info("Booking auto-confirmed: {}", booking.getBookingCode());
+            
+            // Send confirmation email
+            try {
+                emailService.sendBookingConfirmation(booking);
+            } catch (Exception e) {
+                log.error("Failed to send confirmation email for auto-confirmed booking: {}", booking.getBookingCode(), e);
+            }
         }
     }
     

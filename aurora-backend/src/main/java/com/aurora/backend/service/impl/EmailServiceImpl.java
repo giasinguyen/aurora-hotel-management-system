@@ -3,6 +3,7 @@ package com.aurora.backend.service.impl;
 import com.aurora.backend.config.MailjetConfig;
 import com.aurora.backend.entity.Booking;
 import com.aurora.backend.entity.BookingRoom;
+import com.aurora.backend.repository.BookingRepository;
 import com.aurora.backend.service.EmailService;
 import com.mailjet.client.MailjetClient;
 import com.mailjet.client.MailjetRequest;
@@ -14,6 +15,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 import org.thymeleaf.spring6.SpringTemplateEngine;
@@ -33,13 +35,21 @@ public class EmailServiceImpl implements EmailService {
 
     private final MailjetClient mailjetClient;
     private final MailjetConfig mailjetConfig;
+    private final BookingRepository bookingRepository;
     
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy");
     private static final DateTimeFormatter DATETIME_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm");
 
     @Override
+    @Transactional
     public void sendBookingConfirmation(Booking booking) {
         try {
+            // Reload booking to get the latest emailSent flag from DB
+            Booking freshBooking = bookingRepository.findById(booking.getId()).orElse(booking);
+            if (Boolean.TRUE.equals(freshBooking.getEmailSent())) {
+                log.info("=== EMAIL SERVICE: Email already sent for booking: {}, skipping duplicate", booking.getBookingCode());
+                return;
+            }
             log.info("=== EMAIL SERVICE: Starting email send for booking: {}", booking.getBookingCode());
             
             // Get customer email
@@ -106,6 +116,7 @@ public class EmailServiceImpl implements EmailService {
                 log.info("=== EMAIL SERVICE: ✅ Email sent successfully to: {} for booking: {}", 
                     customerEmail, booking.getBookingCode());
                 booking.setEmailSent(true);
+                bookingRepository.save(booking);
             } else {
                 log.error("=== EMAIL SERVICE: ❌ Failed to send email. Status: {}, Response: {}", 
                     response.getStatus(), response.getData());
