@@ -16,7 +16,6 @@ import java.io.IOException;
 @Configuration
 @RequiredArgsConstructor
 @Slf4j
-@Profile({"dev", "local"})
 public class DocumentSeeder {
 
     private final DocumentService documentService;

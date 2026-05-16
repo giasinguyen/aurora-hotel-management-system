@@ -55,6 +55,23 @@ export default function ChatWidget() {
     (state) => state.rag
   );
 
+  // Get auth state — reset chat when login/logout
+  const isLogin = useAppSelector((state) => state.auth.isLogin);
+  const prevIsLoginRef = React.useRef<boolean>(isLogin);
+
+  React.useEffect(() => {
+    if (prevIsLoginRef.current !== isLogin) {
+      // Auth state changed — reset chat session so stale history is cleared
+      chatIdRef.current = "";
+      prevIsLoginRef.current = isLogin;
+      // Close existing WebSocket so it reconnects fresh
+      if (wsRef.current) {
+        wsRef.current.close();
+        wsRef.current = null;
+      }
+    }
+  }, [isLogin]);
+
   // Get messages directly from Redux
   const messages = React.useMemo(() => {
     const session = sessions[currentChatId];
